@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react'
-import { Navbar } from '../components'
 import axios from 'axios'
 import getStripe from '../lib/stripe'
+import { useSession } from 'next-auth/client'
+import { Loader } from '../components/util'
 
 export default function Home({ products }) {
+	const [session, loading] = useSession()
 	const buy = async (price) => {
+		const mode = price.type === 'recurring' ? 'subscription' : 'payment'
 		const {
 			data: { id }
 		} = await axios.post(`/api/checkout_sessions`, {
-			items: [{ price: price.id, quantity: 1 }]
+			items: [{ price: price.id, quantity: 1 }],
+			mode,
+			email: session === null ? '' : session.user.email
 		})
 
 		const stripe = await getStripe()
@@ -17,9 +21,10 @@ export default function Home({ products }) {
 		})
 	}
 
-	return (
+	return loading ? (
+		<Loader loading={loading} />
+	) : (
 		<>
-			<Navbar />
 			{products.map((product, index) => (
 				<div
 					key={index}
@@ -34,12 +39,17 @@ export default function Home({ products }) {
 	)
 }
 
-export async function getServerSideProps(context) {
-	const { data } = await axios.get('http://localhost:3000/api/list_products')
-
-	return {
-		props: {
-			products: data
+export async function getServerSideProps() {
+	try {
+		const { data } = await axios.get(
+			'http://localhost:3000/api/list_products'
+		)
+		return {
+			props: {
+				products: data
+			}
 		}
+	} catch (error) {
+		console.error(error)
 	}
 }

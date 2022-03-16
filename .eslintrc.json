@@ -1,3 +1,22 @@
 {
-  "extends": "next/core-web-vitals"
+	"extends": "next/core-web-vitals",
+	"rules": {
+		"semi": ["off"],
+		"require-await": ["error"],
+		"no-var": ["error"],
+		"no-unused-vars": ["warn"],
+		"no-console": ["warn"],
+		"eqeqeq": ["error"],
+		"no-extra-semi": ["error"],
+		"no-undef": ["error"],
+		"import/no-anonymous-default-export": [
+			"error",
+			{
+				"allowAnonymousFunction": true
+			}
+		]
+	},
+	"env": {
+		"es6": true
+	}
 }

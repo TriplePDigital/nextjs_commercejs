@@ -1,13 +1,5 @@
 import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
-import * as Fauna from 'faunadb'
-import { FaunaAdapter } from '@next-auth/fauna-adapter'
-
-const client = new Fauna.Client({
-	secret: process.env.FAUNA_KEY,
-	domain: 'db.us.fauna.com'
-})
-const q = Fauna.query
 
 export default NextAuth({
 	providers: [
@@ -24,5 +16,9 @@ export default NextAuth({
 	],
 	session: {
 		jwt: true
-	}
+	},
+	jwt: {
+		secret: process.env.JWT_SECRET
+	},
+	database: process.env.DATABASE_URL
 })

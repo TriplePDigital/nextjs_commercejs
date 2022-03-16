@@ -2,9 +2,6 @@ import axios from 'axios'
 import useSWR from 'swr'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Navbar } from '../components'
-
-export const fetcher = (url) => axios.get(url).then((res) => res.data)
 
 export default function Success() {
 	const {
@@ -13,20 +10,12 @@ export default function Success() {
 
 	//clear shopping cart
 
-	const { data, error } = useSWR(
-		() => `/api/checkout_sessions/${session_id}`,
-		fetcher
-	)
+	const { data, error } = useSWR(() => `/api/checkout_sessions/${session_id}`)
 
 	useEffect(() => {
 		if (data) {
 			console.log(data)
 		}
 	}, [data])
-	return (
-		<>
-			<Navbar />
-			Thank you for your order!
-		</>
-	)
+	return <>Thank you for your order!</>
 }
