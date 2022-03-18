@@ -3,17 +3,32 @@ import { Provider } from 'next-auth/client'
 import { Layout } from '../components/Layout'
 import { SWRConfig } from 'swr'
 import axios from 'axios'
+import { createContext, useState } from 'react'
 
-const fetcher = (url) => axios.get(url).then((res) => res.data)
+export const UserContext = createContext({
+	user: {},
+	setUser: () => {}
+})
+
+const fetcher = (url) =>
+	axios
+		.get(url)
+		.then((res) => res.data)
+		.catch((err) => {
+			throw err
+		})
 
 function MyApp({ Component, pageProps }) {
+	const [user, setUser] = useState()
 	return (
 		<Provider session={pageProps.session}>
-			<SWRConfig value={{ fetcher }}>
-				<Layout>
-					<Component {...pageProps} />
-				</Layout>
-			</SWRConfig>
+			<UserContext.Provider value={{ user, setUser }}>
+				<SWRConfig value={{ fetcher }}>
+					<Layout>
+						<Component {...pageProps} />
+					</Layout>
+				</SWRConfig>
+			</UserContext.Provider>
 		</Provider>
 	)
 }
