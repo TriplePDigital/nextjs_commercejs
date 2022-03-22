@@ -125,8 +125,6 @@ export async function getServerSideProps() {
 		`http://localhost:1337/api/profiles?${profileQuery}`
 	)
 
-	console.log(`http://localhost:1337/api/profiles?${profileQuery}`)
-
 	const myCourses = await fetcher(`
     *[_type == 'explorer']{
         ...,
