@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { RiShutDownLine } from 'react-icons/ri'
 import { useContext } from 'react'
 import { UserContext } from '../../pages/_app'
+import { BsFillPersonFill } from 'react-icons/bs'
 
 export default function Navbar() {
 	const [session, loading] = useSession()
@@ -48,7 +49,7 @@ export default function Navbar() {
 						>
 							Sign in
 						</button>
-					) : loading ? (
+					) : loading && !session ? (
 						<Loader />
 					) : (
 						<>
@@ -64,19 +65,23 @@ export default function Navbar() {
 							</button>
 							<div className="bg-ncrma-100 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center">
 								<div className="h-8 w-8 rounded-full mr-2 overflow-hidden">
-									<Image
-										src={session?.user?.image}
-										alt="Profile picture"
-										width={4}
-										height={4}
-										layout="responsive"
-										quality={50}
-									/>
+									{/* {session || session?.user?.image ? (
+										<Image
+											src={session?.user?.image}
+											alt="Profile picture"
+											width={4}
+											height={4}
+											layout="responsive"
+											quality={50}
+										/>
+									) : (
+										<BsFillPersonFill />
+									)} */}
 								</div>
 								<span
 									className={`inline-block capitalize mr-2 font-semibold leading-loose tracking-wide`}
 								>
-									{session.user.name.toLowerCase()}!
+									{/* {session?.user?.name.toLowerCase()}! */}
 								</span>
 								<button
 									className="cursor-pointer"
