@@ -1,9 +1,12 @@
+const colors = require('tailwindcss/colors')
+
 module.exports = {
 	purge: [
 		'./pages/**/*.{js,ts,jsx,tsx}',
 		'./components/**/*.{js,ts,jsx,tsx}'
 	],
-	darkMode: false, // or 'media' or 'class'
+	mode: 'jit',
+	darkMode: 'media', // or 'media' or 'class'
 	theme: {
 		extend: {
 			colors: {
@@ -19,14 +22,12 @@ module.exports = {
 					700: '#32797B',
 					800: '#225153',
 					900: '#122A2B'
-				}
+				},
+				green: colors.emerald,
+				yellow: colors.amber,
+				purple: colors.violet,
+				gray: colors.neutral
 			}
 		}
-	},
-	variants: {
-		extend: {
-			opacity: ['disabled']
-		}
-	},
-	plugins: []
+	}
 }
