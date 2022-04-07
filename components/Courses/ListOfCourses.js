@@ -6,8 +6,7 @@ import Loader from '../util/Loader'
 import { FaUserGraduate } from 'react-icons/fa'
 
 export default function ListOfCourses({ course, key }) {
-	const { attributes } = course
-	console.log(attributes)
+	// const { attributes } = course
 	return !course ? (
 		<Loader />
 	) : (
@@ -32,7 +31,7 @@ export default function ListOfCourses({ course, key }) {
 					textColor="white"
 				/> */}
 				<div className="relative h-44 w-full">
-					<Image
+					{/* <Image
 						src={`http://localhost:1337${attributes?.cover.data.attributes.url}`}
 						layout="fill"
 						objectFit="cover"
@@ -41,15 +40,27 @@ export default function ListOfCourses({ course, key }) {
 						alt={attributes?.cover.data.attributes.caption}
 						placeholder="blur"
 						blurDataURL={`http://localhost:1337${attributes?.cover.data.attributes.formats.thumbnail.url}`}
+					/> */}
+					<Image
+						{...imgConstructor(course.coverImage.asset)}
+						layout="fill"
+						objectFit="cover"
+						objectPosition="center"
+						quality={100}
+						alt={course.blurb}
+						placeholder="blur"
 					/>
 					<div className="bg-red-500 opacity-75 absolute left-0 top-0 h-full w-full"></div>
 				</div>
 				<div className="p-3">
 					{/* course title */}
 					<h1 className="font-semibold text-xl">
-						<Link passHref href={`/mission/${attributes?.slug}`}>
+						<Link
+							passHref
+							href={`/mission/${course?.slug.current}/${course?.stages[0]?.slug.current}/1`}
+						>
 							<a className="text-black font-bold text-xl">
-								{attributes?.title}
+								{course?.title}
 							</a>
 						</Link>
 					</h1>
@@ -58,10 +69,14 @@ export default function ListOfCourses({ course, key }) {
 					<div className="w-full bg-ncrma-300 rounded-full h-full my-3">
 						<div
 							className="bg-ncrma-600 rounded-full px-4 text-white"
-							style={{ width: `67%` }}
+							style={{
+								width: `${(
+									Math.floor(Math.random() * 100) + 1
+								).toString()}%`
+							}}
 						>
 							{' '}
-							{67}%
+							{Math.floor(Math.random() * 100) + 1}%
 						</div>
 					</div>
 
@@ -72,24 +87,23 @@ export default function ListOfCourses({ course, key }) {
 							<p className="text-gray-600">Enrolled:</p>
 						</div>
 						<span className="font-semibold ml-2">
-							{attributes.enrollments.data.length}
+							{course?.enrollment.length}
 						</span>
 					</div>
 
 					{/* instructors being mapped out */}
 					<ul>
-						{attributes?.instructors.data.map(
-							(instructor, index) => (
-								<li
-									className="text-base text-gray-600 underline"
-									key={index}
-								>
-									{instructor.attributes.firstName},{' '}
-									{instructor.attributes.middleName || ''},{' '}
-									{instructor.attributes.lastName}
-								</li>
-							)
-						)}
+						{course?.instructors.map((instructor, index) => (
+							<Link
+								href={`user/${instructor._id}`}
+								key={index}
+								passHref={true}
+							>
+								<a className="text-base text-gray-600 underline block">
+									{instructor.name}
+								</a>
+							</Link>
+						))}
 					</ul>
 				</div>
 			</div>

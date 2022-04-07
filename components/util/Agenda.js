@@ -4,7 +4,7 @@ const getRandomInt = (min, max) => {
 
 export default function Agenda({ time, title }) {
 	return (
-		<div className="bg-ncrma-300 px-6 py-8 my-3 rounded flex lg:flex-row flex-col text-center justify-between uppercase font-semibold relative overflow-hidden">
+		<div className="bg-ncrma-300 px-6 py-8 my-3 rounded flex lg:flex-row flex-col text-center justify-between uppercase font-semibold relative overflow-hidden items-center">
 			<p className="text-white font-light lg:my-0 my-1 z-10">{time}</p>
 			<p className="z-10">{title}</p>
 			<Blob />

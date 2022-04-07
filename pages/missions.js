@@ -1,19 +1,18 @@
 import { Loader } from '../components/util'
-import { fetcher } from '../util/fetcher'
+import { fetcher } from '@/util/fetcher'
 import { FaTrophy } from 'react-icons/fa'
 import { ListOfCourses, Webinar } from '../components/Courses'
 import axios from 'axios'
 import qs from 'qs'
 import { useContext } from 'react'
 import { UserContext } from '../pages/_app'
+import { getSession } from 'next-auth/client'
 
-export default function Course({ courses, myCourses, missions, profile }) {
-	console.log(missions, profile)
-
+export default function Course({ courses, explorer, webinar }) {
 	/* pulling user's context from _app */
 	const { user } = useContext(UserContext)
 
-	return !courses || !missions ? (
+	return !courses || !explorer ? (
 		<Loader />
 	) : (
 		<div className="flex flex-row w-full mt-5">
@@ -52,114 +51,139 @@ export default function Course({ courses, myCourses, missions, profile }) {
 				</div>
 				<h1 className="text-4xl font-semibold mt-5">My Courses</h1>
 				<div className="flex flex-row flex-wrap mt-2">
-					{missions.map((course, index) => (
+					{/* {explorer.missions.map((course, index) => (
 						<ListOfCourses key={index} course={course} />
-					))}
+					))} */}
 				</div>
-				{/* <h1 className="text-4xl font-semibold mt-5">
+				<h1 className="text-4xl font-semibold mt-5">
 					Recommended Courses
 				</h1>
 				<div className="flex flex-row flex-wrap mt-2">
-					{myCourses[0].missions.map((course, index) => (
+					{courses.map((course, index) => (
 						<ListOfCourses key={index} course={course} />
 					))}
-				</div> */}
+				</div>
 			</section>
-			<Webinar />
+			<Webinar webinar={webinar[0]} />
 		</div>
 	)
 }
 
-export async function getServerSideProps() {
-	const q = qs.stringify(
-		{
-			populate: {
-				stages: {
-					populate: {
-						videos: {
-							populate: '*'
-						}
-					}
-				},
-				instructors: {
-					populate: '*'
-				},
-				cover: {
-					populate: '*'
-				},
-				enrollments: {
-					populate: {
-						user: {
-							populate: '*'
-						}
-					}
-				}
+export async function getServerSideProps({ ctx }) {
+	const session = await getSession(ctx)
+	// TODO: figure out a way to block requests from users who don't have a session
+	if (false) {
+		// was !sessions before
+		return {
+			redirect: {
+				destination: '/api/auth/signin',
+				permanent: false
 			}
-		},
-		{
-			encodeValuesOnly: true
 		}
-	)
-	const missions = await axios.get(`http://localhost:1337/api/missions?${q}`)
+	} else {
+		// const q = qs.stringify(
+		// 	{
+		// 		populate: {
+		// 			stages: {
+		// 				populate: {
+		// 					videos: {
+		// 						populate: '*'
+		// 					}
+		// 				},
+		// 				sort: 'order_in_course'
+		// 			},
+		// 			instructors: {
+		// 				populate: '*'
+		// 			},
+		// 			cover: {
+		// 				populate: '*'
+		// 			},
+		// 			enrollments: {
+		// 				populate: {
+		// 					user: {
+		// 						populate: '*'
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	},
+		// 	{
+		// 		encodeValuesOnly: true
+		// 	}
+		// )
+		// const missions = await axios.get(`http://localhost:1337/api/missions?${q}`)
 
-	const profileQuery = qs.stringify(
-		{
-			populate: {
-				enrollments: {
-					populate: {
-						mission: {
-							populate: '*'
-						},
-						user: {
-							populate: '*'
-						}
-					}
-				}
-			}
-		},
-		{
-			encodeValuesOnly: true
-		}
-	)
-	const profile = await axios.get(
-		`http://localhost:1337/api/profiles?${profileQuery}`
-	)
+		// const profileQuery = qs.stringify(
+		// 	{
+		// 		populate: {
+		// 			enrollments: {
+		// 				populate: {
+		// 					mission: {
+		// 						populate: '*'
+		// 					},
+		// 					user: {
+		// 						populate: '*'
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	},
+		// 	{
+		// 		encodeValuesOnly: true
+		// 	}
+		// )
+		// const profile = await axios.get(
+		// 	`http://localhost:1337/api/profiles?${profileQuery}`
+		// )
 
-	const myCourses = await fetcher(`
+		const explorer = await fetcher(`
     *[_type == 'explorer']{
         ...,
-        achievements[] -> {
-            ...
-        },
+        achievements[] -> {...},
         missions[] -> {
             ...,
             coverImage{
-            asset ->
+            	asset ->
             },
-            instructors[]-> {name}
+            instructors[]-> {_id, name},
+			enrollment[]->{...}
         }
     }`)
 
-	const course = await fetcher(`*[_type == 'mission']{
+		const course = await fetcher(`*[_type == 'mission']{
                 ...,
                 coverImage{
                     asset->
                 },
-                instructors[]-> {name},
-                stages[]->{title, slug}
+                instructors[]-> {_id, name},
+                stages[]->{title, slug},
+				enrollment[]->{...}
         }`)
 
-	if (!course) {
-		return {
-			notFound: true
-		}
-	} else {
-		return {
-			props: {
-				courses: course,
-				myCourses: myCourses,
-				missions: missions.data.data,
-				profile: profile.data.data
+		const webinar = await fetcher(`*[_type == 'webinar' ]{
+  ...,
+  presenters[]->{
+    ...,
+    avatar {
+    ...,
+    asset ->
+  }
+  },
+}`)
+
+		if (!course) {
+			return {
+				notFound: true
+			}
+		} else {
+			return {
+				props: {
+					courses: course,
+					explorer,
+					webinar
+					// missions: missions.data.data,
+					// profile: profile.data.data
+				}
 			}
 		}
 	}
