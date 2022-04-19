@@ -37,3 +37,5 @@ README.code-workspace
 
 # Sentry
 .sentryclirc
+
+.idea/
