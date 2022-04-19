@@ -1,5 +1,5 @@
 import 'tailwindcss/tailwind.css'
-import { Provider } from 'next-auth/client'
+import { Provider, useSession } from 'next-auth/client'
 import { Layout } from '../components/Layout'
 import { SWRConfig } from 'swr'
 import { createContext, useState } from 'react'
@@ -19,7 +19,8 @@ export const UserContext = createContext({
 // 		})
 
 function MyApp({ Component, pageProps }) {
-	const [user, setUser] = useState()
+	const [user, setUser] = useState(null)
+
 	return (
 		<Provider session={pageProps.session}>
 			<UserContext.Provider value={{ user, setUser }}>

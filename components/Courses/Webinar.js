@@ -31,7 +31,7 @@ export default function Webinar({ webinar }) {
 	}
 	return (
 		<>
-			<aside className="w-1/4 bg-gray-100 px-4 py-6 ml-4 shadow-md border rounded min-h-screen">
+			<aside className="w-1/4 bg-gray-100 px-4 py-6 ml-4 shadow-md border rounded h-full">
 				<h1 className="text-2xl mb-4 font-semibold">{webinar.title}</h1>
 				<p className="text-gray-600 tracking-wide mb-2">
 					{webinar.description}

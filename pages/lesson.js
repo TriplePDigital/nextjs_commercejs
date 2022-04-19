@@ -22,8 +22,6 @@ export default function Lesson({ data, content, chapters }) {
 	const currentStage = stages?.data[stageIndex]?.attributes
 	const currentContent = content[contentIndex].attributes
 
-	console.log(mission)
-	console.log(content)
 	return !data ? (
 		<Loader />
 	) : (

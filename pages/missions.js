@@ -2,17 +2,32 @@ import { Loader } from '../components/util'
 import { fetcher } from '@/util/fetcher'
 import { FaTrophy } from 'react-icons/fa'
 import { ListOfCourses, Webinar } from '../components/Courses'
-import axios from 'axios'
-import qs from 'qs'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../pages/_app'
-import { getSession } from 'next-auth/client'
+import { getSession, useSession } from 'next-auth/client'
+import { useRouter } from 'next/router'
+import { getToken } from 'next-auth/jwt'
 
-export default function Course({ courses, explorer, webinar }) {
+export default function Course({ webinar, plan, tracks }) {
 	/* pulling user's context from _app */
 	const { user } = useContext(UserContext)
+	const [session, loading] = useSession()
+	const [missions, setMissions] = useState(null)
+	const [stages, setStages] = useState(null)
+	const router = useRouter()
 
-	return !courses || !explorer ? (
+	console.log(plan)
+
+	useEffect(() => {
+		// setMissions(plan.activities.filter((i) => i.mission))
+		// setStages(plan.activities.filter((i) => i.stage))
+	}, [plan.activities])
+
+	if (!session) {
+		return router.push('/auth/login')
+	}
+
+	return loading ? (
 		<Loader />
 	) : (
 		<div className="flex flex-row w-full mt-5">
@@ -51,116 +66,95 @@ export default function Course({ courses, explorer, webinar }) {
 				</div>
 				<h1 className="text-4xl font-semibold mt-5">My Courses</h1>
 				<div className="flex flex-row flex-wrap mt-2">
-					{/* {explorer.missions.map((course, index) => (
-						<ListOfCourses key={index} course={course} />
-					))} */}
+					{/*{missions*/}
+					{/*	? missions.map((course, index) => (*/}
+					{/*			<ListOfCourses*/}
+					{/*				key={index}*/}
+					{/*				course={course.mission}*/}
+					{/*				progress={course.progress}*/}
+					{/*			/>*/}
+					{/*	  ))*/}
+					{/*	: null}*/}
 				</div>
-				<h1 className="text-4xl font-semibold mt-5">
-					Recommended Courses
-				</h1>
-				<div className="flex flex-row flex-wrap mt-2">
-					{courses.map((course, index) => (
-						<ListOfCourses key={index} course={course} />
-					))}
-				</div>
+				{tracks.map((track, i) => (
+					<div key={i}>
+						<h1 className="text-4xl font-semibold mt-5">
+							{track.Name}
+						</h1>
+						<div className="flex flex-row flex-wrap mt-2">
+							{track.missions
+								? track.missions.map((course, index) => (
+										<ListOfCourses
+											key={index}
+											course={course}
+											progress={false}
+										/>
+								  ))
+								: null}
+						</div>
+					</div>
+				))}
 			</section>
-			<Webinar webinar={webinar[0]} />
+			<Webinar webinar={webinar} />
 		</div>
 	)
 }
 
-export async function getServerSideProps({ ctx }) {
+export async function getServerSideProps(ctx) {
+	const token = await getToken({
+		req: ctx.req,
+		secret: process.env.JWT_SECRET
+	})
 	const session = await getSession(ctx)
-	// TODO: figure out a way to block requests from users who don't have a session
-	if (false) {
-		// was !sessions before
-		return {
-			redirect: {
-				destination: '/api/auth/signin',
-				permanent: false
-			}
-		}
-	} else {
-		// const q = qs.stringify(
-		// 	{
-		// 		populate: {
-		// 			stages: {
-		// 				populate: {
-		// 					videos: {
-		// 						populate: '*'
-		// 					}
-		// 				},
-		// 				sort: 'order_in_course'
-		// 			},
-		// 			instructors: {
-		// 				populate: '*'
-		// 			},
-		// 			cover: {
-		// 				populate: '*'
-		// 			},
-		// 			enrollments: {
-		// 				populate: {
-		// 					user: {
-		// 						populate: '*'
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	},
-		// 	{
-		// 		encodeValuesOnly: true
-		// 	}
-		// )
-		// const missions = await axios.get(`http://localhost:1337/api/missions?${q}`)
+	console.log({token, session})
+	// const token = await getToken({ req: ctx.request, secret: process.env.JWT_SECRET })
+	// console.log("JSON Web Token", token)
+	const tracks = await fetcher(`
+    *[_type == 'track']{
+...,
+  missions[] -> {..., instructors[]->,coverImage{
+    asset->
+  }},
+  achievement ->{
+    title,
+    slug
+  }
+}`)
 
-		// const profileQuery = qs.stringify(
-		// 	{
-		// 		populate: {
-		// 			enrollments: {
-		// 				populate: {
-		// 					mission: {
-		// 						populate: '*'
-		// 					},
-		// 					user: {
-		// 						populate: '*'
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	},
-		// 	{
-		// 		encodeValuesOnly: true
-		// 	}
-		// )
-		// const profile = await axios.get(
-		// 	`http://localhost:1337/api/profiles?${profileQuery}`
-		// )
-
-		const explorer = await fetcher(`
-    *[_type == 'explorer']{
-        ...,
-        achievements[] -> {...},
-        missions[] -> {
+	const plan = await fetcher(`
+			*[_type == "plan" && user._ref in *[_type=="user" && email=="${session?.user?.email}"]._id ]{
+\t\t\t...,
+\t\t\t user ->,
+\t\t\t missions[] -> {
+\t\t\t\t...,
+\t\t\t\t coverImage {
+\t\t\t\t\t...,
+\t\t\t\t\t asset ->
+\t\t\t\t},
+\t\t\t\t instructors[] ->
+\t\t\t},
+\t\t\t progress -> {
+\t\t\t\t...,
+        completedCheckpoints[] ->,
+\t\t\t\tinProgress [] {
+          ...,
+\t\t\t\t  mission -> {
             ...,
-            coverImage{
-            	asset ->
-            },
-            instructors[]-> {_id, name},
-			enrollment[]->{...}
-        }
-    }`)
+\t\t\t\t    slug{
+\t\t\t\t        current
+\t\t\t\t    }
+\t\t\t\t  },
+          stage ->,
+          checkpoint ->,
+\t\t\t\t  progress
+\t\t\t\t}
+\t\t\t}
+\t\t}[0]
+`)
 
-		const course = await fetcher(`*[_type == 'mission']{
-                ...,
-                coverImage{
-                    asset->
-                },
-                instructors[]-> {_id, name},
-                stages[]->{title, slug},
-				enrollment[]->{...}
-        }`)
-
-		const webinar = await fetcher(`*[_type == 'webinar' ]{
+	//TODO: fetch the latest webinar only and all the rest in a different query for either this page or the MMP
+	const webinar =
+		await fetcher(`*[_type == 'webinar' ] | order(releaseDateDesc){
   ...,
   presenters[]->{
     ...,
@@ -169,21 +163,20 @@ export async function getServerSideProps({ ctx }) {
     asset ->
   }
   },
-}`)
+}[0]`)
 
-		if (!course) {
-			return {
-				notFound: true
-			}
-		} else {
-			return {
-				props: {
-					courses: course,
-					explorer,
-					webinar
-					// missions: missions.data.data,
-					// profile: profile.data.data
-				}
+	if (!plan) {
+		return {
+			notFound: true
+		}
+	} else {
+		return {
+			props: {
+				tracks,
+				webinar,
+				plan: plan
+				// missions: missions.data.data,
+				// profile: profile.data.data
 			}
 		}
 	}

@@ -2,13 +2,31 @@ import { Navbar } from '../Nav'
 import { Footer } from './'
 import { useSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
+import Loader from 'react-spinners/ClipLoader'
+import { isActive } from '@/util/isActive'
+import { useEffect } from 'react'
 
 export default function Layout({ children }) {
 	const [session, loading] = useSession()
 	const router = useRouter()
-	console.log(router)
-	console.log(session)
-	return (
+
+	useEffect(() => {
+		if (
+			session &&
+			!isActive(session?.user?.email) &&
+			!router?.pathname.includes('login')
+		) {
+			router.push(`/auth/welcome?email=${session?.user?.email}`)
+		} else {
+			return null
+		}
+	}, [session])
+
+	return loading ? (
+		<div className="w-full h-screen flex justify-center items-center text-center">
+			<Loader size={96} />
+		</div>
+	) : (
 		<>
 			{router?.pathname.includes('login') ? null : <Navbar />}
 			<main
@@ -18,14 +36,7 @@ export default function Layout({ children }) {
 			>
 				{children}
 			</main>
-			{/* <Footer /> */}
+			<Footer />
 		</>
 	)
-}
-
-export async function getServerSideProps(ctx) {
-	// const res = await fetcher(`
-	// *[_type == 'explorer' && email == '${session?.user?.email}']{
-	//     ...,
-	// }`)
 }
