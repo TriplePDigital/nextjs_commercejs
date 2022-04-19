@@ -43,21 +43,21 @@ const options = {
 						{
 							to: email,
 							from,
-							subject: `Authentication code: ${token}`,
-							text: `Authentication code: ${token}`,
+							subject: `🪄 NCRMA Learning Management System - Prompt for Authentication code: ${token}`,
+							text: `${token}`,
 							html: `
 							<body style="background: #f9f9f9;">
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
       <td align="center" style="padding: 10px 0px 20px 0px; font-size: 22px; font-family: Helvetica, Arial, sans-serif; color: #444444;">
-        <strong>localhost:3000</strong>
+        <strong>${url}</strong>
       </td>
     </tr>
   </table>
   <table width="100%" border="0" cellspacing="20" cellpadding="0" style="background: #ffffff; max-width: 600px; margin: auto; border-radius: 10px;">
     <tr>
       <td align="center" style="padding: 10px 0px 0px 0px; font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #444444;">
-        Sign in as <strong>papp&#8203;.dany77@icloud&#8203;.com</strong>
+        Sign in as <strong>${encodeURI(email)}</strong>
       </td>
     </tr>
     <tr>
@@ -113,10 +113,13 @@ const options = {
 				console.log(user)
 
 				const res = await axios.get(
-					`https://us-east-1.aws.data.mongodb-api.com/app/application-0-wgzxo/endpoint/users?email=${email}`,
+					`${process.env.NEXT_PUBLIC_EDGE_URL}/getUser`,
 					{
 						method: 'GET',
-						headers: { 'Content-Type': 'application/json' }
+						headers: { 'Content-Type': 'application/json' },
+						params: {
+							email
+						}
 					}
 				)
 				const usr = await res.json()

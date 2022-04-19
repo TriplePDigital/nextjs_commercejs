@@ -3,16 +3,24 @@ import { signIn } from 'next-auth/client'
 import { FcGoogle } from 'react-icons/fc'
 import { FaMagic } from 'react-icons/fa'
 
-function getCallbackUrl() {
-	const urlParams = new URLSearchParams(window.location.search)
-	return urlParams.get('callbackUrl')
+function getCallbackUrl(email) {
+	try {
+		const urlParams = new URLSearchParams(window.location.search)
+		if (!urlParams) {
+			throw Error('Invalid callback URLs')
+		}
+		return urlParams.get('callbackUrl')
+		return `/auth/welcome?email=${encodeURI(email)}`
+	} catch (error) {
+		console.error(error)
+	}
 }
 
 function EmailForm({ onSubmit }) {
 	const [email, setEmail] = useState('')
 
 	const handleSignIn = async () => {
-		await signIn('email', { email, redirect: false })
+		await signIn('email', { email, redirect: false, callbackUrl: `/auth/welcome?email=${encodeURI(email)}` })
 		onSubmit(email)
 	}
 
@@ -36,7 +44,7 @@ function EmailForm({ onSubmit }) {
 						onChange={(event) => {
 							setEmail(event.target.value)
 						}}
-						autoComplete={true}
+						autoComplete={'true'}
 					/>
 				</div>
 				<button
@@ -67,7 +75,9 @@ function CodeForm({ email }) {
 	const urlParams = new URLSearchParams({
 		email,
 		token,
-		callbackUrl: getCallbackUrl()
+		callbackUrl: `http://localhost:3000/auth/welcome?email=${encodeURI(
+			email
+		)}`
 	})
 
 	return (
