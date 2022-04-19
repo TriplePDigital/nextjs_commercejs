@@ -10,9 +10,7 @@ export const configuredSanityClient = sanityClient({
 
 export default function imgConstructor(asset) {
 	try {
-		/* eslint-disable-next-line */
-		const imgProps = useNextSanityImage(configuredSanityClient, asset)
-		return imgProps
+		return useNextSanityImage(configuredSanityClient, asset)
 	} catch (error) {
 		throw new Error(error)
 	}
