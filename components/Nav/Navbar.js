@@ -92,7 +92,7 @@ export default function Navbar() {
 							</button>
 							<Link
 								href={
-									user ? `user/student/${user._id}` : '/user'
+									user ? `/user/student/${user._id}` : '/user'
 								}
 								passHref={true}
 							>
