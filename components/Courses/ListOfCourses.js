@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react'
 import { nanoid } from 'nanoid'
 
 export default function ListOfCourses({ course, key, progress }) {
-	console.log(course?.instructors)
 	return !course ? (
 		<Loader />
 	) : (
@@ -44,18 +43,19 @@ export default function ListOfCourses({ course, key, progress }) {
 					</h1>
 
 					{/* progress bar */}
-					{progress ? (<div className="w-full bg-ncrma-300 rounded-full h-full my-3">
-						<div
-							className="bg-ncrma-600 rounded-full px-4 text-white"
-							style={{
-								width: `${progress}%`
-							}}
-						>
-							{' '}
-							{progress}%
+					{progress ? (
+						<div className="w-full bg-ncrma-300 rounded-full h-full my-3">
+							<div
+								className="bg-ncrma-600 rounded-full px-4 text-white"
+								style={{
+									width: `${progress}%`
+								}}
+							>
+								{' '}
+								{progress}%
+							</div>
 						</div>
-					</div>) : null}
-
+					) : null}
 
 					{/* enrollment line */}
 					<div className="flex my-4">
@@ -64,7 +64,7 @@ export default function ListOfCourses({ course, key, progress }) {
 							<p className="text-gray-600">Enrolled:</p>
 						</div>
 						<span className="font-semibold ml-2">
-							{course?.enrollment.length}
+							{course?.enrollCount}
 						</span>
 					</div>
 
