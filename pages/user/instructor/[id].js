@@ -27,7 +27,7 @@ export async function getServerSideProps(ctx) {
 
 	return {
 		props: {
-			profile: profile.length > 0 ? profile[0] : {},
+			profile: profile.length > 0 ? profile[0] : {}
 		}
 	}
 }
