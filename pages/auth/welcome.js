@@ -2,23 +2,46 @@ import { useEffect, useState } from 'react'
 import { configuredSanityClient as client } from '@/util/img'
 import { useRouter } from 'next/router'
 import { Loader } from '@/components/util'
-import axios from 'axios'
+import axios, { post } from 'axios'
 import { fetcher } from '@/util/fetcher'
+import Image from 'next/image'
 
 export default function Welcome({ error, email, active, userID }) {
-	const [fullName, setFullName] = useState('')
-	const [asset, setAsset] = useState('')
+	const [firstName, setFirstName] = useState('')
+	const [lastName, setLastName] = useState('')
+	const [asset, setAsset] = useState(null)
+	const [createObjectURL, setCreateObjectURL] = useState(null)
 	const [em, setEmail] = useState('')
+	const [loading, setLoading] = useState(true)
 
 	const router = useRouter()
 
+	const uploadToClient = (event) => {
+		if (event.target.files && event.target.files[0]) {
+			const i = event.target.files[0]
+
+			const file = new File([i], i.name, { type: i.type })
+
+			setAsset(file)
+			setCreateObjectURL(URL.createObjectURL(i))
+		}
+	}
+
 	const updateUser = async () => {
 		const { data } = await axios.post(
-			`${process.env.NEXT_PUBLIC_EDGE_URL}/updateUser?email=${email}&fullName=${fullName}&image=${asset}`,
-			{}
+			`${process.env.NEXT_PUBLIC_EDGE_URL}/updateUser`,
+			{},
+			{
+				params: {
+					id: userID,
+					email,
+					firstName,
+					lastName
+				}
+			}
 		)
-		if (data.status === 'success') {
-			router.push('/dashboard')
+		if (data) {
+			return true
 		} else {
 			throw Error('Error while updating user')
 		}
@@ -27,31 +50,35 @@ export default function Welcome({ error, email, active, userID }) {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		try {
-			await client.create({
+			let res = await client.create({
 				_type: 'user',
 				account_id: userID,
 				active: true,
-				name: fullName,
-				image: asset,
+				firstName,
+				lastName,
 				email: em.length > 0 ? em : email
-			}) // Document
-			//TODO: Update document in MongoDB using image path and name
-			await router.push('/')
+			})
+
+			setLoading(true)
+
+			//Update document in MongoDB
+			if (await updateUser()) {
+				setLoading(false)
+				router.push('/')
+			}
 		} catch (error) {
 			throw new Error(error)
 		}
 	}
 
 	useEffect(() => {
-		if (error && error.length > 0 && userID && active) {
-			router.push('/')
-		}
 		if (active) {
 			router.push('/')
 		}
+		setLoading(false)
 	}, [])
 
-	return em ? (
+	return em && loading ? (
 		<Loader />
 	) : (
 		<section className="text-center">
@@ -72,31 +99,49 @@ export default function Welcome({ error, email, active, userID }) {
 				className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-1/3 flex flex-col border border-gray-100 mx-auto"
 				onSubmit={handleSubmit}
 			>
+				{createObjectURL ? (
+					<div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden">
+						<Image
+							src={createObjectURL}
+							alt="avatar"
+							layout="fill"
+							objectFit="cover"
+							objectPosition="center"
+							quality={50}
+						/>
+					</div>
+				) : null}
 				<input
-					className="my-1 px-3 py-1.5 border rounded mx-auto w-1/2 focus:ring"
-					type="text"
-					placeholder="Full name"
-					value={fullName}
-					onChange={(e) => setFullName(e.target.value)}
+					className="my-1 px-3 py-1.5 border rounded mx-auto w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white"
+					type="file"
+					placeholder="URL to image"
+					onChange={(e) => uploadToClient(e)}
 				/>
 				<input
-					className="my-1 px-3 py-1.5 border rounded mx-auto w-1/2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white"
+					className="my-1 px-3 py-1.5 border rounded mx-auto w-full focus:ring"
+					type="text"
+					placeholder="First name"
+					value={firstName}
+					onChange={(e) => setFirstName(e.target.value)}
+				/>
+				<input
+					className="my-1 px-3 py-1.5 border rounded mx-auto w-full focus:ring"
+					type="text"
+					placeholder="Last name"
+					value={lastName}
+					onChange={(e) => setLastName(e.target.value)}
+				/>
+				<input
+					className="my-1 px-3 py-1.5 border rounded mx-auto w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white"
 					type="email"
 					placeholder="example@example.com"
 					value={email}
 					disabled={!error}
 					onChange={(e) => setEmail(e.target.value)}
 				/>
-				<input
-					className="my-1 px-3 py-1.5 border rounded mx-auto w-1/2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white"
-					type="text"
-					placeholder="URL to image"
-					value={asset}
-					onChange={(e) => setAsset(e.target.value)}
-				/>
 				<button
 					type="submit"
-					className="bg-blue-500 hover:bg-blue-700 rounded text-white py-4 w-1/3 mx-auto mt-4 "
+					className="bg-blue-500 hover:bg-blue-700 rounded text-white py-4 w-2/3 mx-auto mt-4 "
 				>
 					Save Profile
 				</button>
@@ -106,40 +151,44 @@ export default function Welcome({ error, email, active, userID }) {
 }
 
 export async function getServerSideProps(ctx) {
-	const { email } = await ctx.query
+	try {
+		const { email } = await ctx.query
 
-	const query = `*[_type == "user" && email == "${email}"]{...}`
-	const userCheck = await fetcher(query)
+		const query = `*[_type == "user" && email == "${email}"]{...}`
+		const userCheck = await fetcher(query)
 
-	if (userCheck.length > 0) {
-		return {
-			props: {
-				error: 'User already exists',
-				userID: userCheck[0]._id,
-				active: userCheck[0].active
+		if (userCheck.length > 0) {
+			return {
+				props: {
+					error: 'User already exists',
+					userID: userCheck[0]._id,
+					active: userCheck[0].active
+				}
 			}
 		}
-	}
 
-	const url = `https://us-east-1.aws.data.mongodb-api.com/app/application-0-wgzxo/endpoint/users?email=${await email}`
+		try {
+			let res = await axios.get(
+				`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
+				{
+					params: { email }
+				}
+			)
 
-	const res = await axios.get(url)
+			res = JSON.parse(res.data)
 
-	if (res.data.length === 0) {
-		return {
-			props: {
-				error: 'User not found'
+			return {
+				props: {
+					error: false,
+					email,
+					userID: res._id,
+					active: false
+				}
 			}
+		} catch (error) {
+			throw Error(error)
 		}
-	} else {
-		const user = await JSON.parse(res.data)
-		return {
-			props: {
-				error: false,
-				email,
-				userID: user._id,
-				active: false
-			}
-		}
+	} catch (error) {
+		throw new Error(error)
 	}
 }
