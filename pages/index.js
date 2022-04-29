@@ -21,5 +21,5 @@ export default function Home({ missions }) {
 		)
 	}
 
-	return <button onClick={() => signIn('google')}>Sign In</button>
+	return <button onClick={() => signIn('google')}>Sign In with google</button>
 }

@@ -109,7 +109,12 @@ export default function Navbar() {
 										</span>
 										<button
 											className="cursor-pointer"
-											onClick={() => signOut()}
+											onClick={() =>
+												signOut({
+													callbackUrl:
+														'http://localhost:3000/auth/login'
+												})
+											}
 										>
 											<RiShutDownLine />
 										</button>

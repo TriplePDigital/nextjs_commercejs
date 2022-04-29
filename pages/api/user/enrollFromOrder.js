@@ -14,9 +14,7 @@ export default async function (req, res) {
 			const { transaction_id } = await req.body.event_body
 
 			const payment = await post(
-				`https://paybotic.transactiongateway.com/api/query.php?security_key=${
-					process.env.NEXT_PUBLIC_PAYBOTIC_KEY
-				}&transaction_id=${transaction_id}`
+				`https://paybotic.transactiongateway.com/api/query.php?security_key=${process.env.NEXT_PUBLIC_PAYBOTIC_KEY}&transaction_id=${transaction_id}`
 			)
 
 			const parser = new xml2js.Parser()

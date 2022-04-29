@@ -20,7 +20,11 @@ function EmailForm({ onSubmit }) {
 	const [email, setEmail] = useState('')
 
 	const handleSignIn = async () => {
-		await signIn('email', { email, redirect: false, callbackUrl: `/auth/welcome?email=${encodeURI(email)}` })
+		await signIn('email', {
+			email,
+			redirect: false,
+			callbackUrl: `/auth/welcome?email=${encodeURI(email)}`
+		})
 		onSubmit(email)
 	}
 

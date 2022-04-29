@@ -1,8 +1,11 @@
 {
-  "trailingComma": "none",
-  "semi": false,
-  "bracketSpacing": true,
-  "singleQuote": true,
-  "tabWidth": 4,
-  "useTabs": true
+	"trailingComma": "none",
+	"semi": false,
+	"bracketSpacing": true,
+	"singleQuote": true,
+	"tabWidth": 4,
+	"useTabs": true,
+	"plugins": [
+		"prettier-plugin-groq"
+	]
 }
