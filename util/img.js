@@ -8,9 +8,22 @@ export const configuredSanityClient = sanityClient({
 	useCdn: process.env.NODE_ENV === 'production'
 })
 
-export default function imgConstructor(asset) {
+export default function imgConstructor(
+	asset,
+	options = {
+		fit: null
+	}
+) {
 	try {
-		return useNextSanityImage(configuredSanityClient, asset)
+		const img = useNextSanityImage(configuredSanityClient, asset)
+		if (options.fit === 'fill') {
+			delete img['width']
+			delete img['height']
+			img.layout = 'fill'
+			img.objectFit = 'cover' || options.objFit
+			img.objectPosition = 'center' || options.objPos
+		}
+		return img
 	} catch (error) {
 		throw new Error(error)
 	}

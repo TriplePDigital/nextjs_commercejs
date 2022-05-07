@@ -19,13 +19,12 @@ export default function ListOfCourses({ course, key, progress }) {
 				{/* TODO: figure out if we need tooltip over the courses or not. might need to get a different tooltip lib */}
 				<div className="relative h-44 w-full">
 					<Image
-						{...imgConstructor(course.coverImage.asset)}
+						{...imgConstructor(course.coverImage.asset, {
+							fit: 'fill'
+						})}
 						layout="fill"
-						objectFit="cover"
-						objectPosition="center"
 						quality={100}
 						alt={course.blurb}
-						placeholder="blur"
 					/>
 					<div className="bg-red-500 opacity-75 absolute left-0 top-0 h-full w-full"></div>
 				</div>
