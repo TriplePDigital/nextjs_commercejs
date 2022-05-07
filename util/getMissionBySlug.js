@@ -4,6 +4,7 @@ export default async function getMissionBySlug(slug) {
 	const query = `
         *[_type == 'mission' && slug.current == '${slug}']{
           title,
+          "slug": slug.current,
           "stages": *[_type == 'stage' && references(^._id)] | order(order){
             title,
             "slug": slug.current,
@@ -30,7 +31,8 @@ export default async function getMissionBySlug(slug) {
                   "url": vimeoVideo.url,
                   body
               },
-              "progress": *[_type == 'progress' && references(^._id)]{status}[0]
+              "progress": *[_type == 'progress' && references(^._id)]{status}[0],
+              instance
             }
           }
         }[0]

@@ -64,45 +64,49 @@ export default function Course({ webinar, tracks, enrollment }) {
 
 export async function getServerSideProps(ctx) {
 	const session = await getSession(ctx)
-	const usr = await fetcher(
-		`*[_type=="user" && email=="${session?.user?.email}"]{_id}[0]`
-	)
-
-	const tracks = await fetcher(`
-    *[_type == 'track']{
-		...,
-		missions[] -> {
-			...,
-			instructors[]->,
-			coverImage{
-				asset->
-			}
-		},
-		achievement ->{
-			title,
-			slug
-		}
-	}`)
-
-	const enrollment = await getEnrollmentByStudentID(usr._id)
-
-	const webinar = await fetcher(`
-		*[_type == 'webinar' ] | order(releaseDateDesc){
-			...,
-			presenters[]->{
-				...,
-				avatar {
-					...,
-					asset ->
-				}
-			},
-	}[0]`)
-
-	if (!usr) {
+	if (!session) {
 		return {
-			notFound: true
+			redirect: {
+				destination:
+					'/auth/login?callbackUrl=http://localhost:3000/auth/welcome',
+				permanent: false
+			}
 		}
 	} else {
+		const usr = await fetcher(
+			`*[_type=="user" && email=="${session?.user?.email}"]{_id}[0]`
+		)
+
+		const tracks = await fetcher(`
+			*[_type == 'track']{
+				...,
+				missions[] -> {
+					...,
+					instructors[]->,
+					coverImage{
+						asset->
+					}
+				},
+				achievement ->{
+					title,
+					slug
+				}
+			}`)
+
+		const enrollment = await getEnrollmentByStudentID(usr._id)
+
+		const webinar = await fetcher(`
+			*[_type == 'webinar' ] | order(releaseDateDesc){
+				...,
+				presenters[]->{
+					...,
+					avatar {
+						...,
+						asset ->
+					}
+				},
+			}[0]`)
+
 		return {
 			props: {
 				tracks,
