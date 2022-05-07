@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { configuredSanityClient as client } from '@/util/img'
 import { useRouter } from 'next/router'
 import { Loader } from '@/components/util'
-import axios, { post } from 'axios'
+import axios from 'axios'
 import { fetcher } from '@/util/fetcher'
 import Image from 'next/image'
 
@@ -154,15 +154,15 @@ export async function getServerSideProps(ctx) {
 	try {
 		const { email } = await ctx.query
 
-		const query = `*[_type == "user" && email == "${email}"]{...}`
+		const query = `*[_type == "user" && email == "${email}"]{_id, active}[0]`
 		const userCheck = await fetcher(query)
 
-		if (userCheck.length > 0) {
+		if (userCheck) {
 			return {
 				props: {
-					error: 'User already exists',
-					userID: userCheck[0]._id,
-					active: userCheck[0].active
+					error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
+					userID: userCheck._id,
+					active: userCheck.active
 				}
 			}
 		}

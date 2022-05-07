@@ -10,7 +10,6 @@ function getCallbackUrl(email) {
 			throw Error('Invalid callback URLs')
 		}
 		return urlParams.get('callbackUrl')
-		return `/auth/welcome?email=${encodeURI(email)}`
 	} catch (error) {
 		console.error(error)
 	}
@@ -19,7 +18,8 @@ function getCallbackUrl(email) {
 function EmailForm({ onSubmit }) {
 	const [email, setEmail] = useState('')
 
-	const handleSignIn = async () => {
+	const handleSignIn = async (e) => {
+		e.preventDefault()
 		await signIn('email', {
 			email,
 			redirect: false,
@@ -30,7 +30,7 @@ function EmailForm({ onSubmit }) {
 
 	return (
 		<div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-1/3 border border-gray-100">
-			<form>
+			<form onSubmit={handleSignIn}>
 				<div className="mb-4">
 					<label
 						className="block text-gray-700 text-sm font-bold mb-2"
@@ -54,7 +54,6 @@ function EmailForm({ onSubmit }) {
 				<button
 					className="flex justify-center items-center bg-blue-500 hover:bg-blue-700 w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 					type="button"
-					onClick={handleSignIn}
 				>
 					<FaMagic className="mr-4" />
 					Sign in using magic link

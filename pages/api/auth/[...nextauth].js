@@ -97,40 +97,39 @@ const options = {
 					)
 				})
 			}
-		}),
-		Providers.Credentials({
-			name: 'credentials',
-			credentials: {
-				username: {
-					label: 'email',
-					type: 'email',
-					placeholder: 'example@ncrma.net'
-				},
-				password: { label: 'Password', type: 'password' }
-			},
-			async authorize({ credentials, user }) {
-				const { email, password } = credentials
-				console.log(user)
-
-				const res = await axios.get(
-					`${process.env.NEXT_PUBLIC_EDGE_URL}/getUser`,
-					{
-						method: 'GET',
-						headers: { 'Content-Type': 'application/json' },
-						params: {
-							email
-						}
-					}
-				)
-				const usr = await res.json()
-				if (!usr) {
-					return true
-				} else {
-					return null
-				}
-			}
 		})
-		//SanityCredentials(configuredSanityClient)
+		// Providers.Credentials({
+		// 	name: 'credentials',
+		// 	credentials: {
+		// 		username: {
+		// 			label: 'email',
+		// 			type: 'email',
+		// 			placeholder: 'example@ncrma.net'
+		// 		},
+		// 		password: { label: 'Password', type: 'password' }
+		// 	},
+		// 	async authorize({ credentials, user }) {
+		// 		const { email, password } = credentials
+		// 		console.log(user)
+
+		// 		const res = await axios.get(
+		// 			`${process.env.NEXT_PUBLIC_EDGE_URL}/getUser`,
+		// 			{
+		// 				method: 'GET',
+		// 				headers: { 'Content-Type': 'application/json' },
+		// 				params: {
+		// 					email
+		// 				}
+		// 			}
+		// 		)
+		// 		const usr = await res.json()
+		// 		if (!usr) {
+		// 			return true
+		// 		} else {
+		// 			return null
+		// 		}
+		// 	}
+		// })
 	],
 	session: {
 		jwt: true
@@ -138,7 +137,6 @@ const options = {
 	jwt: {
 		secret: process.env.JWT_SECRET
 	},
-	// adapter: SanityAdapter(configuredSanityClient),
 	database: process.env.DATABASE_URL,
 	pages: {
 		newUser: '/auth/welcome',
