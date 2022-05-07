@@ -4,6 +4,7 @@ import { MdOutlineQuiz } from 'react-icons/md'
 import isVideo from '@/util/isVideo'
 import { Loader } from '../util'
 import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 const secondsToTime = (e) => {
 	let h = Math.floor(e / 3600)
@@ -24,11 +25,14 @@ const secondsToTime = (e) => {
 }
 
 export default function Stages({
+	mission,
 	stages,
 	title,
 	setStageContext,
-	setCheckpointContext
+	setCheckpointContext,
+	setCurrentCheckpoint
 }) {
+	const router = useRouter()
 	return (
 		<>
 			<ul className="w-3/12 px-4 py-6 mt-6 mx-2 mr-0">
@@ -57,27 +61,45 @@ export default function Stages({
 												}`}
 												key={cntIndex}
 											>
-												<a
-													className={`py-2 my-2 text-black rounded-lg flex items-center cursor-pointer`}
-													onClick={() => {
-														setStageContext(chIndex)
-														setCheckpointContext(
-															cntIndex
-														)
-													}}
+												<Link
+													href={
+														checkpoint.instance ===
+														'quiz'
+															? `/quiz/${checkpoint._id}`
+															: `/mission/${mission.slug}`
+													}
 												>
-													<div className="text-4xl mr-4 text-ncrma-400 relative z-10">
-														{isVideo(
-															checkpoint.type
-														) ? (
-															<AiFillPlayCircle />
-														) : (
-															<MdOutlineQuiz />
-														)}
-														<div className="bg-ncrma-800 w-full h-full absolute left-0 top-0 -z-10 rounded-full"></div>
-													</div>
-													{checkpoint.title}
-												</a>
+													<a
+														className={`py-2 my-2 text-black rounded-lg flex items-center cursor-pointer`}
+														onClick={() => {
+															if (
+																checkpoint.instance !==
+																'quiz'
+															) {
+																setStageContext(
+																	chIndex
+																)
+																setCheckpointContext(
+																	cntIndex
+																)
+															} else {
+																null
+															}
+														}}
+													>
+														<div className="text-4xl mr-4 text-ncrma-400 relative z-10">
+															{isVideo(
+																checkpoint.type
+															) ? (
+																<AiFillPlayCircle />
+															) : (
+																<MdOutlineQuiz />
+															)}
+															<div className="bg-ncrma-800 w-full h-full absolute left-0 top-0 -z-10 rounded-full"></div>
+														</div>
+														{checkpoint.title}
+													</a>
+												</Link>
 												<span className="text-sm text-gray-500">
 													{isVideo(checkpoint.type)
 														? secondsToTime(
