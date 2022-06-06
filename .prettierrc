@@ -5,6 +5,7 @@
 	"singleQuote": true,
 	"tabWidth": 4,
 	"useTabs": true,
+	"pluginSearchDirs": ["./node_modules"],
 	"plugins": [
 		"prettier-plugin-groq"
 	]

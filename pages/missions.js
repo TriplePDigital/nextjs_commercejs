@@ -9,6 +9,8 @@ import { useRouter } from 'next/router'
 import Streak from '@/components/Courses/Streak'
 import { nanoid } from 'nanoid'
 import getEnrollmentByStudentID from '@/util/getEnrollmentByStudentID'
+import getTracks from '@/util/getTracks'
+import getUserFromSession from '@/util/getUserFromSession'
 
 export default function Course({ webinar, tracks, enrollment }) {
 	/* pulling user's context from _app */
@@ -41,18 +43,20 @@ export default function Course({ webinar, tracks, enrollment }) {
 				{tracks.map((track, i) => (
 					<div key={i}>
 						<h1 className="text-4xl font-semibold mt-5">
-							{track.Name}
+							{track.name}
 						</h1>
-						<div className="flex flex-row flex-wrap mt-2">
-							{track.missions
-								? track.missions.map((course) => (
-										<ListOfCourses
-											key={nanoid()}
-											course={course}
-											progress={false}
-										/>
-								  ))
-								: null}
+						<div className="flex overflow-x-scroll pb-10">
+							<div className="flex flex-nowrap mt-2">
+								{track.missions
+									? track.missions.map((course) => (
+											<ListOfCourses
+												key={nanoid()}
+												course={course}
+												progress={false}
+											/>
+									  ))
+									: null}
+							</div>
 						</div>
 					</div>
 				))}
@@ -73,25 +77,9 @@ export async function getServerSideProps(ctx) {
 			}
 		}
 	} else {
-		const usr = await fetcher(
-			`*[_type=="user" && email=="${session?.user?.email}"]{_id}[0]`
-		)
+		const usr = await getUserFromSession(session?.user?.email)
 
-		const tracks = await fetcher(`
-			*[_type == 'track']{
-				...,
-				missions[] -> {
-					...,
-					instructors[]->,
-					coverImage{
-						asset->
-					}
-				},
-				achievement ->{
-					title,
-					slug
-				}
-			}`)
+		const tracks = await getTracks()
 
 		const enrollment = await getEnrollmentByStudentID(usr._id)
 

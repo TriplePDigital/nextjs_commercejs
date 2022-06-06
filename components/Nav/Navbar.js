@@ -23,13 +23,11 @@ export default function Navbar() {
 				avatar {
 					asset ->
 				}
-			}{...}
+			}{...}[0]
 			`
 		fetcher(query)
 			.then(async (usr) => {
-				const profile = await usr.pop()
-				setUser(await profile)
-				// setAvatar(imgConstructor(await profile?.avatar?.asset))
+				setUser(await usr)
 			})
 			.catch((err) => {
 				throw Error(err)
@@ -80,8 +78,16 @@ export default function Navbar() {
 						</button>
 					) : (
 						<>
+							{user?.role === 'admin' ||
+							user?.role === 'riskManager' ? (
+								<Link href={`/admin`}>
+									<a className="bg-orange-400 hover:bg-orange-600 font-bold text-white uppercase xl:px-6 px-3 py-2 rounded leading-loose tracking-wide xl:mr-4 mr-1">
+										Member Management
+									</a>
+								</Link>
+							) : null}
 							<button
-								className="bg-ncrma-400 font-bold text-white uppercase xl:px-6 px-3 py-2 rounded leading-loose tracking-wide xl:mr-12 mr-1"
+								className="bg-ncrma-400 hover:bg-ncrma-600 font-bold text-white uppercase xl:px-6 px-3 py-2 rounded leading-loose tracking-wide xl:mr-12 mr-1"
 								onClick={() =>
 									alert(
 										'Purchase membership to access exclusive features'
@@ -97,7 +103,7 @@ export default function Navbar() {
 								passHref={true}
 							>
 								<a>
-									<div className="bg-ncrma-100 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center">
+									<div className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center">
 										<div className="h-8 w-8 rounded-full mr-2 overflow-hidden">
 											<BsFillPersonFill size={30} />
 										</div>
