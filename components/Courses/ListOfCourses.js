@@ -11,10 +11,11 @@ export default function ListOfCourses({ course, key, progress }) {
 	return !course ? (
 		<Loader />
 	) : (
-		<>
+		<div className="inline-block px-3">
 			<div
 				key={nanoid()}
-				className="xl:w-1/4 lg:w-1/3 md:w-1/2 w-full first:ml-0 first:mr-0 lg:first:ml-0 lg:first:mx-0 lg:mx-3 mx-0 border rounded-md shadow-md lg:mb-0 mb-6 h-min"
+				// className="xl:w-1/4 lg:w-1/3 md:w-1/2 w-full first:ml-0 first:mr-0 lg:first:ml-0 lg:first:mx-0 lg:mx-3 mx-0 border rounded-md shadow-md lg:mb-0 mb-6 h-min"
+				className="w-72 h-fit xl:max-w-xl lg:max-w-lg md:max-w-md max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
 			>
 				{/* TODO: figure out if we need tooltip over the courses or not. might need to get a different tooltip lib */}
 				<div className="relative h-44 w-full">
@@ -26,7 +27,10 @@ export default function ListOfCourses({ course, key, progress }) {
 						quality={100}
 						alt={course.blurb}
 					/>
-					<div className="bg-red-500 opacity-75 absolute left-0 top-0 h-full w-full"></div>
+					<div
+						className="opacity-75 absolute left-0 top-0 h-full w-full"
+						style={{ backgroundColor: `${course.colorCode}` }}
+					></div>
 				</div>
 				<div className="p-3">
 					{/* course title */}
@@ -69,20 +73,22 @@ export default function ListOfCourses({ course, key, progress }) {
 
 					{/* instructors being mapped out */}
 					<ul>
-						{course?.instructors.map((instructor) => (
-							<Link
-								href={`user/instructor/${instructor._id}`}
-								key={nanoid()}
-								passHref={true}
-							>
-								<a className="text-base text-gray-600 underline block">
-									{instructor.name}
-								</a>
-							</Link>
-						))}
+						{course?.instructors.map((instructor) => {
+							return (
+								<Link
+									href={`user/instructor/${instructor._id}`}
+									key={nanoid()}
+									passHref={true}
+								>
+									<a className="text-base text-gray-600 underline block">
+										{instructor.name}
+									</a>
+								</Link>
+							)
+						})}
 					</ul>
 				</div>
 			</div>
-		</>
+		</div>
 	)
 }
