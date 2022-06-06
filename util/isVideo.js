@@ -1,8 +1,8 @@
 export default function isVideo(type) {
-	if (type.url) {
+	if (type?.vimeoVideo?.url) {
 		return true
 	}
-	if (type.minimumScore) {
+	if (type?.minimumScore) {
 		return false
 	}
 }

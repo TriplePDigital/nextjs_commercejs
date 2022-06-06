@@ -1,8 +1,10 @@
 import { fetcher } from './fetcher'
+import groq from 'groq'
 
 export default async function getMissionBySlug(slug) {
-	const query = `
+	const query = groq`
         *[_type == 'mission' && slug.current == '${slug}']{
+          _id,
           title,
           "slug": slug.current,
           "stages": *[_type == 'stage' && references(^._id)] | order(order){

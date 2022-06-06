@@ -25,8 +25,9 @@ export default async function getQuizByID(quizID, userID) {
             minimumScore,
         },
         stage -> {
-            mission {
-            "slug": slug.current
+            mission -> {
+            	"slug": slug.current,
+            	_id
             },
             order,
         }

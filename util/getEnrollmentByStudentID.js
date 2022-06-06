@@ -6,10 +6,11 @@ export default async function getEnrollmentByStudentID(studentID) {
   ...,
   course -> {
      title,
-     instructors[] ->{name},
+     instructors[] ->{name, _id},
      slug,
      "coverImage": coverImage{asset->},
      "enrollCount": count(*[_type == 'enrollment' && references(^._id)]{...}),
+     colorCode
   },
   student,
   "progress": *[_type == 'progress' && references(^._id)]{
@@ -18,6 +19,5 @@ export default async function getEnrollmentByStudentID(studentID) {
   }
 }
     `
-	const result = await fetcher(query)
-	return result
+	return await fetcher(query)
 }
