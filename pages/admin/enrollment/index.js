@@ -209,26 +209,27 @@ function AllEnrollments({ enrollments, loading }) {
 		<Loader />
 	) : (
 		<>
-			<table className="w-full mx-auto text-center bg-gray-50 shadow-md border px-4 py-6 rounded">
-				<thead className="bg-gray-200 text-gray-500 font-light font-sans">
-					<tr className="flex px-4 py-2">
-						<th className="flex basis-1/5">User</th>
-						<th className="flex basis-1/5">Email</th>
-						<th className="flex basis-1/5">
+			<table className="w-full text-center bg-gray-50 shadow-md border px-4 py-6 rounded">
+				<thead className="w-full flex bg-gray-200 font-semibold font-sans">
+					<tr className="flex items-center w-full px-4 py-2">
+						<th className="border-r border-gray-500 w-1/4">User</th>
+						<th className="border-x border-gray-500 w-1/4">
 							Number of course enrollments
 						</th>
-						<th className="flex basis-1/5">Progress</th>
-						<th className="flex basis-1/5">Certificates</th>
+						<th className=" border-gray-500 w-1/4">Progress</th>
+						<th className="border-l border-gray-500 w-1/4">
+							Certificates
+						</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody className="flex flex-col">
 					{enrollments &&
 						enrollments.map((user, userIndex) => (
 							<tr
 								key={userIndex}
-								className="flex py-2 border border-gray-200 px-4"
+								className="flex items-center py-2 px-5 border border-gray-200 text-center"
 							>
-								<td className="flex basis-1/5 items-center">
+								<td className="basis-1/4 items-center flex">
 									<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
 										<Image
 											{...imgConstructor(
@@ -244,15 +245,20 @@ function AllEnrollments({ enrollments, loading }) {
 
 										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 									</div>
-									{user.firstName + ' ' + user.lastName}
+									<div className="flex flex-col items-start">
+										<span className="">
+											{user.firstName +
+												' ' +
+												user.lastName}
+										</span>
+
+										<span className="text-sm text-gray-500">
+											{user.email}
+										</span>
+									</div>
 								</td>
-								<td className="flex basis-1/5 items-center">
-									{user.email}
-								</td>
-								<td className="flex basis-1/5 items-center">
-									{user.count}
-								</td>
-								<td className="flex flex-col basis-1/5 items-center">
+								<td className="basis-1/4">{user.count}</td>
+								<td className="basis-1/4">
 									<>
 										<button
 											className="bg-ncrma-300 rounded px-5 py-1 min-w-fit"
@@ -348,7 +354,7 @@ function AllEnrollments({ enrollments, loading }) {
 										</ul>
 									</>
 								</td>
-								<td className="flex basis-1/5 items-center">
+								<td className="basis-1/4">
 									{user?.achievements?.length || 0}
 								</td>
 							</tr>
@@ -370,83 +376,87 @@ function LatestEnrollments({ latestEnrollments }) {
 
 	useEffect(() => {}, [latestEnrollments])
 	return (
-		<table className="w-full mx-auto text-center bg-gray-50 shadow-md border px-4 py-6 rounded">
-			<thead className="bg-gray-200 text-gray-500 font-light font-sans">
-				<tr className="px-4 py-2">
-					<span></span>
-					<th className="w-1/3">Student</th>
-					<th className="w-1/3">Course</th>
-					<th className="w-1/3">Track</th>
-				</tr>
-			</thead>
-			<tbody>
-				{latestEnrollments &&
-					latestEnrollments.map((enrollment) => (
-						<tr
-							key={encodeURI(enrollment._id)}
-							className="border-b items-center border-gray-200 px-4 py-2 relative"
-						>
-							<span
-								className="block w-2 h-full absolute left-0 top-0"
-								style={{
-									backgroundColor: `${enrollment.course.colorCode}`
-								}}
-							></span>
-							<td className="px-4 py-2">
-								<div className="flex gap-2">
-									<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-										<Image
-											{...imgConstructor(
-												enrollment?.student?.avatar,
-												{
-													fit: 'fill'
-												}
+		<>
+			<table className="w-full bg-gray-50 shadow-md border px-4 py-6 rounded">
+				<thead className="flex w-full bg-gray-200 font-semibold font-sans">
+					<tr className="flex items-center w-full px-4 py-2">
+						<span className=""></span>
+						<th className="w-1/3">Student</th>
+						<th className="w-1/3 border-x border-gray-500">
+							Course
+						</th>
+						<th className="w-1/3">Track</th>
+					</tr>
+				</thead>
+				<tbody className="flex flex-col">
+					{latestEnrollments &&
+						latestEnrollments.map((enrollment) => (
+							<tr
+								key={encodeURI(enrollment._id)}
+								className="flex py-2 px-5 items-center border border-gray-200 text-center relative"
+							>
+								<span
+									className="block w-2 h-full absolute left-0 top-0"
+									style={{
+										backgroundColor: `${enrollment.course.colorCode}`
+									}}
+								></span>
+								<td className="w-1/3 px-4 py-2">
+									<div className="flex gap-2 items-center justify-center">
+										<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
+											<Image
+												{...imgConstructor(
+													enrollment?.student?.avatar,
+													{
+														fit: 'fill'
+													}
+												)}
+												alt="Instructor Avatar"
+												layout="fill"
+												quality={50}
+											/>
+											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
+										</div>
+										<div className="flex flex-col text-left">
+											<span>
+												{enrollment.student.firstName +
+													' ' +
+													enrollment.student.lastName}
+											</span>
+											<span className="text-gray-500 font-light text-sm">
+												{enrollment.student.email}
+											</span>
+										</div>
+									</div>
+								</td>
+								<td className="w-1/3 px-4 py-2">
+									<div className="flex flex-col">
+										<div className="">
+											{enrollment.course.title}
+										</div>
+										<div className="text-gray-500 font-light text-sm">
+											Enrollment date:{' '}
+											{formatEnrollmentDate(
+												enrollment._createdAt
 											)}
-											alt="Instructor Avatar"
-											layout="fill"
-											quality={50}
-										/>
-										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
+										</div>
 									</div>
-									<div className="flex flex-col text-left">
-										<span>
-											{enrollment.student.firstName +
-												' ' +
-												enrollment.student.lastName}
-										</span>
-										<span className="text-gray-500 font-light text-sm">
-											{enrollment.student.email}
-										</span>
+								</td>
+								<td className="w-1/3 px-4 py-2">
+									<div className="flex flex-col">
+										<div className="">
+											{enrollment.course.track
+												? enrollment.course.track.name
+												: 'N/A'}
+										</div>
+										<div className="text-gray-500 font-light text-sm"></div>
 									</div>
-								</div>
-							</td>
-							<td className="px-4 py-2">
-								<div className="flex flex-col">
-									<div className="">
-										{enrollment.course.title}
-									</div>
-									<div className="text-gray-500 font-light text-sm">
-										Enrollment date:{' '}
-										{formatEnrollmentDate(
-											enrollment._createdAt
-										)}
-									</div>
-								</div>
-							</td>
-							<td className="px-4 py-2">
-								<div className="flex flex-col">
-									<div className="">
-										{enrollment.course.track
-											? enrollment.course.track.name
-											: 'N/A'}
-									</div>
-									<div className="text-gray-500 font-light text-sm"></div>
-								</div>
-							</td>
-						</tr>
-					))}
-			</tbody>
-		</table>
+								</td>
+							</tr>
+						))}
+				</tbody>
+			</table>
+		</>
 	)
 }
 
@@ -489,12 +499,11 @@ function EnrollStudents({}) {
 					return res.json()
 				})
 				.then((file) => {
-					file.map((row, i) => {
+					file.map((row) => {
 						row['course'] = []
 					})
 					setStudents(file)
 					setUploading(false)
-					console.log(file)
 				})
 				.catch((error) => {
 					setUploading(false)

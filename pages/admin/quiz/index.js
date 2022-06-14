@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSession } from 'next-auth/client'
 import getQuizAttempts from '@/util/getQuizAttempts'
-import Table from './Table'
-import { getEnrollmentsPerUser } from '@/util/getEnrollments'
 import getUserFromSession from '@/util/getUserFromSession'
 import Link from 'next/link'
 import { MdOutlineDashboard, MdQuiz } from 'react-icons/md'
@@ -21,6 +19,7 @@ function Quiz({ quizAttempts }) {
 
 		if (searchTerm.length >= 2) {
 			// do search query
+			setFilteredEnrollment(filteredEnrollment)
 		}
 	}
 
@@ -108,50 +107,61 @@ function AllQuizAttempts({ quizAttempts }) {
 	return (
 		<>
 			<table className="w-full bg-gray-50 shadow-md border px-4 py-6 rounded">
-				<thead className="bg-gray-200 text-gray-500 font-light font-sans">
-					<tr className="flex px-4 py-2">
-						<th className="flex basis-1/5">Quiz</th>
-						<th className="flex basis-1/5">Course</th>
-						<th className="flex basis-1/5">Student</th>
-						<th className="flex basis-1/5">Score</th>
-						<th className="flex basis-1/5">Action</th>
+				<thead className="flex w-full bg-gray-200 font-semibold font-sans">
+					<tr className="flex items-center w-full px-4 py-2">
+						<th className="border-r border-gray-500 w-1/5">Quiz</th>
+						<th className="w-1/5">Course</th>
+						<th className="border-x border-gray-500 w-1/5">
+							Student
+						</th>
+						<th className="w-1/5">Score</th>
+						<th className="border-l border-gray-500 w-1/5">
+							Action
+						</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody className="flex flex-col">
 					{quizAttempts.map((attempt) => (
 						<tr
 							key={encodeURI(attempt._id)}
-							className="flex py-2 border border-gray-200 px-4"
+							className="flex py-2 px-5 items-center border border-gray-200 text-center"
 						>
-							<td className="flex basis-1/5 items-center">
+							<td className="w-1/5">
 								{attempt.checkpoint?.quiz?.title}
 							</td>
-							<td className="flex basis-1/5 items-center">
+							<td className="w-1/5">
 								{attempt.checkpoint?.stage.mission?.title}
 							</td>
-							<td className="flex basis-1/5 items-center">
-								<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-									<Image
-										{...imgConstructor(
-											attempt.user.avatar.asset,
-											{
-												fit: 'fill'
-											}
-										)}
-										alt="Instructor Avatar"
-										layout="fill"
-										quality={50}
-									/>
-									<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>{' '}
+							<td className="w-1/5">
+								<div className="flex items-center justify-center">
+									<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
+										<Image
+											{...imgConstructor(
+												attempt.user.avatar.asset,
+												{
+													fit: 'fill'
+												}
+											)}
+											alt="Instructor Avatar"
+											layout="fill"
+											quality={50}
+										/>
+										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
+									</div>
+									<div className="flex flex-col items-start">
+										<span className="">
+											{attempt.user.firstName +
+												' ' +
+												attempt.user.lastName}
+										</span>
+										<span className="text-sm text-gray-500">
+											{attempt.user.email}
+										</span>
+									</div>
 								</div>
-								{attempt.user.firstName +
-									' ' +
-									attempt.user.lastName}
 							</td>
-							<td className="flex basis-1/5 items-center">
-								{attempt.score}%
-							</td>
-							<td className="flex basis-1/5 items-center">
+							<td className="w-1/5">{attempt.score}%</td>
+							<td className="w-1/5">
 								<button className="bg-ncrma-300 rounded px-5 py-1 min-w-fit">
 									Do something
 								</button>

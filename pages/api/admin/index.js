@@ -1,6 +1,5 @@
 export default async function (req, res) {
-	const documentsFromCSV = req?.body?.csv
-	console.log('documentsFromCSV', documentsFromCSV)
+	const documentsFromCSV = await req?.body?.csv
 	res.json(documentsFromCSV)
 	res.status(200)
 }
