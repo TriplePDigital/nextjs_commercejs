@@ -1,13 +1,8 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import qs from 'qs'
-import { Loader } from '../components/util'
-import { fetcher } from '../util/fetcher'
+// import Head from 'next/head'
 import { useSession, signIn, signOut } from 'next-auth/client'
 
-export default function Home({ missions }) {
+export default function Home({ }) {
+	// eslint-disable-next-line no-unused-vars
 	const [session, loading] = useSession()
 
 	if (session) {

@@ -26,7 +26,6 @@ function Profile({ profile, account }) {
 					}
 				}
 			)
-			console.log(res)
 			return res
 		} catch (error) {
 			throw Error(error)
@@ -43,7 +42,6 @@ function Profile({ profile, account }) {
 			.commit()
 			.then((res) => {
 				syncEdgeInstance()
-				console.log(res)
 				if (profile.email !== user.email) {
 					signOut()
 				}
@@ -70,6 +68,7 @@ function Profile({ profile, account }) {
 						objectPosition="center"
 						quality={50}
 						placeholder="blur"
+						alt='user profile image in a round shape'
 					/>
 				</div>
 				<label htmlFor="">First name</label>

@@ -3,6 +3,7 @@ import { signIn } from 'next-auth/client'
 import { FcGoogle } from 'react-icons/fc'
 import { FaMagic } from 'react-icons/fa'
 
+// eslint-disable-next-line no-unused-vars
 function getCallbackUrl(email) {
 	try {
 		const urlParams = new URLSearchParams(window.location.search)
@@ -11,7 +12,7 @@ function getCallbackUrl(email) {
 		}
 		return urlParams.get('callbackUrl')
 	} catch (error) {
-		console.error(error)
+		throw new Error(error)
 	}
 }
 

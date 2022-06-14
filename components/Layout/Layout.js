@@ -17,10 +17,9 @@ export default function Layout({ children }) {
 			!router?.pathname.includes('login')
 		) {
 			router.push(`/auth/welcome?email=${session?.user?.email}`)
-		} else {
-			return null
 		}
-	}, [session])
+		return () => {}
+	}, [session, router])
 
 	return loading ? (
 		<div className="w-full h-screen flex justify-center items-center text-center">

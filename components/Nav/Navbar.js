@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useSession, signIn, signOut } from 'next-auth/client'
 import ActiveLink from './ActiveLink'
 import { Loader } from '../util'
@@ -16,7 +17,7 @@ export default function Navbar() {
 	const [avatar, setAvatar] = useState(null)
 	const { setUser, user } = useContext(UserContext)
 
-	useEffect(() => {
+	const getUser = () => {
 		const query = `
 			*[_type == 'user' && email == '${session?.user?.email}']{
 				...,
@@ -24,7 +25,7 @@ export default function Navbar() {
 					asset ->
 				}
 			}{...}[0]
-			`
+		`
 		fetcher(query)
 			.then(async (usr) => {
 				setUser(await usr)
@@ -32,6 +33,12 @@ export default function Navbar() {
 			.catch((err) => {
 				throw Error(err)
 			})
+	}
+
+	useEffect(() => {
+		getUser()
+		return () => {}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session])
 
 	return loading ? null : (

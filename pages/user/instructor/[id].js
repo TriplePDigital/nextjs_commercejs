@@ -23,8 +23,6 @@ export async function getServerSideProps(ctx) {
         }
     }`)
 
-	console.log(profile)
-
 	return {
 		props: {
 			profile: profile.length > 0 ? profile[0] : {}

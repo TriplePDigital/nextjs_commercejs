@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Loader } from '../components/util'
 import { fetcher } from '@/util/fetcher'
 import { FaTrophy } from 'react-icons/fa'
@@ -40,26 +41,28 @@ export default function Course({ webinar, tracks, enrollment }) {
 						  ))
 						: null}
 				</div>
-				{tracks.map((track, i) => (
-					<div key={i}>
-						<h1 className="text-4xl font-semibold mt-5">
-							{track.name}
-						</h1>
-						<div className="flex overflow-x-scroll pb-10">
-							<div className="flex flex-nowrap mt-2">
-								{track.missions
-									? track.missions.map((course) => (
-											<ListOfCourses
-												key={nanoid()}
-												course={course}
-												progress={false}
-											/>
-									  ))
-									: null}
+				{tracks.map((track, i) => {
+					return track.numCourses !== 0 ? (
+						<div key={i}>
+							<h1 className="text-4xl font-semibold mt-5">
+								{track.name}
+							</h1>
+							<div className="flex overflow-x-scroll pb-10">
+								<div className="flex flex-nowrap mt-2">
+									{track.missions
+										? track.missions.map((course) => (
+												<ListOfCourses
+													key={nanoid()}
+													course={course}
+													progress={false}
+												/>
+										  ))
+										: null}
+								</div>
 							</div>
 						</div>
-					</div>
-				))}
+					) : null
+				})}
 			</section>
 			<Webinar webinar={webinar} />
 		</div>

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react'
 import { configuredSanityClient as client } from '@/util/img'
 import { useRouter } from 'next/router'
@@ -76,7 +77,9 @@ export default function Welcome({ error, email, active, userID }) {
 			router.push('/')
 		}
 		setLoading(false)
-	}, [])
+		return () => {
+		}
+	}, [active, router])
 
 	return em && loading ? (
 		<Loader />

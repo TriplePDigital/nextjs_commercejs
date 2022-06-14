@@ -1,5 +1,5 @@
 import 'tailwindcss/tailwind.css'
-import { Provider, useSession } from 'next-auth/client'
+import { Provider } from 'next-auth/client'
 import { Layout } from '../components/Layout'
 import { SWRConfig } from 'swr'
 import { createContext, useState } from 'react'

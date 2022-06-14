@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react'
 import { Loader } from '../util'
 
@@ -119,7 +120,6 @@ export default function Questions({ data }) {
 							answer: selected,
 							questionID: currentQuestion?._id
 						}
-						console.log(response)
 						if (questions.length !== 0) {
 							//if the user has already answered the question, we update the answer
 							// 1. find the question in the questions array
@@ -130,7 +130,6 @@ export default function Questions({ data }) {
 										question.questionID ===
 										response.questionID
 									) {
-										console.log('found duplicate response')
 										question.answer = response.answer
 									} else {
 										return

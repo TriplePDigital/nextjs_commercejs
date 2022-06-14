@@ -1,11 +1,8 @@
-import NextAuth, { generateAuthtoken } from 'next-auth'
-import { SanityAdapter, SanityCredentials } from 'next-auth-sanity'
+import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
 // Once upgraded to v4 of NextAuth we need to change the above to the below line
 // import GoogleProvider from 'next-auth/providers/google'
-import { configuredSanityClient as client } from '@/util/img'
 import nodemailer from 'nodemailer'
-import axios from 'axios'
 
 function generateRandomNumber() {
 	const minm = 100000
@@ -27,14 +24,12 @@ const options = {
 			maxAge: 24 * 60 * 60 * 1000000,
 			generateVerificationToken: () => {
 				const token = generateRandomNumber()
-				console.log('generate verification token: ', token)
 				return token
 			},
 			sendVerificationRequest: ({
 				identifier: email,
 				url,
 				token,
-				baseUrl,
 				provider
 			}) => {
 				return new Promise((resolve, reject) => {
@@ -81,11 +76,6 @@ const options = {
 						},
 						(error) => {
 							if (error) {
-								console.error(
-									'SEND_VERIFICATION_EMAIL_ERROR',
-									email,
-									error
-								)
 								return reject(
 									new Error(
 										`SEND_VERIFICATION_EMAIL_ERROR ${error}`
@@ -150,4 +140,5 @@ const options = {
 	debug: process.env.NODE_ENV !== 'production'
 }
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default (req, res) => NextAuth(req, res, options)

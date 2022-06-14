@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { getSession, options } from 'next-auth/client'
 import getMissionBySlug from '@/util/getMissionBySlug'
 import { useRouter } from 'next/router'
@@ -52,10 +53,6 @@ function MissionSlug({ session, mission, user, enrollment }) {
 		enrollment.course.stages[stageContext].checkpoints[checkpointContext]
 	)
 
-	console.log(
-		enrollment.course.stages[stageContext].checkpoints[checkpointContext]
-	)
-
 	useEffect(() => {
 		setCurrentCheckpoint(
 			enrollment.course.stages[stageContext].checkpoints[
@@ -64,7 +61,10 @@ function MissionSlug({ session, mission, user, enrollment }) {
 		)
 
 		setLoading(false)
-	}, [stageContext, checkpointContext, videoRef])
+		return () => {
+
+		}
+	}, [stageContext, checkpointContext, videoRef, enrollment])
 
 	const router = useRouter()
 

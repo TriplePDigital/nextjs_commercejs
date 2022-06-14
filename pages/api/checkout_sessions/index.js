@@ -4,8 +4,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET)
 export default async function handler(req, res) {
 	//TODO: look up user based on email in req.body.email
 	//TODO: store associated customer id in user's document in database
-	console.log(req.body)
 	if (req.method === 'POST') {
+		// eslint-disable-next-line no-unused-vars
 		const customerID = 'cus_KYL47WhERA3FGA'
 		try {
 			const email =

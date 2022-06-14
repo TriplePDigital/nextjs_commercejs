@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import getQuizByID from '@/util/getQuizByID'
 import getUserByEmail from '@/util/getUserByEmail'
 import { getSession } from 'next-auth/client'
@@ -14,8 +15,6 @@ function Quiz({ quizID, session, content }) {
 	const [enrollment, setEnrollment] = useState(null)
 	const [score, setScore] = useState(0)
 	const [showScore, setShowScore] = useState(false)
-
-	console.log(session, content)
 
 	const LENGTH = quiz.questions.length - 1
 
@@ -97,7 +96,10 @@ function Quiz({ quizID, session, content }) {
 			.catch((err) => {
 				throw new Error(err)
 			})
-	}, [])
+		return () => {
+			
+		}
+	}, [session, content])
 
 	return (
 		<>

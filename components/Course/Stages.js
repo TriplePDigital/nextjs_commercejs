@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Link from 'next/link'
 import { AiOutlinePlayCircle, AiFillPlayCircle } from 'react-icons/ai'
 import { MdOutlineQuiz } from 'react-icons/md'

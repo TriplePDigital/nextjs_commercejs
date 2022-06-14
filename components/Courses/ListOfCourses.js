@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import imgConstructor from '../../util/img'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -20,7 +21,7 @@ export default function ListOfCourses({ course, key, progress }) {
 				{/* TODO: figure out if we need tooltip over the courses or not. might need to get a different tooltip lib */}
 				<div className="relative h-44 w-full">
 					<Image
-						{...imgConstructor(course.coverImage.asset, {
+						{...imgConstructor(course.coverImage, {
 							fit: 'fill'
 						})}
 						layout="fill"

@@ -2,6 +2,7 @@ import axios from 'axios'
 
 export default async function handler(req, res) {
 	if (req.method === 'POST') {
+		// eslint-disable-next-line no-unused-vars
 		const { quizID, answers } = req.body
 
 		const query =
@@ -13,11 +14,9 @@ export default async function handler(req, res) {
                 }
             }`)
 
-		const res = await axios.get(
+		return await axios.get(
 			`${process.env.NEXT_PUBLIC_SANITY_URL}query=${query}`
 		)
-
-		console.log(res)
 	} else {
 		res.setHeader('Allow', 'POST')
 		res.status(405).end(`Method ${req.method} Not Allowed`)

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // **** https://cdn.dribbble.com/users/1008889/screenshots/17247195/media/e8e6ae59a1569f0b3370c1c2d4a29ba0.png
 import { get } from 'axios'
 import ReactPlayer from 'react-player/vimeo'
@@ -14,8 +15,6 @@ export default function Lesson({ data, content, chapters }) {
 	const [stageIndex, setstageIndex] = useState(0)
 	const [contentIndex, setContentIndex] = useState(0)
 	const [stageContentType, setStageContentType] = useState('')
-
-	console.log(chapters)
 
 	const mission = data.attributes
 	const { stages } = mission

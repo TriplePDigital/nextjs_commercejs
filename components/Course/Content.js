@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react'
 import ReactPlayer from 'react-player/vimeo'
 import Image from 'next/image'
@@ -7,8 +8,6 @@ import imgConstructor from '../../util/img'
 
 export default function Content({ body, className }) {
 	const imgProps = imgConstructor(body?.instructor?.avatar?.asset)
-
-	console.log(body)
 
 	return body._type === 'video' ? (
 		<div className={className}>
@@ -32,6 +31,7 @@ export default function Content({ body, className }) {
 							{...imgProps}
 							layout="intrinsic"
 							placeholder="blur"
+							alt='the instructors avatar image in the shape of a circle'
 						/>
 					</div>
 				)}
