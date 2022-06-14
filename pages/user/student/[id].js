@@ -1,5 +1,5 @@
 import { fetcher } from '@/util/fetcher'
-import { Loader } from '@/components/util/Loader'
+import Loader from '@/components/util/Loader'
 import imgConstructor from '@/util/img'
 import Image from 'next/image'
 import { FaTrophy } from 'react-icons/fa'
