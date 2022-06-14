@@ -46,7 +46,7 @@ export default async function getEnrollmentByStudentIDandCourseID(
     },
     student -> {
         _id,
-        "quizAttemps": *[_type == 'quizAttempt' && references(^._id)] | order(score desc){
+        "quizAttempts": *[_type == 'quizAttempt' && references(^._id)] | order(score desc){
             _id,
             score,
             "quizID": quiz->_id
