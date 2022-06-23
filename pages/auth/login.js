@@ -24,7 +24,7 @@ function EmailForm({ onSubmit }) {
 		await signIn('email', {
 			email,
 			redirect: false,
-			callbackUrl: `/auth/welcome?email=${encodeURI(email)}`
+			callbackUrl: `${process.env.NEXTAUTH_URL}/auth/welcome?email=${encodeURI(email)}`
 		})
 		onSubmit(email)
 	}
@@ -79,7 +79,7 @@ function CodeForm({ email }) {
 	const urlParams = new URLSearchParams({
 		email,
 		token,
-		callbackUrl: `http://localhost:3000/auth/welcome?email=${encodeURI(
+		callbackUrl: `${process.env.NEXTAUTH_URL}/welcome?email=${encodeURI(
 			email
 		)}`
 	})
