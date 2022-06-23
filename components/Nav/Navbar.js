@@ -77,7 +77,7 @@ export default function Navbar() {
 							onClick={() =>
 								signIn(undefined, {
 									callbackUrl:
-										'http://localhost:3000/auth/welcome'
+										`${process.env.NEXTAUTH_URL}/welcome`
 								})
 							}
 						>
@@ -125,7 +125,7 @@ export default function Navbar() {
 											onClick={() =>
 												signOut({
 													callbackUrl:
-														'http://localhost:3000/auth/login'
+														`${process.env.NEXTAUTH_URL}/login`
 												})
 											}
 										>

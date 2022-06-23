@@ -486,7 +486,7 @@ function EnrollStudents({}) {
 		reader.onloadend = ({ target }) => {
 			const csv = Papa.parse(target.result, { header })
 
-			fetch('http://localhost:3000/api/admin', {
+			fetch('/api/admin', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
