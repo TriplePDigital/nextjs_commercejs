@@ -5,7 +5,8 @@ const date = new Date()
 const config = {
 	headers: {
 		'Cache-Control': 'max-age=31536000, immutable',
-		'If-Modified-Since': `${date.setMinutes(date.getMinutes() - 120)}`
+		'If-Modified-Since': `${date.setMinutes(date.getMinutes() - 120)}`,
+		'Access-Control-Allow-Origin': '*',
 	}
 }
 
