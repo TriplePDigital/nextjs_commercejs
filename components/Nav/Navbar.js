@@ -38,14 +38,14 @@ export default function Navbar() {
 	useEffect(() => {
 		getUser()
 		return () => {}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session])
 
 	return loading ? null : (
 		<nav className={`w-full h-16 border-b border-gray-200 px-10`}>
 			<ul className={`flex flex-row justify-between items-center h-full`}>
 				<div className="flex flex-row justify-between items-center h-full lg:w-1/3 w-1/2 text-gray-500 font-semibold">
-					<ActiveLink
+					{/* <ActiveLink
 						href={`/`}
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
@@ -56,19 +56,19 @@ export default function Navbar() {
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
 						<a>My Learning</a>
-					</ActiveLink>
+					</ActiveLink> */}
 					<ActiveLink
 						href={`/missions`}
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
 						<a>Courses</a>
 					</ActiveLink>
-					<ActiveLink
+					{/* <ActiveLink
 						href={`/certs`}
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
 						<a>Certificates</a>
-					</ActiveLink>
+					</ActiveLink> */}
 				</div>
 				<div className="lg:w-1/2 w-1/2 flex justify-end">
 					{!session ? (
@@ -76,8 +76,7 @@ export default function Navbar() {
 							className="bg-ncrma-400 font-bold text-white uppercase px-6 py-2 rounded leading-loose tracking-wide"
 							onClick={() =>
 								signIn(undefined, {
-									callbackUrl:
-										`${process.env.NEXTAUTH_URL}/welcome`
+									callbackUrl: `${process.env.NEXTAUTH_URL}/welcome`
 								})
 							}
 						>
@@ -124,8 +123,7 @@ export default function Navbar() {
 											className="cursor-pointer"
 											onClick={() =>
 												signOut({
-													callbackUrl:
-														`${process.env.NEXTAUTH_URL}/login`
+													callbackUrl: `${process.env.NEXTAUTH_URL}/login`
 												})
 											}
 										>
