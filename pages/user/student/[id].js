@@ -68,7 +68,7 @@ function Profile({ profile, account }) {
 						objectPosition="center"
 						quality={50}
 						placeholder="blur"
-						alt='user profile image in a round shape'
+						alt="user profile image in a round shape"
 					/>
 				</div>
 				<label htmlFor="">First name</label>
@@ -122,7 +122,7 @@ function Profile({ profile, account }) {
 										type="text"
 									>
 										<FaTrophy className="text-xl mr-3 text-ncrma-400" />
-										{achievement.title}
+										{achievement?.title}
 									</div>
 								</div>
 							))}
