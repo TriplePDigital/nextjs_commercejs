@@ -24,13 +24,15 @@ function EmailForm({ onSubmit }) {
 		await signIn('email', {
 			email,
 			redirect: false,
-			callbackUrl: `${process.env.NEXTAUTH_URL}/auth/welcome?email=${encodeURI(email)}`
+			callbackUrl: `${
+				process.env.NEXTAUTH_URL
+			}/auth/welcome?email=${encodeURI(email)}`
 		})
 		onSubmit(email)
 	}
 
 	return (
-		<div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-1/3 border border-gray-100">
+		<div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 lg:w-2/4  md:w-2/3 w-full border border-gray-100">
 			<form onSubmit={handleSignIn}>
 				<div className="mb-4">
 					<label
@@ -57,10 +59,18 @@ function EmailForm({ onSubmit }) {
 					type="button"
 				>
 					<FaMagic className="mr-4" />
-					Sign in using magic link
+					Sign in using magic passcode
 				</button>
+				<p className="text-sm text-gray-500 my-2">
+					You will receive a 6 digit code to your email inbox. This
+					code will act as your password and will regenerate upon
+					every login attempt.{' '}
+					<strong className="text-gray-800">
+						DO NOT SHARE THIS CODE WITH ANYONE!
+					</strong>
+				</p>
 			</form>
-			<div className="border-t border-gray-200 flex flex-col mt-6 pt-4">
+			{/* <div className="border-t border-gray-200 flex flex-col mt-6 pt-4">
 				<button
 					className="flex justify-center items-center bg-gray-100 hover:bg-gray-300 w-full text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 					onClick={() => signIn('google')}
@@ -68,7 +78,7 @@ function EmailForm({ onSubmit }) {
 					<FcGoogle className="mr-4" />
 					Sign in using Google Account
 				</button>
-			</div>
+			</div> */}
 		</div>
 	)
 }
