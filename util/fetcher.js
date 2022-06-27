@@ -6,7 +6,7 @@ const config = {
 	headers: {
 		'Cache-Control': 'max-age=31536000, immutable',
 		'If-Modified-Since': `${date.setMinutes(date.getMinutes() - 120)}`,
-		'Access-Control-Allow-Origin': '*',
+		'Access-Control-Allow-Origin': '*'
 	}
 }
 
@@ -15,9 +15,11 @@ export const fetcher = async (query) => {
 		const results = await axios.get(
 			`https://tfh7h5l0.api${
 				process.env.NODE_ENV === 'production' ? 'cdn' : ''
-			}.sanity.io/vX/data/query/production?query=${encodeURIComponent(
-				query
-			)}`,
+			}.sanity.io/vX/data/query/${
+				process.env.NODE_ENV === 'production'
+					? 'production'
+					: 'development'
+			}?query=${encodeURIComponent(query)}`,
 			config
 		)
 		return results.data.result
