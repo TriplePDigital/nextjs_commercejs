@@ -74,11 +74,10 @@ export default function Welcome({ error, email, active, userID }) {
 
 	useEffect(() => {
 		if (active) {
-			router.push('/')
+			router.push('/missions')
 		}
 		setLoading(false)
-		return () => {
-		}
+		return () => {}
 	}, [active, router])
 
 	return em && loading ? (
