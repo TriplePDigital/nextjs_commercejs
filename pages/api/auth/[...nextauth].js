@@ -38,7 +38,14 @@ const options = {
 		// 		'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code'
 		// }),
 		Providers.Email({
-			server: 'in-v3.mailjet.com',
+			server: {
+				host: 'in-v3.mailjet.com',
+				port: '587',
+				auth: {
+					user: process.env.NEXT_PUBLIC_MAILJET_API_KEY,
+					pass: process.env.NEXT_PUBLIC_MAILJET_API_SECRET
+				}
+			},
 			from: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
 			generateVerificationToken: () => {
 				const token = generateRandomNumber()
@@ -68,7 +75,7 @@ const options = {
 									{
 										to: email,
 										from,
-										subject: `NCRMA Learning Management System - Prompt for Authentication code: ${token}`,
+										subject: `NCRMA Learning Management System - Prompt for Authentication`,
 										text: `${token}`,
 										html: `
 										<body style="background: #f9f9f9;">
