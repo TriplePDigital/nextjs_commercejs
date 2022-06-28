@@ -10,12 +10,21 @@ function generateRandomNumber() {
 	return Math.floor(Math.random() * (maxm - minm + 1)) + minm
 }
 
-const transporterConfig = {
+const transporterConfigSendGrid = {
 	host: process.env.NEXT_PUBLIC_SENDGRID_API_SERVER,
 	port: process.env.NEXT_PUBLIC_SENDGRID_API_PORT,
 	auth: {
 		user: process.env.NEXT_PUBLIC_SENDGRID_API_USERNAME,
 		pass: process.env.NEXT_PUBLIC_SENDGRID_API_KEY
+	}
+}
+
+const transporterConfigMailjet = {
+	service: 'Mailjet',
+	host: 'in-v3.mailjet.com',
+	auth: {
+		user: process.env.NEXT_PUBLIC_MAILJET_API_KEY,
+		pass: process.env.NEXT_PUBLIC_MAILJET_API_SECRET
 	}
 }
 
@@ -29,9 +38,8 @@ const options = {
 		// 		'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code'
 		// }),
 		Providers.Email({
-			server: process.env.NEXT_PUBLIC_SENDGRID_API_SERVER,
+			server: 'in-v3.mailjet.com',
 			from: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
-			maxAge: 24 * 60 * 60 * 1000000,
 			generateVerificationToken: () => {
 				const token = generateRandomNumber()
 				return token
@@ -44,14 +52,18 @@ const options = {
 			}) => {
 				return new Promise((resolve, reject) => {
 					const { server, from } = provider
-					let transporter =
-						nodemailer.createTransport(transporterConfig)
+					let transporter = nodemailer.createTransport(
+						transporterConfigMailjet
+					)
+
 					transporter.verify(function (error, success) {
 						if (error) {
-							console.log(error)
+							throw new Error(error)
 						} else {
-							console.log('Server is ready to take our messages')
 							if (success) {
+								console.log(
+									'Server is ready to take our messages'
+								)
 								transporter.sendMail(
 									{
 										to: email,
