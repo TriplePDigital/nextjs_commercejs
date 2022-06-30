@@ -18,6 +18,8 @@ function Quiz({ quizID, session, content }) {
 
 	const LENGTH = quiz.questions.length - 1
 
+	const router = useRouter()
+
 	const handlePrevious = (e) => {
 		e.preventDefault()
 		const prev = currentQuestion - 1
@@ -69,7 +71,7 @@ function Quiz({ quizID, session, content }) {
 					_ref: enrollment._id
 				}
 			})
-			client.create({
+			let quizAttempt = await client.create({
 				_type: 'quizAttempt',
 				score: percRes,
 				quiz: {
@@ -81,6 +83,8 @@ function Quiz({ quizID, session, content }) {
 					_type: 'reference'
 				}
 			})
+			// setAttempt(quizAttempt)
+			router.push(`/quiz/result/[quizResult]`, `/quiz/result/${quizAttempt._id}?quizID=${quizID}`)
 		}
 	}
 
@@ -96,9 +100,7 @@ function Quiz({ quizID, session, content }) {
 			.catch((err) => {
 				throw new Error(err)
 			})
-		return () => {
-			
-		}
+		return () => {}
 	}, [session, content])
 
 	return (
@@ -190,8 +192,7 @@ export async function getServerSideProps(ctx) {
 	if (!session) {
 		return {
 			redirect: {
-				destination:
-					`/auth/login?callbackUrl=${process.env.NEXTAUTH_URL}/welcome`,
+				destination: `/auth/login?callbackUrl=${process.env.NEXTAUTH_URL}/welcome`,
 				permanent: false
 			}
 		}

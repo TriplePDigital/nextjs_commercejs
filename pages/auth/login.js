@@ -56,7 +56,7 @@ function EmailForm({ onSubmit }) {
 				</div>
 				<button
 					className="flex justify-center items-center bg-blue-500 hover:bg-blue-700 w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-					type="button"
+					type="submit"
 				>
 					<FaMagic className="mr-4" />
 					Sign in using magic passcode
@@ -89,9 +89,7 @@ function CodeForm({ email }) {
 	const urlParams = new URLSearchParams({
 		email,
 		token,
-		callbackUrl: `${process.env.NEXTAUTH_URL}/welcome?email=${encodeURI(
-			email
-		)}`
+		callbackUrl: `${process.env.NEXTAUTH_URL}/}`
 	})
 
 	return (

@@ -60,17 +60,19 @@ function Profile({ profile, account }) {
 				className="flex flex-col mx-auto w-1/3"
 				onSubmit={(e) => handleSubmit(e)}
 			>
-				<div className="mx-auto rounded-full h-48 w-48 aspect-square relative overflow-hidden shadow border border-gray-100">
-					<Image
-						{...imgConstructor(profile.avatar.asset)}
-						layout="fill"
-						objectFit="cover"
-						objectPosition="center"
-						quality={50}
-						placeholder="blur"
-						alt="user profile image in a round shape"
-					/>
-				</div>
+				{profile.avatar ? (
+					<div className="mx-auto rounded-full h-48 w-48 aspect-square relative overflow-hidden shadow border border-gray-100">
+						<Image
+							{...imgConstructor(profile.avatar.asset)}
+							layout="fill"
+							objectFit="cover"
+							objectPosition="center"
+							quality={50}
+							placeholder="blur"
+							alt="user profile image in a round shape"
+						/>
+					</div>
+				) : null}
 				<label htmlFor="">First name</label>
 				<input
 					onChange={(e) =>
