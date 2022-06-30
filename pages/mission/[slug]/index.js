@@ -61,9 +61,7 @@ function MissionSlug({ session, mission, user, enrollment }) {
 		)
 
 		setLoading(false)
-		return () => {
-
-		}
+		return () => {}
 	}, [stageContext, checkpointContext, videoRef, enrollment])
 
 	const router = useRouter()

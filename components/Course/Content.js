@@ -31,7 +31,7 @@ export default function Content({ body, className }) {
 							{...imgProps}
 							layout="intrinsic"
 							placeholder="blur"
-							alt='the instructors avatar image in the shape of a circle'
+							alt="the instructors avatar image in the shape of a circle"
 						/>
 					</div>
 				)}
