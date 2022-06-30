@@ -25,7 +25,7 @@ export default function ListOfCourses({ course, key, progress }) {
 							fit: 'fill'
 						})}
 						layout="fill"
-						quality={100}
+						quality={50}
 						alt={course.blurb}
 					/>
 					<div
@@ -36,14 +36,27 @@ export default function ListOfCourses({ course, key, progress }) {
 				<div className="p-3">
 					{/* course title */}
 					<h1 className="font-semibold text-xl">
-						<Link
-							passHref
-							href={`/mission/${course?.slug.current}`}
-						>
-							<a className="text-black font-bold text-xl">
+						{course.numberOfStages > 0 ? (
+							<Link
+								passHref
+								href={`/mission/${course?.slug.current}`}
+							>
+								<a className="text-black font-bold text-xl">
+									{course?.title}
+								</a>
+							</Link>
+						) : (
+							<a
+								className="text-black font-bold text-xl cursor-pointer"
+								onClick={() =>
+									alert(
+										'This course is still in the making by one of our associates. Please check back later for an update.'
+									)
+								}
+							>
 								{course?.title}
 							</a>
-						</Link>
+						)}
 					</h1>
 
 					{/* progress bar */}
