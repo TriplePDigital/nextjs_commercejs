@@ -76,7 +76,7 @@ const options = {
 										to: email,
 										from,
 										subject: `NCRMA Learning Management System - Prompt for Authentication`,
-										text: `${token}`,
+										text: `Authentication token is: ${token}`,
 										html: `
 										<body style="background: #f9f9f9;">
 			  <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -123,8 +123,10 @@ const options = {
 									}
 								)
 							} else {
-								throw new Error(
-									'There was an error while sending your magic password email.'
+								return reject(
+									new Error(
+										'There was an error while sending your magic password email.'
+									)
 								)
 							}
 						}

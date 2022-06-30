@@ -31,7 +31,7 @@ export default function Course({ webinar, tracks, enrollment }) {
 				{/* <Streak user={user} /> */}
 				<h1 className="text-4xl font-semibold mt-5">My Courses</h1>
 				<div className="flex flex-row flex-wrap mt-2">
-					{enrollment
+					{enrollment?.length > 0
 						? enrollment.map((item) => (
 								<ListOfCourses
 									key={nanoid()}
@@ -74,8 +74,7 @@ export async function getServerSideProps(ctx) {
 	if (!session) {
 		return {
 			redirect: {
-				destination:
-					`/auth/login?callbackUrl=${process.env.NEXTAUTH_URL}/welcome`,
+				destination: `/auth/login?callbackUrl=${process.env.NEXTAUTH_URL}/welcome`,
 				permanent: false
 			}
 		}
@@ -84,7 +83,7 @@ export async function getServerSideProps(ctx) {
 
 		const tracks = await getTracks()
 
-		const enrollment = await getEnrollmentByStudentID(usr._id)
+		const enrollment = await getEnrollmentByStudentID(usr?._id)
 
 		const webinar = await fetcher(`
 			*[_type == 'webinar' ] | order(releaseDateDesc){
@@ -102,7 +101,7 @@ export async function getServerSideProps(ctx) {
 			props: {
 				tracks,
 				webinar,
-				enrollment
+				enrollment: enrollment?.length > 0 ? enrollment : []
 			}
 		}
 	}
