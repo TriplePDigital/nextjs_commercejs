@@ -1,20 +1,12 @@
-import { configuredSanityClient as client } from '@/util/img'
+import getUserFromSession from './getUserFromSession'
 
 export const isActive = async (sessionEmail) => {
 	try {
-		const query = `*[_type == 'user' && email == '${await sessionEmail}']`
-		const userCheck = await client.fetch(query, {})
-
-		if (userCheck.length === 0) {
-			// throw 'User not found'
+		const userCheck = await getUserFromSession(sessionEmail)
+		if (!userCheck) {
 			return false
 		} else {
-			const active = await userCheck[0].active
-			if (active) {
-				return true
-			} else {
-				return false
-			}
+			return userCheck.active ? true : false
 		}
 	} catch (error) {
 		throw new Error(error)

@@ -1,20 +1,30 @@
 // import Head from 'next/head'
-import { useSession, signIn, signOut } from 'next-auth/client'
+import { useState } from 'react'
+import { useSession, signIn } from 'next-auth/client'
+import { useRouter } from 'next/router'
+import { Loader } from '@/components/util'
 
-export default function Home({ }) {
-	// eslint-disable-next-line no-unused-vars
-	const [session, loading] = useSession()
+export default function Home({}) {
+	const [session] = useSession()
+	const [loading, setLoading] = useState(true)
+
+	const router = useRouter()
 
 	if (session) {
-		return (
-			<div>
-				<p>User: {session.user.name}</p>
-				<button onClick={() => signOut({ redirect: false })}>
-					Sign Out
-				</button>
-			</div>
-		)
+		router.push('/missions')
+	} else {
+		setLoading(false)
 	}
 
-	return <button onClick={() => signIn('google')}>Sign In with google</button>
+	return (
+		<div className="w-full h-screen flex justify-center items-center text-center">
+			{loading ? (
+				<Loader size={96} />
+			) : (
+				<button onClick={() => signIn()}>
+					Sign In to gain access to your courses
+				</button>
+			)}
+		</div>
+	)
 }

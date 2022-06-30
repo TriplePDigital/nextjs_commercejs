@@ -11,15 +11,21 @@ export default function Layout({ children }) {
 	const router = useRouter()
 
 	useEffect(() => {
-		if (
-			session &&
-			!isActive(session?.user?.email) &&
-			!router?.pathname.includes('login')
-		) {
-			router.push(`/auth/welcome?email=${session?.user?.email}`)
+		if (session && !loading && !router?.pathname.includes('login')) {
+			isActive(session.user.email)
+				.then((res) => {
+					if (!res) {
+						router.push(
+							`/auth/welcome?email=${session?.user?.email}`
+						)
+					}
+				})
+				.catch((err) => {
+					throw new Error(err)
+				})
 		}
 		return () => {}
-	}, [session, router])
+	}, [session, loading, router])
 
 	return loading ? (
 		<div className="w-full h-screen flex justify-center items-center text-center">
@@ -27,7 +33,7 @@ export default function Layout({ children }) {
 		</div>
 	) : (
 		<>
-			{router?.pathname.includes('login') ? null : <Navbar />}
+			{!router?.pathname.includes('login') ? <Navbar /> : null}
 			<main
 				className={`mb-10 px-10 ${
 					router?.pathname.includes('login') ? 'h-screen' : ''
