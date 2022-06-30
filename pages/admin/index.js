@@ -13,28 +13,28 @@ function MemberManagementPage({ courses }) {
 		<section className="flex flex-col md:flex-row gap-5">
 			<aside className="h-full bg-gray-50 w-full md:w-2/12 mt-5 rounded flex-col shadow-md border">
 				<Link href="/admin/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer">
+					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer relative hover:before:block before:bg-transparent hover:before:bg-ncrma-400 before:h-full before:w-2 before:absolute before:left-0 before:top-0 transition-all before:transition-all">
 						<MdOutlineDashboard size={20} className="opacity-30" />
 						Management Portal
 					</a>
 				</Link>
 
 				<Link href="/admin/quiz/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer">
+					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer relative hover:before:block before:bg-transparent hover:before:bg-ncrma-400 before:h-full before:w-2 before:absolute before:left-0 before:top-0 transition-all before:transition-all">
 						<MdQuiz size={20} className="opacity-30" />
 						Quizzes
 					</a>
 				</Link>
 
 				<Link href="/admin/enrollment/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-gray-300 font-semibold cursor-pointer">
+					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-gray-300 font-semibold cursor-pointer relative hover:before:block before:bg-transparent hover:before:bg-ncrma-400 before:h-full before:w-2 before:absolute before:left-0 before:top-0 transition-all before:transition-all">
 						<GrUserAdmin size={20} className="opacity-30" />
 						Enrollments
 					</a>
 				</Link>
 
 				<Link href="/admin/progress/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer">
+					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer relative hover:before:block before:bg-transparent hover:before:bg-ncrma-400 before:h-full before:w-2 before:absolute before:left-0 before:top-0 transition-all before:transition-all">
 						<BsGraphUp size={20} className="opacity-30" />
 						Progress
 					</a>
