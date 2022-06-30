@@ -11,6 +11,7 @@ export default async function getEnrollmentByStudentID(studentID) {
             slug,
             "coverImage": coverImage.asset->,
             "enrollCount": count(*[_type == 'enrollment' && references(^._id)]),
+            "numberOfStages": count(*[_type == 'stage' && references(^._id)]),
             colorCode
           },
           student,

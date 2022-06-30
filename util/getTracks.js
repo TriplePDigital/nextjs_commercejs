@@ -7,6 +7,7 @@ export default async function getTracks() {
 				...,
 				missions[] -> {
 					...,
+					"numberOfStages": count(*[_type == 'stage' && references(^._id)]),
 					instructors[]->,
 					coverImage{
 						asset->
