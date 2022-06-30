@@ -41,6 +41,8 @@ export default function Navbar() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session])
 
+	let rex = /([A-Z])([A-Z])([a-z])|([a-z])([A-Z])/g
+
 	return loading ? null : (
 		<nav className={`w-full h-16 border-b border-gray-200 px-10`}>
 			<ul className={`flex flex-row justify-between items-center h-full`}>
@@ -100,7 +102,12 @@ export default function Navbar() {
 									)
 								}
 							>
-								no membership
+								{user?.membership
+									? user?.membership.replace(
+											rex,
+											'$1$4 $2$3$5'
+									  )
+									: 'Become a Member'}
 							</button>
 							<Link
 								href={
