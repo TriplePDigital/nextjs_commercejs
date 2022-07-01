@@ -87,23 +87,13 @@ function EmailForm({ onSubmit }) {
 
 function CodeForm({ email }) {
 	const [token, setToken] = useState('')
-	const [callbackUrl] = useState(
-		'http://localhost:3000/auth' || process.env.NEXTAUTH_URL
-	)
+	const [callbackUrl] = useState(process.env.NEXT_PUBLIC_CALLBACK_BASE_URL)
 
 	const urlParams = new URLSearchParams({
 		email,
 		token,
 		callbackUrl: `${callbackUrl}/welcome?email=${email}`
 	})
-
-	const onReady = useCallback(() => {
-		window.location.href = `/api/auth/callback/email?email=${encodeURIComponent(
-			email
-		)}&token=${token}&callbackUrl=${callbackUrl}/welcome?email=${encodeURI(
-			email
-		)}`
-	}, [callbackUrl, token, email])
 
 	return (
 		<form
