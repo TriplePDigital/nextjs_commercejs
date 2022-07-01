@@ -24,7 +24,7 @@ export default function Navbar() {
 				avatar {
 					asset ->
 				}
-			}{...}[0]
+			}[0]
 		`
 		fetcher(query)
 			.then(async (usr) => {
@@ -77,8 +77,8 @@ export default function Navbar() {
 						<button
 							className="bg-ncrma-400 font-bold text-white uppercase px-6 py-2 rounded leading-loose tracking-wide"
 							onClick={() =>
-								signIn(undefined, {
-									callbackUrl: `${process.env.NEXTAUTH_URL}/welcome`
+								signIn(null, {
+									callbackUrl: `http://localhost:3000/auth/welcome`
 								})
 							}
 						>

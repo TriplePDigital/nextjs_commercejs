@@ -10,7 +10,7 @@ export default function Layout({ children }) {
 	const [session, loading] = useSession()
 	const router = useRouter()
 
-	useEffect(() => {
+	const checkForActive = () => {
 		if (session && !loading && !router?.pathname.includes('login')) {
 			isActive(session.user.email)
 				.then((res) => {
@@ -18,14 +18,27 @@ export default function Layout({ children }) {
 						router.push(
 							`/auth/welcome?email=${session?.user?.email}`
 						)
+					} else {
+						return true
 					}
 				})
 				.catch((err) => {
 					throw new Error(err)
 				})
 		}
-		return () => {}
-	}, [session, loading, router])
+	}
+
+	useEffect(() => {
+		let mounted = true
+
+		if (mounted) {
+			checkForActive()
+		}
+
+		return () => {
+			mounted = false
+		}
+	}, [])
 
 	return loading ? (
 		<div className="w-full h-screen flex justify-center items-center text-center">

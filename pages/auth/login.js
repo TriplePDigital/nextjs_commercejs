@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { signIn } from 'next-auth/client'
 import { FcGoogle } from 'react-icons/fc'
 import { FaMagic } from 'react-icons/fa'
+import { Loader } from '@/components/util'
 
 // eslint-disable-next-line no-unused-vars
 function getCallbackUrl(email) {
@@ -18,20 +19,21 @@ function getCallbackUrl(email) {
 
 function EmailForm({ onSubmit }) {
 	const [email, setEmail] = useState('')
+	const [loading, setLoading] = useState(false)
 
 	const handleSignIn = async (e) => {
 		e.preventDefault()
+		setLoading(true)
 		await signIn('email', {
 			email,
-			redirect: false,
-			callbackUrl: `${
-				process.env.NEXTAUTH_URL
-			}/auth/welcome?email=${encodeURI(email)}`
+			redirect: false
 		})
 		onSubmit(email)
 	}
 
-	return (
+	return loading ? (
+		<Loader size={96} />
+	) : (
 		<div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 lg:w-2/4  md:w-2/3 w-full border border-gray-100">
 			<form onSubmit={handleSignIn}>
 				<div className="mb-4">
@@ -85,12 +87,23 @@ function EmailForm({ onSubmit }) {
 
 function CodeForm({ email }) {
 	const [token, setToken] = useState('')
+	const [callbackUrl] = useState(
+		'http://localhost:3000/auth' || process.env.NEXTAUTH_URL
+	)
 
 	const urlParams = new URLSearchParams({
 		email,
 		token,
-		callbackUrl: `${process.env.NEXTAUTH_URL}/}`
+		callbackUrl: `${callbackUrl}/welcome?email=${email}`
 	})
+
+	const onReady = useCallback(() => {
+		window.location.href = `/api/auth/callback/email?email=${encodeURIComponent(
+			email
+		)}&token=${token}&callbackUrl=${callbackUrl}/welcome?email=${encodeURI(
+			email
+		)}`
+	}, [callbackUrl, token, email])
 
 	return (
 		<form

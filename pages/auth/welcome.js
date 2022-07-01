@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { configuredSanityClient as client } from '@/util/img'
 import { useRouter } from 'next/router'
 import { Loader } from '@/components/util'
@@ -7,15 +7,16 @@ import axios from 'axios'
 import { fetcher } from '@/util/fetcher'
 import Image from 'next/image'
 
-export default function Welcome({ error, email, active, userID }) {
+export default function Welcome({ error, email, userID }) {
+	const router = useRouter()
+
 	const [firstName, setFirstName] = useState('')
+	// const [userID, setUserID] = useState('')
 	const [lastName, setLastName] = useState('')
 	const [asset, setAsset] = useState(null)
 	const [createObjectURL, setCreateObjectURL] = useState(null)
 	const [em, setEmail] = useState('')
-	const [loading, setLoading] = useState(true)
-
-	const router = useRouter()
+	const [loading, setLoading] = useState(false)
 
 	const uploadToClient = (event) => {
 		if (event.target.files && event.target.files[0]) {
@@ -51,6 +52,8 @@ export default function Welcome({ error, email, active, userID }) {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		try {
+			setLoading(true)
+
 			let res = await client.create({
 				_type: 'user',
 				account_id: userID,
@@ -60,28 +63,25 @@ export default function Welcome({ error, email, active, userID }) {
 				email: em.length > 0 ? em : email
 			})
 
-			setLoading(true)
-
 			//Update document in MongoDB
-			if (await updateUser()) {
-				setLoading(false)
-				router.push('/')
-			}
+
+			updateUser()
+				.then((res) => {
+					if (res) {
+						setLoading(false)
+						router.reload('/missions')
+					}
+				})
+				.catch((err) => {
+					throw new Error(err)
+				})
 		} catch (error) {
 			throw new Error(error)
 		}
 	}
 
-	useEffect(() => {
-		if (active) {
-			router.push('/missions')
-		}
-		setLoading(false)
-		return () => {}
-	}, [active, router])
-
-	return em && loading ? (
-		<Loader />
+	return loading ? (
+		<Loader size={96} />
 	) : (
 		<section className="text-center">
 			{error ? (
@@ -89,18 +89,20 @@ export default function Welcome({ error, email, active, userID }) {
 					{error}
 				</p>
 			) : null}
-
-			<h1 className="text-3xl">
-				Welcome to the NCRMA Learning Management System
-			</h1>
-			<p className="">
-				Please finish setting up your profile in order to gain access to
-				your courses. You can always edit your profile later on.
-			</p>
 			<form
-				className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-1/3 flex flex-col border border-gray-100 mx-auto"
+				className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-1/2 flex flex-col border border-gray-100 mx-auto"
 				onSubmit={handleSubmit}
 			>
+				<div className="mb-3">
+					<h1 className="text-3xl font-semibold">
+						Welcome to the NCRMA Learning Management System
+					</h1>
+					<p className="">
+						Please finish setting up your profile in order to gain
+						access to your courses. You can always edit your profile
+						later on.
+					</p>
+				</div>
 				{createObjectURL ? (
 					<div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden">
 						<Image
@@ -113,12 +115,12 @@ export default function Welcome({ error, email, active, userID }) {
 						/>
 					</div>
 				) : null}
-				<input
+				{/* <input
 					className="my-1 px-3 py-1.5 border rounded mx-auto w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white"
 					type="file"
 					placeholder="URL to image"
 					onChange={(e) => uploadToClient(e)}
-				/>
+				/> */}
 				<input
 					className="my-1 px-3 py-1.5 border rounded mx-auto w-full focus:ring"
 					type="text"
@@ -154,41 +156,71 @@ export default function Welcome({ error, email, active, userID }) {
 
 export async function getServerSideProps(ctx) {
 	try {
+		const { callbackUrl } = await ctx.query
+		if (callbackUrl) {
+			return {
+				redirect: {
+					destination: callbackUrl,
+					permanent: true
+				}
+			}
+		}
+
 		const { email } = await ctx.query
 
-		const query = `*[_type == "user" && email == "${email}"]{_id, active}[0]`
+		if (!email) {
+			return {
+				props: {
+					error: 'Your email could not be found. Please enter it manually.',
+					email: '',
+					active: false
+				}
+			}
+		}
+
+		const query = `*[_type == "user" && email == "${email}"]{_id, active, email, account_id}[0]`
 		const userCheck = await fetcher(query)
 
 		if (userCheck) {
 			return {
 				props: {
 					error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
-					userID: userCheck._id,
-					active: userCheck.active
+					userID: userCheck.account_id,
+					active: userCheck.active,
+					email: userCheck.email
 				}
 			}
 		}
 
-		try {
-			let res = await axios.get(
-				`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
-				{
-					params: { email }
-				}
-			)
+		let res = await axios.get(
+			`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
+			{
+				params: { email }
+			}
+		)
 
-			res = JSON.parse(res.data)
+		const edgeProfile = JSON.parse(res.data)
 
+		console.log(edgeProfile)
+
+		if (edgeProfile) {
 			return {
 				props: {
+					userID: edgeProfile?._id,
 					error: false,
 					email,
-					userID: res._id,
 					active: false
 				}
 			}
-		} catch (error) {
-			throw Error(error)
+		} else {
+			return {
+				props: {
+					userID: null,
+					error: 'There was an error while verifying your credentials...',
+					email: '',
+					active: false
+				}
+			}
 		}
 	} catch (error) {
 		throw new Error(error)

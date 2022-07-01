@@ -6,14 +6,12 @@ import { Loader } from '@/components/util'
 
 export default function Home({}) {
 	const [session] = useSession()
-	const [loading, setLoading] = useState(true)
+	const [loading, setLoading] = useState(false)
 
 	const router = useRouter()
 
 	if (session) {
 		router.push('/missions')
-	} else {
-		setLoading(false)
 	}
 
 	return (
