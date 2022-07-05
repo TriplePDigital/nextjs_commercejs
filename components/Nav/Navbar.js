@@ -46,6 +46,12 @@ export default function Navbar() {
 	return loading ? null : (
 		<nav className={`w-full h-16 border-b border-gray-200 px-10`}>
 			<ul className={`flex flex-row justify-between items-center h-full`}>
+				<span
+					className="font-bold text-white bg-slate-500 px-2 py-2 rounded"
+					title="The current release of this application is still under active development. If you experience any issues with the application, please let one of our associates know."
+				>
+					PRE-BETA RELEASE
+				</span>
 				<div className="flex flex-row justify-between items-center h-full lg:w-1/3 w-1/2 text-gray-500 font-semibold">
 					{/* <ActiveLink
 						href={`/`}
