@@ -27,19 +27,21 @@ export default function Course({ webinar, tracks, enrollment }) {
 		<Loader />
 	) : (
 		<div className="flex flex-row w-full mt-5">
-			<section className="w-3/4">
+			<section className="w-full">
 				{/* <Streak user={user} /> */}
 				<h1 className="text-4xl font-semibold mt-5">My Courses</h1>
-				<div className="flex flex-row flex-wrap mt-2">
-					{enrollment?.length > 0
-						? enrollment.map((item) => (
-								<ListOfCourses
-									key={nanoid()}
-									course={item.course}
-									progress={false}
-								/>
-						  ))
-						: null}
+				<div className="flex overflow-x-scroll pb-10">
+					<div className="flex flex-nowrap mt-2">
+						{enrollment?.length > 0
+							? enrollment.map((item) => (
+									<ListOfCourses
+										key={nanoid()}
+										course={item.course}
+										progress={false}
+									/>
+							  ))
+							: null}
+					</div>
 				</div>
 				{tracks.map((track, i) => {
 					return track.numCourses !== 0 ? (
@@ -64,7 +66,7 @@ export default function Course({ webinar, tracks, enrollment }) {
 					) : null
 				})}
 			</section>
-			<Webinar webinar={webinar} />
+			{/* <Webinar webinar={webinar} /> */}
 		</div>
 	)
 }

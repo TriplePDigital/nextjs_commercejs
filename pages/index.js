@@ -1,12 +1,10 @@
 // import Head from 'next/head'
-import { useState } from 'react'
 import { useSession, signIn } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import { Loader } from '@/components/util'
 
 export default function Home({}) {
-	const [session] = useSession()
-	const [loading, setLoading] = useState(false)
+	const [session, loading] = useSession()
 
 	const router = useRouter()
 
@@ -19,8 +17,11 @@ export default function Home({}) {
 			{loading ? (
 				<Loader size={96} />
 			) : (
-				<button onClick={() => signIn()}>
-					Sign In to gain access to your courses
+				<button
+					className="bg-ncrma-400 hover:bg-ncrma-700 text-white rounded py-2 px-4 block mx-auto"
+					onClick={() => signIn()}
+				>
+					Sign in to gain access to your courses
 				</button>
 			)}
 		</div>
