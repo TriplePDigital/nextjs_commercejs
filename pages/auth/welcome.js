@@ -182,6 +182,14 @@ export async function getServerSideProps(ctx) {
 		const userCheck = await fetcher(query)
 
 		if (userCheck) {
+			if (userCheck.active) {
+			return {
+				redirect: {
+					destination: '/missions',
+					permanent: true
+				}
+			}
+		}
 			return {
 				props: {
 					error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
