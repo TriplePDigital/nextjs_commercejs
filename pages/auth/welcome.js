@@ -54,14 +54,25 @@ export default function Welcome({ error, email, userID }) {
 		try {
 			setLoading(true)
 
-			let res = await client.create({
-				_type: 'user',
-				account_id: userID,
-				active: true,
-				firstName,
-				lastName,
-				email: em.length > 0 ? em : email
-			})
+			let usr = await client.fetch(
+				`*[_type == 'user' && email == '${email}'][0]`
+			)
+
+			if (!usr) {
+				await client.create({
+					_type: 'user',
+					account_id: userID,
+					active: true,
+					firstName,
+					lastName,
+					email: em.length > 0 ? em : email
+				})
+			} else {
+				await client
+					.patch(usr._id) // Document ID to patch
+					.set({ active: true, account_id: userID }) // Shallow merge
+					.commit() // Perform the patch and return a promise
+			}
 
 			//Update document in MongoDB
 
@@ -183,50 +194,40 @@ export async function getServerSideProps(ctx) {
 
 		if (userCheck) {
 			if (userCheck.active) {
-			return {
-				redirect: {
-					destination: '/missions',
-					permanent: true
+				return {
+					redirect: {
+						destination: '/missions',
+						permanent: true
+					}
 				}
-			}
-		}
-			return {
-				props: {
-					error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
-					userID: userCheck.account_id,
-					active: userCheck.active,
-					email: userCheck.email
-				}
-			}
-		}
+			} else {
+				let res = await axios.get(
+					`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
+					{
+						params: { email }
+					}
+				)
 
-		let res = await axios.get(
-			`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
-			{
-				params: { email }
-			}
-		)
+				const edgeProfile = JSON.parse(res.data)
 
-		const edgeProfile = JSON.parse(res.data)
-
-		console.log(edgeProfile)
-
-		if (edgeProfile) {
-			return {
-				props: {
-					userID: edgeProfile?._id,
-					error: false,
-					email,
-					active: false
-				}
-			}
-		} else {
-			return {
-				props: {
-					userID: null,
-					error: 'There was an error while verifying your credentials...',
-					email: '',
-					active: false
+				if (edgeProfile) {
+					return {
+						props: {
+							userID: edgeProfile?._id,
+							error: false,
+							email,
+							active: false
+						}
+					}
+				} else {
+					return {
+						props: {
+							error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
+							userID: userCheck.account_id,
+							active: userCheck.active,
+							email: userCheck.email
+						}
+					}
 				}
 			}
 		}

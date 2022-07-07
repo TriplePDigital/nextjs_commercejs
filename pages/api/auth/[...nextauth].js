@@ -10,21 +10,30 @@ function generateRandomNumber() {
 	return Math.floor(Math.random() * (maxm - minm + 1)) + minm
 }
 
-const transporterConfigSendGrid = {
-	host: process.env.NEXT_PUBLIC_SENDGRID_API_SERVER,
-	port: process.env.NEXT_PUBLIC_SENDGRID_API_PORT,
-	auth: {
-		user: process.env.NEXT_PUBLIC_SENDGRID_API_USERNAME,
-		pass: process.env.NEXT_PUBLIC_SENDGRID_API_KEY
-	}
-}
-
-const transporterConfigMailjet = {
-	service: 'Mailjet',
+const mailjetServerConfig = {
 	host: 'in-v3.mailjet.com',
+	port: '587',
 	auth: {
 		user: process.env.NEXT_PUBLIC_MAILJET_API_KEY,
 		pass: process.env.NEXT_PUBLIC_MAILJET_API_SECRET
+	}
+}
+
+const transporterConfigMailtrap = {
+	host:
+		process.env.NODE_ENV === 'production'
+			? 'in-v3.mailjet.com'
+			: 'smtp.mailtrap.io',
+	port: process.env.NODE_ENV === 'production' ? 587 : 2525,
+	auth: {
+		user:
+			process.env.NODE_ENV === 'production'
+				? process.env.NEXT_PUBLIC_MAILJET_API_KEY
+				: '9e0c155ae8f9b0',
+		pass:
+			process.env.NODE_ENV === 'production'
+				? process.env.NEXT_PUBLIC_MAILJET_API_SECRET
+				: '5cf722b6a809ae'
 	}
 }
 
@@ -38,14 +47,10 @@ const options = {
 		// 		'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code'
 		// }),
 		Providers.Email({
-			server: {
-				host: 'in-v3.mailjet.com',
-				port: '587',
-				auth: {
-					user: process.env.NEXT_PUBLIC_MAILJET_API_KEY,
-					pass: process.env.NEXT_PUBLIC_MAILJET_API_SECRET
-				}
-			},
+			server:
+				process.env.NODE_ENV === 'production'
+					? mailjetServerConfig
+					: process.env.EMAIL_SERVER,
 			from: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
 			generateVerificationToken: () => {
 				const token = generateRandomNumber()
@@ -58,9 +63,9 @@ const options = {
 				provider
 			}) => {
 				return new Promise((resolve, reject) => {
-					const { server, from } = provider
+					const { from } = provider
 					let transporter = nodemailer.createTransport(
-						transporterConfigMailjet
+						transporterConfigMailtrap
 					)
 
 					transporter.verify(function (error, success) {
