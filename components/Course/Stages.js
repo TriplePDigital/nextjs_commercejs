@@ -6,6 +6,7 @@ import isVideo from '@/util/isVideo'
 import { Loader } from '../util'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { duration } from 'moment'
 
 const secondsToTime = (e) => {
 	let h = Math.floor(e / 3600)
@@ -67,6 +68,10 @@ export default function Stages({
 							<>
 								{stage.checkpoints.map(
 									(checkpoint, cntIndex) => {
+										const durr = duration(
+											checkpoint.type?.duration,
+											'm'
+										)._data
 										return (
 											<>
 												<div
@@ -128,11 +133,14 @@ export default function Stages({
 														{isVideo(
 															checkpoint.type
 														)
-															? secondsToTime(
-																	checkpoint
-																		.type
-																		?.duration
-															  )
+															? `${
+																	durr.hours >
+																	0
+																		? `${durr.hours}:`
+																		: ''
+															  }
+															  ${durr.minutes > 0 ? `${durr.minutes}:` : '00'}
+															  ${durr.seconds > 0 ? durr.seconds : '00'}`
 															: null}
 													</span>
 												</div>
