@@ -11,11 +11,11 @@ export default async function getQuizAttempts() {
 	        email,
 	        firstName,
 	        lastName,
-	        enrollment -> {
+	        "enrollment": *[_type == "enrollment" && references(^._id)]{
 	            _createdAt,
 	            course -> {
 	              ...
-	            }
+	            },
 	        },
 	        avatar{
 	            asset ->

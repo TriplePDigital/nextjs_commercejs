@@ -1,7 +1,8 @@
+import groq from 'groq'
 import { fetcher } from './fetcher'
 
 export default async function getQuizByID(quizID, userID) {
-	const query = `
+	const query = groq`
         *[_type == "checkpoint" && _id == '${quizID}']
         {
         _id,
