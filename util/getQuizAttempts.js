@@ -42,6 +42,6 @@ export default async function getQuizAttempts() {
             title,
           }
         }
-      }`
+      } | order(_createdAt desc)`
 	return await fetcher(query)
 }

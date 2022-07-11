@@ -89,15 +89,16 @@ export default function ListOfCourses({ course, key, progress }) {
 					<ul>
 						{course?.instructors.map((instructor) => {
 							return (
-								<Link
-									href={`user/instructor/${instructor._id}`}
-									key={nanoid()}
-									passHref={true}
-								>
-									<a className="text-base text-gray-600 underline block">
-										{instructor.name}
-									</a>
-								</Link>
+								<li key={nanoid()} className="relative">
+									<Link
+										href={`user/instructor/${instructor._id}`}
+										passHref={true}
+									>
+										<a className="text-base text-gray-600 underline block">
+											{instructor.name}
+										</a>
+									</Link>
+								</li>
 							)
 						})}
 					</ul>
