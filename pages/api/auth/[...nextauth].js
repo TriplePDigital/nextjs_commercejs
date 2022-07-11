@@ -83,37 +83,90 @@ const options = {
 										subject: `NCRMA Learning Management System - Prompt for Authentication`,
 										text: `Authentication token is: ${token}`,
 										html: `
-										<body style="background: #f9f9f9;">
-			  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-				  <td align="center" style="padding: 10px 0px 20px 0px; font-size: 22px; font-family: Helvetica, Arial, sans-serif; color: #444444;">
-					<strong>NCRMA Learning Management System</strong>
-				  </td>
-				</tr>
-			  </table>
-			  <table width="100%" border="0" cellspacing="20" cellpadding="0" style="background: #ffffff; max-width: 600px; margin: auto; border-radius: 10px;">
-				<tr>
-				  <td align="center" style="padding: 10px 0px 0px 0px; font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #444444;">
-					Sign in as <strong>${encodeURI(email)}</strong>
-				  </td>
-				</tr>
-				<tr>
-				  <td align="center" style="padding: 20px 0;">
-					<table border="0" cellspacing="0" cellpadding="0">
-					  <tr>
-						<td align="center" style="border-radius: 5px;" bgcolor="#346df1"><a href="${url}" target="_blank" style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; text-decoration: none;border-radius: 5px; padding: 10px 20px; border: 1px solid #346df1; display: inline-block; font-weight: bold;">${token}</a></td>
-					  </tr>
-					</table>
-				  </td>
-				</tr>
-				<tr>
-				  <td align="center" style="padding: 0px 0px 10px 0px; font-size: 16px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: #444444;">
-					If you did not request this email you can safely ignore it.
-				  </td>
-				</tr>
-			  </table>
-			</body>
-			
+										<!DOCTYPE html>
+											<html lang="en">
+
+											<head>
+											<meta charset="UTF-8" />
+											<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+											<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+											</head>
+											<style>
+											body {
+												font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+												background-color: #f9f9f9;
+											}
+											.wrapper{
+												width: 100%; 
+												max-width: 600px; 
+												margin: 0 auto;
+											}
+											.container {
+												margin: 0 auto;
+												max-width: 1100px;
+												width: 100%;
+												display: flex;
+												flex-direction: column;
+												align-items: center;
+												text-align: center;
+												padding: 20px;
+												border-radius: 0.5em;
+												background-color: #fff;
+											}
+
+											h1 {
+												font-weight: bold;
+												margin: 0 20px;
+												font-size: 1.75em;
+											}
+
+											h2 {
+												font-weight: normal;
+												font-size: 1.5em;
+											}
+
+											p {
+												font-size: 1em;
+												line-height: 1.5;
+												margin: 0;
+												padding: 3px 0;
+											}
+											.small {
+												font-size: 0.8em;
+												opacity: 0.6;
+											}
+											.token {
+												background-color: #5FBBBE;
+												color: white;
+												padding: 0.5em 0.25em;
+											}
+											</style>
+
+											<body>
+											<div class="wrapper">
+												<div class="container">
+												<h1>
+													NCRMA Learning Management System
+												</h1>
+												<h2>
+													Prompt for Authentication
+												</h2>
+												<p>
+													Your authentication code is: <span class="token">${token}</span>
+												</p>
+												<p class="small">
+													Please either click the link below, or copy and paste the 6 digit code into the appropriate field on the website to log into your account.
+												</p>
+												<br/>
+												<p>
+													<a href="${url}" style="color: #0070f3;">
+													${url}
+													</a>
+												</p>
+												</div>
+											</div>
+											</body>
+										</html>		
 										`
 									},
 									(error) => {
