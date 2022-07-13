@@ -65,11 +65,6 @@ export default function ListOfCourses({ course, key, progress }) {
 						) : (
 							<a
 								className="text-black font-bold text-xl cursor-pointer"
-								// onClick={() =>
-								// 	alert(
-								// 		'This course is still in the making by one of our associates. Please check back later for an update.'
-								// 	)
-								// }
 							>
 								<div className="relative h-44 w-full">
 									<Image

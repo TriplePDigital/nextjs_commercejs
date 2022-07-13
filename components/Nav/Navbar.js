@@ -1,14 +1,11 @@
 /* eslint-disable no-unused-vars */
 import { useSession, signIn, signOut } from 'next-auth/client'
 import ActiveLink from './ActiveLink'
-import { Loader } from '../util'
-import Image from 'next/image'
 import { RiShutDownLine } from 'react-icons/ri'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../pages/_app'
 import { BsFillPersonFill } from 'react-icons/bs'
 import { fetcher } from '@/util/fetcher'
-import imgConstructor, { configuredSanityClient } from '@/util/img'
 import { useNextSanityImage } from 'next-sanity-image'
 import Link from 'next/link'
 
