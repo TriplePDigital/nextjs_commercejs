@@ -13,97 +13,131 @@ export default function ListOfCourses({ course, key, progress }) {
 		<Loader />
 	) : (
 		<div className="inline-block px-3">
-			<div
-				key={nanoid()}
-				// className="xl:w-1/4 lg:w-1/3 md:w-1/2 w-full first:ml-0 first:mr-0 lg:first:ml-0 lg:first:mx-0 lg:mx-3 mx-0 border rounded-md shadow-md lg:mb-0 mb-6 h-min"
-				className="w-72 h-fit xl:max-w-xl lg:max-w-lg md:max-w-md max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
+			<Link
+				href={`${
+					course.numberOfStages > 0
+						? `/mission/${course.slug.current}`
+						: '/missions'
+				}`}
 			>
-				{/* TODO: figure out if we need tooltip over the courses or not. might need to get a different tooltip lib */}
-				<div className="relative h-44 w-full">
-					<Image
-						{...imgConstructor(course.coverImage, {
-							fit: 'fill'
-						})}
-						layout="fill"
-						quality={50}
-						alt={course.blurb}
-					/>
+				<a
+					onClick={() =>
+						course.numberOfStages > 0
+							? null
+							: alert(
+									'This course is still in the making by one of our associates. Please check back later for an update.'
+							  )
+					}
+				>
 					<div
-						className="opacity-75 absolute left-0 top-0 h-full w-full"
-						style={{ backgroundColor: `${course.colorCode}` }}
-					></div>
-				</div>
-				<div className="p-3">
-					{/* course title */}
-					<h1 className="font-semibold text-xl">
+						key={nanoid()}
+						// className="xl:w-1/4 lg:w-1/3 md:w-1/2 w-full first:ml-0 first:mr-0 lg:first:ml-0 lg:first:mx-0 lg:mx-3 mx-0 border rounded-md shadow-md lg:mb-0 mb-6 h-min"
+						className="w-72 h-fit xl:max-w-xl lg:max-w-lg md:max-w-md max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"
+					>
+						{/* TODO: figure out if we need tooltip over the courses or not. might need to get a different tooltip lib */}
 						{course.numberOfStages > 0 ? (
 							<Link
-								passHref
+								passHref={false}
 								href={`/mission/${course?.slug.current}`}
 							>
 								<a className="text-black font-bold text-xl">
-									{course?.title}
+									<div className="relative h-44 w-full">
+										<Image
+											{...imgConstructor(
+												course.coverImage,
+												{
+													fit: 'fill'
+												}
+											)}
+											layout="fill"
+											quality={50}
+											alt={course.blurb}
+										/>
+										<div
+											className="opacity-75 absolute left-0 top-0 h-full w-full"
+											style={{
+												backgroundColor: `${course.colorCode}`
+											}}
+										></div>
+									</div>
 								</a>
 							</Link>
 						) : (
 							<a
 								className="text-black font-bold text-xl cursor-pointer"
-								onClick={() =>
-									alert(
-										'This course is still in the making by one of our associates. Please check back later for an update.'
-									)
-								}
+								// onClick={() =>
+								// 	alert(
+								// 		'This course is still in the making by one of our associates. Please check back later for an update.'
+								// 	)
+								// }
 							>
-								{course?.title}
+								<div className="relative h-44 w-full">
+									<Image
+										{...imgConstructor(course.coverImage, {
+											fit: 'fill'
+										})}
+										layout="fill"
+										quality={50}
+										alt={course.blurb}
+									/>
+									<div
+										className="opacity-75 absolute left-0 top-0 h-full w-full"
+										style={{
+											backgroundColor: `${course.colorCode}`
+										}}
+									></div>
+								</div>
 							</a>
 						)}
-					</h1>
-
-					{/* progress bar */}
-					{progress ? (
-						<div className="w-full bg-ncrma-300 rounded-full h-full my-3">
-							<div
-								className="bg-ncrma-600 rounded-full px-4 text-white"
-								style={{
-									width: `${progress}%`
-								}}
-							>
-								{' '}
-								{progress}%
-							</div>
-						</div>
-					) : null}
-
-					{/* enrollment line */}
-					<div className="flex my-4">
-						<div className="flex items-center">
-							<FaUserGraduate className="mr-2 text-gray-300" />
-							<p className="text-gray-600">Enrolled:</p>
-						</div>
-						<span className="font-semibold ml-2">
-							{course?.enrollCount}
-						</span>
-					</div>
-
-					{/* instructors being mapped out */}
-					<ul>
-						{course?.instructors.map((instructor) => {
-							return (
-								<li key={nanoid()} className="relative">
+						<div className="p-3">
+							{/* course title */}
+							<h1 className="font-semibold text-xl">
+								{course.numberOfStages > 0 ? (
 									<Link
-										href={`user/instructor/${instructor._id}`}
-										passHref={true}
+										passHref={false}
+										href={`/mission/${course?.slug.current}`}
 									>
-										<a className="text-base text-gray-600 underline block">
-											{instructor.name}
+										<a className="text-black font-bold text-xl">
+											{course?.title}
 										</a>
 									</Link>
-								</li>
-							)
-						})}
-					</ul>
-				</div>
-			</div>
+								) : (
+									<a
+										className="text-black font-bold text-xl cursor-pointer"
+										onClick={() =>
+											alert(
+												'This course is still in the making by one of our associates. Please check back later for an update.'
+											)
+										}
+									>
+										{course?.title}
+									</a>
+								)}
+							</h1>
+
+							{/* enrollment line */}
+							<div className="flex my-4">
+								<div className="flex items-center">
+									<FaUserGraduate className="mr-2 text-gray-300" />
+									<p className="text-gray-600">Enrolled:</p>
+								</div>
+								<span className="font-semibold ml-2">
+									{course?.enrollCount}
+								</span>
+							</div>
+
+							{/* instructors being mapped out */}
+							<ul>
+								{course?.instructors.map((instructor) => (
+									<li key={nanoid()} className="relative">
+										{instructor.name}
+									</li>
+								))}
+							</ul>
+						</div>
+					</div>
+				</a>
+			</Link>
 		</div>
 	)
 }
