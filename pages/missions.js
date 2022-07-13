@@ -76,7 +76,7 @@ export async function getServerSideProps(ctx) {
 	if (!session) {
 		return {
 			redirect: {
-				destination: `/auth/login?callbackUrl=${process.env.NEXTAUTH_URL}/welcome`,
+				destination: `/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`,
 				permanent: false
 			}
 		}
