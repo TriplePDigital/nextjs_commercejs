@@ -33,9 +33,10 @@ export default function Course({ webinar, tracks, enrollment }) {
 				<div className="flex overflow-x-scroll pb-10">
 					<div className="flex flex-nowrap mt-2">
 						{enrollment?.length > 0
-							? enrollment.map((item) => (
+							? enrollment.map((item, enrollmentIndex) => (
 									<ListOfCourses
-										key={nanoid()}
+										key={enrollmentIndex}
+										index={enrollmentIndex}
 										course={item.course}
 										progress={false}
 									/>
@@ -52,13 +53,16 @@ export default function Course({ webinar, tracks, enrollment }) {
 							<div className="flex overflow-x-scroll pb-10">
 								<div className="flex flex-nowrap mt-2">
 									{track.missions
-										? track.missions.map((course) => (
-												<ListOfCourses
-													key={nanoid()}
-													course={course}
-													progress={false}
-												/>
-										  ))
+										? track.missions.map(
+												(course, courseIndex) => (
+													<ListOfCourses
+														key={courseIndex}
+														index={courseIndex}
+														course={course}
+														progress={false}
+													/>
+												)
+										  )
 										: null}
 								</div>
 							</div>

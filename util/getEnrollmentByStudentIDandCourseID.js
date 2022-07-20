@@ -38,6 +38,7 @@ export default async function getEnrollmentByStudentIDandCourseID(
                     title,
                     instructor -> {name, _id, "avatar":avatar.asset->, stages[]->}
                 },
+                order,
                 title,
                 _id,
                 instance

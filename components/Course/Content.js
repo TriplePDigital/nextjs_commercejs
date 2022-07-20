@@ -1,63 +1,172 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactPlayer from 'react-player/vimeo'
 import Image from 'next/image'
 import { Question, Bio } from '../Lesson'
 import Link from 'next/link'
-import imgConstructor from '../../util/img'
+import imgConstructor, { configuredSanityClient as client } from '@/util/img'
+import { useRouter } from 'next/router'
 
-export default function Content({ body, className }) {
-	const imgProps = imgConstructor(body?.instructor?.avatar?.asset)
+/**
+ * Gets a single progress document that references a specific checkpoint and user
+ * @param object the checkpoint ID that we want to get the reference to
+ * @param object the user's ID that we want to get the reference to
+ * @returns an progress document if one exists, otherwise null
+ */
+const getCheckpointProgress = async (checkpointID, enrollmentID) => {
+	try {
+		return await client.fetch(
+			`*[_type == "progress" && references($checkpointID) && references($enrollmentID)]{...}[0]`,
+			{ checkpointID: checkpointID, enrollmentID: enrollmentID }
+		)
+	} catch (error) {
+		throw new Error(error)
+	}
+}
 
-	return body._type === 'video' ? (
-		<div className={className}>
-			<ReactPlayer
-				url={body?.vimeoVideo?.url}
-				config={{
-					vimeo: {
-						playerOptions: {
-							byline: false,
-							pip: true,
-							title: false,
-							controls: true
-						}
-					}
-				}}
-			/>
-			<div className="flex flex-row items-center mt-5">
-				{imgProps && (
-					<div className="w-14 h-14 rounded-full overflow-hidden">
-						<Image
-							{...imgProps}
-							layout="intrinsic"
-							placeholder="blur"
-							alt="the instructors avatar image in the shape of a circle"
-						/>
+export default function Content({ currentCheckpoint, enrollment }) {
+	const videoRef = useRef(null)
+
+	const getCurrentProgress = async () => {
+		return Math.floor(
+			((await videoRef.current.getCurrentTime()) /
+				(await videoRef.current.getDuration())) *
+				100
+		)
+	}
+
+	const createProgress = async (checkpoint) => {
+		let currProgress = await getCurrentProgress()
+		const checkpointProgress = await getCheckpointProgress(
+			checkpoint._id,
+			enrollment._id
+		)
+		if (!checkpointProgress) {
+			const res = await client.create({
+				_type: 'progress',
+				content: {
+					_type: 'reference',
+					_ref: checkpoint._id
+				},
+				enrollment: {
+					_type: 'reference',
+					_ref: enrollment._id
+				},
+				status: currProgress
+			})
+			console.warn(
+				'There was no existing activity documents for the current user given the current checkpoint: ',
+				res
+			)
+		} else {
+			console.warn(
+				'There was already an existing document for the current checkpoint.'
+			)
+		}
+	}
+
+	const updateProgress = async (checkpoint) => {
+		let currProgress = await getCurrentProgress()
+		if (currProgress === 50 || currProgress === 100) {
+			const checkpointProgress = await getCheckpointProgress(
+				checkpoint._id,
+				enrollment._id
+			)
+			if (currProgress > checkpointProgress.status) {
+				try {
+					let res = await client
+						.patch(checkpointProgress._id)
+						.set({ status: currProgress })
+						.commit()
+					console.warn('Updated the users activity: ', res)
+				} catch (error) {
+					throw new Error(error)
+				}
+			}
+		}
+	}
+
+	return (
+		<div className="w-9/12 bg-gray-100 shadow-md border px-4 py-6 mt-6 mx-2 ml-0 rounded">
+			<>
+				<div className={`aspect-video h-auto w-full`}>
+					<ReactPlayer
+						url={currentCheckpoint.type?.vimeoVideo.url}
+						config={{
+							vimeo: {
+								playerOptions: {
+									byline: false,
+									pip: true,
+									title: false,
+									controls: true,
+									fallback: null
+								}
+							}
+						}}
+						width="100%"
+						height="100%"
+						onEnded={() => updateProgress(currentCheckpoint)}
+						onProgress={() => updateProgress(currentCheckpoint)}
+						onStart={() => createProgress(currentCheckpoint)}
+						ref={videoRef}
+					/>
+				</div>
+				<div className="flex items-center my-6">
+					<Link
+						href={`/user/instructor/${currentCheckpoint.type?.instructor._id}`}
+						passHref
+					>
+						<div className="flex items-center mx-4 first:ml-0">
+							<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
+								{currentCheckpoint.type?.instructor ? (
+									<>
+										<Image
+											{...imgConstructor(
+												currentCheckpoint.type
+													?.instructor.avatar,
+												{
+													fit: 'fill'
+												}
+											)}
+											alt="Instructor Avatar"
+											layout="fill"
+											quality={50}
+										/>
+										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
+									</>
+								) : null}
+							</div>
+							<span className="font-semibold leading-loose text-lg">
+								{currentCheckpoint.type?.instructor.name}
+							</span>
+						</div>
+					</Link>
+				</div>
+				<div>
+					<div className="font-semibold text-lg">
+						{currentCheckpoint.type?.title}
 					</div>
-				)}
-				<p className="ml-3">
-					<span className="text-gray-500">Author:</span>{' '}
-					<span className="font-semibold leading-loose">
-						{body?.instructor?.name}
-					</span>
-				</p>
-			</div>
-			<h1 className="text-2xl leading-loose tracking-wide font-bold">
-				{body.title}
-			</h1>
-			<Bio data={body?.instructor?.bio ?? ''} />
-			<h1 className="text-2xl">Other stages by this instructor</h1>
-			{body?.instructor?.stages.map((stage, index) => (
-				<Link href="" key={index}>
-					<a className="underline text-blue-700">{stage.title}</a>
-				</Link>
-			))}
-		</div>
-	) : (
-		<div className={className}>
-			<p>{body.title}</p>
-			{body.minimumScore}
-			<Question data={body.questions} />
+					<div className="font-light text-gray-500">
+						{currentCheckpoint.type?.body}
+					</div>
+				</div>
+				<div className="flex flex-col">
+					<div className="flex justify-between items-center bg-gray-200 rounded text-center mb-5">
+						<span className="px-6 py-4 border-r-2 border-gray-300 w-full">
+							Supporting Files
+						</span>
+						<span className="px-6 py-4 border-r-2 border-gray-300 w-full">
+							Discussion
+						</span>
+						<span className="px-6 py-4 border-r-2 border-gray-300 w-full">
+							Reviews
+						</span>
+						<span className="px-6 py-4 w-full">
+							More from {currentCheckpoint.type?.instructor.name}
+						</span>
+					</div>
+				</div>
+			</>
 		</div>
 	)
 }
