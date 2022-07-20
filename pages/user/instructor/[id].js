@@ -27,7 +27,7 @@ function Profile({ profile }) {
 			<div className="">{profile.bio}</div>
 			<div className="flex flex-col my-5">
 				<h1 className="font-medium text-xl">
-					Courses {profile.name} teaches
+					Course(s) by {profile.name}
 				</h1>
 				<table className="">
 					<thead className="border-b-2 border-gray-500">

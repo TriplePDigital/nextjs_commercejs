@@ -6,6 +6,19 @@ export default async function getMissionBySlug(slug) {
         *[_type == 'mission' && slug.current == '${slug}']{
           _id,
           title,
+          blurb,
+          description,
+          categories,
+          colorCode,
+          "instructors": *[_type == 'instructor' && references(^._id)]{
+            ...,
+            "avatar": avatar.asset->
+          },
+          instructors[]->{
+            ...,
+            "avatar": avatar.asset->
+          },
+          "coverImage": coverImage.asset->,
           "slug": slug.current,
           "stages": *[_type == 'stage' && references(^._id)] | order(order){
             title,
