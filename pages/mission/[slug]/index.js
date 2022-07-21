@@ -53,9 +53,10 @@ function MissionSlug({ session, mission, user, enrollment }) {
 	useEffect(() => {
 		setLoading(true)
 		setCurrentCheckpoint(
-			enrollment.course.stages[stageContext].checkpoints[
+			enrollment
+			? enrollment.course.stages[stageContext].checkpoints[
 				checkpointContext
-			]
+			] : null
 		)
 		skipToCheckpoint(checkpointIDQuery)
 		return () => {}
