@@ -36,8 +36,9 @@ export default async function getEnrollmentByStudentIDandCourseID(
                     minimumScore,
                     questions[]->,
                     title,
-                    instructor -> {name, _id, "avatar":avatar.asset->, stages[]->}
+                    instructor -> {name, email, _id, "avatar":avatar.asset->, stages[]->}
                 },
+                order,
                 title,
                 _id,
                 instance

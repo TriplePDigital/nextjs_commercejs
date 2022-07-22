@@ -1,20 +1,23 @@
 /* eslint-disable no-unused-vars */
 import { useSession, signIn, signOut } from 'next-auth/client'
 import ActiveLink from './ActiveLink'
-import { Loader } from '../util'
-import Image from 'next/image'
 import { RiShutDownLine } from 'react-icons/ri'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../pages/_app'
-import { BsFillPersonFill } from 'react-icons/bs'
+import {
+	BsCaretDownFill,
+	BsCaretUpFill,
+	BsFillPersonFill,
+	BsGearFill
+} from 'react-icons/bs'
 import { fetcher } from '@/util/fetcher'
-import imgConstructor, { configuredSanityClient } from '@/util/img'
 import { useNextSanityImage } from 'next-sanity-image'
 import Link from 'next/link'
 
 export default function Navbar() {
 	const [session, loading] = useSession()
 	const [avatar, setAvatar] = useState(null)
+	const [toggleDropdown, setToggleDropdown] = useState(false)
 	const { setUser, user } = useContext(UserContext)
 
 	const getUser = () => {
@@ -115,36 +118,65 @@ export default function Navbar() {
 									  )
 									: 'Become a Member'}
 							</button>
-							<Link
-								href={
-									user ? `/user/student/${user._id}` : '/user'
+							<button
+								className="relative bg-ncrma-100 hover:bg-ncrma-300 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center"
+								onClick={() =>
+									setToggleDropdown(!toggleDropdown)
 								}
-								passHref={true}
+								onMouseLeave={() => setToggleDropdown(false)}
 							>
-								<a>
-									<div className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center">
-										<div className="h-8 w-8 rounded-full mr-2 overflow-hidden">
-											<BsFillPersonFill size={30} />
-										</div>
+								<div className="h-8 w-8 rounded-full mr-2 overflow-hidden">
+									<BsFillPersonFill size={30} />
+								</div>
 
-										<span
-											className={`inline-block capitalize mr-2 font-semibold leading-loose tracking-wide`}
+								<span
+									className={`inline-block capitalize mr-2 font-semibold leading-loose tracking-wide`}
+								>
+									{user?.firstName.toLowerCase()}
+								</span>
+								{toggleDropdown ? (
+									<ol className="absolute w-full h-fit top-full left-0 bg-gray-100 rounded shadow-md border text-left flex flex-col gap-1">
+										<Link
+											href={
+												user
+													? `/user/student/${user._id}`
+													: '/user'
+											}
+											passHref={false}
 										>
-											{user?.firstName.toLowerCase()}
-										</span>
-										<button
-											className="cursor-pointer"
+											<a>
+												<li className="flex gap-2 items-center hover:bg-gray-200 px-2 py-3">
+													<span className="opacity-50">
+														<BsGearFill />
+													</span>
+													Your Profile
+												</li>
+											</a>
+										</Link>
+										<a
 											onClick={() =>
 												signOut({
 													callbackUrl: `${process.env.NEXTAUTH_URL}/login`
 												})
 											}
 										>
-											<RiShutDownLine />
-										</button>
-									</div>
-								</a>
-							</Link>
+											<li className="flex gap-2 items-center hover:bg-gray-200 px-2 py-3">
+												<span className="opacity-50">
+													<RiShutDownLine />
+												</span>
+												Log Out
+											</li>
+										</a>
+									</ol>
+								) : null}
+								<span>
+									{toggleDropdown ? (
+										<BsCaretUpFill />
+									) : (
+										<BsCaretDownFill />
+									)}
+								</span>
+							</button>
 						</>
 					)}
 				</div>

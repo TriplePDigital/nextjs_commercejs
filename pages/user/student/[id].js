@@ -110,7 +110,7 @@ function Profile({ profile, account }) {
 					defaultValue={profile.email}
 				/>
 				{/* <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:ring focus:shadow-outline my-1" type="text" value={profile.email}/> */}
-				{profile.achievements ? (
+				{profile.achievements?.length > 0 ? (
 					<>
 						<label htmlFor="">Achievements</label>
 						<div className="">

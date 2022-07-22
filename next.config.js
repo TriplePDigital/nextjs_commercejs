@@ -10,7 +10,8 @@ const moduleExports = {
 			'localhost',
 			'via.placeholder.com'
 		]
-	}
+	},
+	env: {VERSION: process.env.npm_package_version}
 }
 
 const sentryWebpackPluginOptions = {

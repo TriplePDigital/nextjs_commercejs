@@ -1,6 +1,7 @@
 {
 	"name": "nextjs_e-commerce",
 	"private": true,
+	"version": "1.0.0",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",

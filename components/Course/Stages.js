@@ -1,30 +1,16 @@
 /* eslint-disable no-unused-vars */
 import Link from 'next/link'
-import { AiOutlinePlayCircle, AiFillPlayCircle } from 'react-icons/ai'
+import {
+	AiOutlinePlayCircle,
+	AiFillPlayCircle,
+	AiFillCheckCircle
+} from 'react-icons/ai'
 import { MdOutlineQuiz } from 'react-icons/md'
 import isVideo from '@/util/isVideo'
 import { Loader } from '../util'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { duration } from 'moment'
-
-const secondsToTime = (e) => {
-	let h = Math.floor(e / 3600)
-			.toString()
-			.padStart(2, '0'),
-		m = Math.floor((e % 3600) / 60)
-			.toString()
-			.padStart(2, '0'),
-		s = Math.floor(e % 60)
-			.toString()
-			.padStart(2, '0')
-
-	if (h === '00') {
-		return `${m}:${s}`
-	}
-
-	return `${h}:${m}:${s}`
-}
 
 const getProgressForCheckpoint = (stageID, checkpointID, enrollment) => {
 	const progress = enrollment.progress
@@ -41,6 +27,17 @@ const getProgressForCheckpoint = (stageID, checkpointID, enrollment) => {
 			return '0'
 		} else {
 			return res?.status
+		}
+	}
+}
+
+const findQuizResult = (quizAttempts, quizID) => {
+	if (!quizAttempts) {
+		return null
+	} else {
+		const res = quizAttempts.find((attempt) => attempt.quizID === quizID)
+		if (res) {
+			return res.score
 		}
 	}
 }
@@ -76,9 +73,12 @@ export default function Stages({
 											<>
 												<div
 													className={`flex flex-row items-center justify-between w-full ${
-														checkpoint.progress
-															?.status === 100
-															? 'opacity-25'
+														getProgressForCheckpoint(
+															stage._id,
+															checkpoint._id,
+															enrollment
+														) === 100
+															? 'opacity-25 line-through'
 															: ''
 													}`}
 													key={cntIndex}
@@ -110,9 +110,15 @@ export default function Stages({
 															}}
 														>
 															<div className="text-4xl mr-4 text-ncrma-400 relative z-10">
-																{isVideo(
-																	checkpoint.type
-																) ? (
+																{getProgressForCheckpoint(
+																	stage._id,
+																	checkpoint._id,
+																	enrollment
+																) === 100 ? (
+																	<AiFillCheckCircle />
+																) : isVideo(
+																		checkpoint.type
+																  ) ? (
 																	<AiFillPlayCircle />
 																) : (
 																	<MdOutlineQuiz />
@@ -128,6 +134,11 @@ export default function Stages({
 															checkpoint._id,
 															enrollment
 														)}%`}
+														{/* {findQuizResult(
+															enrollment.student
+																.quizAttempts,
+															checkpoint._id
+														)} */}
 													</span>
 													<span className="text-sm text-gray-500 w-1/6">
 														{isVideo(
@@ -139,7 +150,8 @@ export default function Stages({
 																		? `${durr.hours}:`
 																		: ''
 															  }
-															  ${durr.minutes > 0 ? `${durr.minutes}:` : '00'}
+															  ${durr.minutes > 0 ? durr.minutes : '00'}
+															  :
 															  ${durr.seconds > 0 ? durr.seconds : '00'}`
 															: null}
 													</span>

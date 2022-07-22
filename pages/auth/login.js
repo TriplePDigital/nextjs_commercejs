@@ -48,6 +48,7 @@ function EmailForm({ onSubmit }) {
 						type="email"
 						id="email"
 						name="email"
+						required
 						placeholder="example@ncrma.net"
 						value={email}
 						onChange={(event) => {
@@ -92,7 +93,7 @@ function CodeForm({ email }) {
 	const urlParams = new URLSearchParams({
 		email,
 		token,
-		callbackUrl: `${callbackUrl}/welcome?email=${email}`
+		callbackUrl: `${callbackUrl}welcome?email=${email}`
 	})
 
 	return (
@@ -112,6 +113,7 @@ function CodeForm({ email }) {
 				type="text"
 				id="token"
 				name="token"
+				required
 				value={token}
 				placeholder="123456"
 				maxLength={6}

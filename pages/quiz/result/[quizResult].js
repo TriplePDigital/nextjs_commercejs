@@ -1,70 +1,163 @@
 import { getSession } from 'next-auth/client'
 import getQuizResultByID from '@/util/getQuizResultByID'
 import Link from 'next/link'
+import { MdCheck, MdClose } from 'react-icons/md'
+import { useState } from 'react'
 
-function quizResult({ result, quizID }) {
-	console.log(result)
+const QuizResult = ({ result }) => {
+	const [showAlert, setShowAlert] = useState(true)
+
 	const getNextStage = (stageObj) => {
-		const nextStage = stageObj.find(
-			(stage) => stage.order === result.quiz.stage.order + 1
-		)
-		return nextStage._id
+		try {
+			const nextStage = stageObj.find(
+				(stage) => stage.order === result.checkpoint.stage.order + 1
+			)
+			return nextStage._id
+		} catch (error) {
+			throw new Error(error)
+		}
 	}
 
 	const getNextCheckpoint = (checkpointObj) => {
-		const nextCheckpoint = checkpointObj.find(
-			(checkpoint) => checkpoint.order === result.quiz.order + 1
-		)
-		return nextCheckpoint._id
+		try {
+			const nextCheckpoint = checkpointObj.find(
+				(checkpoint) => checkpoint.order === result.checkpoint.order + 1
+			)
+			return nextCheckpoint._id
+		} catch (error) {
+			throw new Error(error)
+		}
 	}
 
 	return (
-		<div className="flex flex-col w-2/3 mx-auto mt-5">
-			<div>Final score: {result.score}</div>
-			{/* <div>Quiz position in stage: {result.quiz.order}</div>
-			<div>
-				Number of checkpoints in the stage:{' '}
-				{result.quiz.stage.checkpoints?.length}
+		<div className="flex flex-col w-2/3 mx-auto mt-5 shadow-md rounded p-8 bg-gray-50 border">
+			<div className="mb-3">
+				<h1 className="text-3xl font-medium">
+					{result.checkpoint.title}
+				</h1>
+				<h2 className="text-lg font-light opacity-50">
+					{result.checkpoint.stage.mission.title}
+				</h2>
 			</div>
-
 			<div>
-				Number of stages in the mission:{' '}
-				{result.quiz.stage.mission?.nextStage?.length}
+				Your score:{' '}
+				<span
+					className={`font-bold ${
+						result.score > result.checkpoint.type.minimumScore
+							? 'text-green-500'
+							: 'text-red-500'
+					}`}
+				>
+					{result.score}
+				</span>{' '}
+				/ 100{' '}
+				<span className="text-sm text-gray-400">
+					({(Number(result.score) / 100).toFixed(2) * 100}%)
+				</span>
 			</div>
-			{result.quiz.stage.checkpoints?.length !== result.quiz.order
-				? `This is not the final checkpoint. The next checkpoint is No: ${getNextCheckpoint(
-						result.quiz.stage.checkpoints
-				  )}`
-				: `This is the final checkpoint. The next stage is ${getNextStage(
-						result.quiz.stage.mission?.nextStage
-				  )}`} */}
+			<div className="text-sm mb-3">
+				Minimum Score to Pass: {result.checkpoint.type.minimumScore}{' '}
+				<span className="text-sm text-gray-400">
+					(
+					{(
+						Number(result.checkpoint.type.minimumScore) / 100
+					).toFixed(2) * 100}
+					%)
+				</span>
+			</div>
+			{showAlert ? (
+				<div
+					className="relative text-xs text-yellow-700 font-light italic px-4 py-3 w-4/5 mx-auto bg-yellow-100 rounded-lg"
+					role="alert"
+				>
+					We kindly apologize but your responses are not shown at this
+					time. Our team is working on an issue regarding the
+					retrieval of individual student&apos;s responses.{' '}
+					<span className="font-bold">
+						Your final score will be stored regardless of this issue
+						being present.
+					</span>
+					<button
+						className="absolute right-2 top-2 text-gray-400"
+						onClick={() => setShowAlert(false)}
+					>
+						<MdClose size={21} />
+					</button>
+				</div>
+			) : null}
+			<section className="mt-5 ">
+				{result.checkpoint.type.questions.map(
+					(question, questionIndex) => {
+						return (
+							<div className="list-none" key={questionIndex}>
+								<li className="font-medium">
+									{`${questionIndex + 1}.) ${question.title}`}
+								</li>
+								<ul className="mx-5 my-2">
+									{question.answers.map(
+										(answer, answerIndex) => {
+											return (
+												<li
+													key={answerIndex}
+													className="flex gap-5 items-center justify-between w-full md:w-1/2"
+												>
+													<span className="md:w-1/3 ">
+														{answer.answers}
+													</span>
+													<span className="md:w-1/3 text-sm text-gray-600 flex items-center justify-center">
+														Correct response:{' '}
+													</span>
+													<span className="md:w-1/3">
+														{answer.correct ? (
+															<MdCheck
+																size={21}
+																className="text-green-500"
+															/>
+														) : (
+															<MdClose
+																size={21}
+																className="text-red-500"
+															/>
+														)}
+													</span>
+												</li>
+											)
+										}
+									)}
+								</ul>
+							</div>
+						)
+					}
+				)}
+			</section>
 			<div className="flex gap-5 items-center justify-between my-5">
-				<Link href={`/missions}`}>
-					<a className="block bg-gray-300 py-3 px-6 rounded">
+				<Link href={`/missions`}>
+					<a className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg px-6 py-4 w-fit">
 						Back to Courses
 					</a>
 				</Link>
-				{result.quiz.stage.checkpoints?.length !== result.quiz.order ? (
+				{result.checkpoint.stage.checkpoints?.length !==
+				result.checkpoint.order ? (
 					<Link
 						href={`/mission/${
-							result.quiz.stage.mission.slug
+							result.checkpoint.stage.mission.slug
 						}?checkpointID=${getNextCheckpoint(
-							result.quiz.stage.checkpoints
+							result.checkpoint.stage.checkpoints
 						)}`}
 					>
-						<a className="block bg-ncrma-400 py-3 px-6 rounded">
+						<a className="bg-ncrma-400 hover:bg-ncrma-600 text-white px-6 py-4 rounded-lg">
 							Proceed to next Checkpoint
 						</a>
 					</Link>
 				) : (
 					<Link
 						href={`/mission/${
-							result.quiz.stage.mission.slug
+							result.checkpoint.stage.mission.slug
 						}?checkpointID=${getNextStage(
-							result.quiz.stage.mission?.nextStage
+							result.checkpoint.stage.mission?.nextStage
 						)}`}
 					>
-						<a className="block bg-ncrma-400 py-3 px-6 rounded">
+						<a className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center">
 							Proceed to next Stage
 						</a>
 					</Link>
@@ -74,14 +167,14 @@ function quizResult({ result, quizID }) {
 	)
 }
 
-export default quizResult
+export default QuizResult
 
 export async function getServerSideProps(ctx) {
 	const session = await getSession(ctx)
 	if (!session) {
 		return {
 			redirect: {
-				destination: `/auth/login?callbackUrl=${process.env.NEXTAUTH_URL}/welcome`,
+				destination: `/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`,
 				permanent: false
 			}
 		}
