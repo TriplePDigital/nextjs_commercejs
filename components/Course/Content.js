@@ -7,6 +7,8 @@ import Link from 'next/link'
 import imgConstructor, { configuredSanityClient as client } from '@/util/img'
 import { useRouter } from 'next/router'
 
+// TODO: https://cdn.dribbble.com/users/1008889/screenshots/17247195/media/e8e6ae59a1569f0b3370c1c2d4a29ba0.png
+
 /**
  * Gets a single progress document that references a specific checkpoint and user
  * @param object the checkpoint ID that we want to get the reference to
@@ -114,32 +116,45 @@ export default function Content({ currentCheckpoint, enrollment }) {
 				<div className="flex items-center my-6">
 					<Link
 						href={`/user/instructor/${currentCheckpoint.type?.instructor._id}`}
-						passHref
+						passHref={false}
 					>
-						<div className="flex items-center mx-4 first:ml-0">
-							<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-								{currentCheckpoint.type?.instructor ? (
-									<>
-										<Image
-											{...imgConstructor(
-												currentCheckpoint.type
-													?.instructor.avatar,
-												{
-													fit: 'fill'
-												}
-											)}
-											alt="Instructor Avatar"
-											layout="fill"
-											quality={50}
-										/>
-										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
-									</>
-								) : null}
+						<a>
+							<div className="flex items-center mx-4 first:ml-0 cursor-pointer">
+								<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
+									{currentCheckpoint.type?.instructor ? (
+										<>
+											<Image
+												{...imgConstructor(
+													currentCheckpoint.type
+														?.instructor.avatar,
+													{
+														fit: 'fill'
+													}
+												)}
+												alt="Instructor Avatar"
+												layout="fill"
+												quality={50}
+											/>
+											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
+										</>
+									) : null}
+								</div>
+								<div className="flex-col flex gap-0 justify-center">
+									<span className="font-semibold tracking-wide text-lg underline cursor-pointer hover:text-gray-600">
+										{
+											currentCheckpoint.type?.instructor
+												.name
+										}
+									</span>
+									<span className="text-sm text-gray-400">
+										{
+											currentCheckpoint.type?.instructor
+												.email
+										}
+									</span>
+								</div>
 							</div>
-							<span className="font-semibold leading-loose text-lg">
-								{currentCheckpoint.type?.instructor.name}
-							</span>
-						</div>
+						</a>
 					</Link>
 				</div>
 				<div>

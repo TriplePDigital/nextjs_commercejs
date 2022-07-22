@@ -6,7 +6,10 @@ import { fetcher } from './fetcher'
  * @returns user's profile document
  */
 export default async function getUserByEmail(email) {
-	const query = `*[_type == 'user' && email == '${email}']{_id}[0]`
-	const result = await fetcher(query)
-	return result
+	try {
+		const query = `*[_type == 'user' && email == '${email}']{_id}[0]`
+		return await fetcher(query, false)
+	} catch (error) {
+		throw new Error(error)
+	}
 }
