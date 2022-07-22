@@ -32,13 +32,27 @@ export default function Layout({ children }) {
 		let mounted = true
 
 		if (mounted) {
-			checkForActive()
+			if (session && !loading && !router?.pathname.includes('login')) {
+				isActive(session.user.email)
+					.then((res) => {
+						if (!res) {
+							router.push(
+								`/auth/welcome?email=${session?.user?.email}`
+							)
+						} else {
+							return true
+						}
+					})
+					.catch((err) => {
+						throw new Error(err)
+					})
+			}
 		}
 
 		return () => {
 			mounted = false
 		}
-	}, [])
+	}, [session, loading, router])
 
 	return loading ? (
 		<div className="w-full h-screen flex justify-center items-center text-center">
