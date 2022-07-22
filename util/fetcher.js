@@ -10,12 +10,14 @@ const config = {
 	}
 }
 
-export const fetcher = async (query) => {
+export const fetcher = async (query, useCDN = false) => {
 	try {
 		const results = await axios.get(
 			`https://tfh7h5l0.api${
-				process.env.NODE_ENV === 'production' ? 'cdn' : ''
-			}.sanity.io/vX/data/query/production?query=${encodeURIComponent(query)}`,
+				useCDN ? 'cdn' : ''
+			}.sanity.io/vX/data/query/production?query=${encodeURIComponent(
+				query
+			)}`,
 			config
 		)
 		return results.data.result

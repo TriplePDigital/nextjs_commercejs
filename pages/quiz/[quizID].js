@@ -84,7 +84,10 @@ function Quiz({ quizID, session, content }) {
 				}
 			})
 			// setAttempt(quizAttempt)
-			router.push(`/quiz/result/[quizResult]`, `/quiz/result/${quizAttempt._id}?quizID=${quizID}`)
+			router.push(
+				`/quiz/result/[quizResult]`,
+				`/quiz/result/${quizAttempt._id}`
+			)
 		}
 	}
 
