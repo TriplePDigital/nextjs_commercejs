@@ -11,10 +11,7 @@ import { Loader } from '@/components/util'
 import { BsSearch } from 'react-icons/bs'
 import Papa from 'papaparse'
 import { configuredSanityClient as client } from '@/util/img'
-import Link from 'next/link'
-import { MdOutlineDashboard, MdQuiz } from 'react-icons/md'
-import { GrUserAdmin } from 'react-icons/gr'
-import { BsGraphUp } from 'react-icons/bs'
+import AdminSidebar from '@/components/Nav/AdminSidebar'
 
 function EnrollmentReportPage({ enrollments, latestEnrollments }) {
 	const [filteredEnrollment, setFilteredEnrollment] = useState(enrollments)
@@ -88,35 +85,7 @@ function EnrollmentReportPage({ enrollments, latestEnrollments }) {
 	])
 	return (
 		<section className="flex flex-col md:flex-row gap-5">
-			<aside className="h-full bg-gray-50 w-full md:w-2/12 mt-5 rounded flex-col shadow-md border">
-				<Link href="/admin/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer">
-						<MdOutlineDashboard size={20} className="opacity-30" />
-						Management Portal
-					</a>
-				</Link>
-
-				<Link href="/admin/quiz/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer">
-						<MdQuiz size={20} className="opacity-30" />
-						Quizzes
-					</a>
-				</Link>
-
-				<Link href="/admin/enrollment/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-gray-300 font-semibold cursor-pointer">
-						<GrUserAdmin size={20} className="opacity-30" />
-						Enrollments
-					</a>
-				</Link>
-
-				<Link href="/admin/progress/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer">
-						<BsGraphUp size={20} className="opacity-30" />
-						Progress
-					</a>
-				</Link>
-			</aside>
+			<AdminSidebar />
 			<section className="w-full mt-5">
 				<div className="flex justify-between mb-5">
 					<form
