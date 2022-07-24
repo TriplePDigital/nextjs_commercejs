@@ -11,6 +11,8 @@ import Papa from 'papaparse'
 import Upload from './Upload'
 import AdminSidebar from '@/components/Nav/AdminSidebar'
 import { nanoid } from 'nanoid'
+import { BsCaretUpFill, BsCheck } from 'react-icons/bs'
+import Link from 'next/link'
 
 function Quiz({ quizAttempts }) {
 	const [tabIndex, setTabIndex] = useState(1)
@@ -31,7 +33,7 @@ function Quiz({ quizAttempts }) {
 							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5`}
 							onClick={() => setTabIndex(1)}
 						>
-							Upload Quiz
+							Quiz Upload Wizard
 						</button>
 					</div>
 				</div>
@@ -54,18 +56,21 @@ function UploadQuiz() {
 	const [quizSchemaQuestions, setQuizSchemaQuestions] = useState([])
 
 	const [courses, setCourses] = useState(null)
-	const [toggleCourseID, setToggleCourseID] = useState(false)
-	const [toggleChapterID, setToggleChapterID] = useState(false)
 	const [chapters, setChapters] = useState(null)
-	const [checkpoints, setCheckpoints] = useState(null)
-	const [selectedPosition, setSelectedPosition] = useState(null)
 	const [toggleQuestion, setToggleQuestion] = useState(false)
+	const [uploadingQuestions, setUploadingQuestions] = useState(false)
 
 	const [selectedCourse, setSelectedCourse] = useState(null)
 	const [selectedCourseID, setSelectedCourseID] = useState(null)
 	const [selectedStage, setSelectedStage] = useState(null)
 	const [selectedStageID, setSelectedStageID] = useState(null)
-	const [quiz, setQuiz] = useState({})
+	const [quiz, setQuiz] = useState({
+		minimumScore: null,
+		title: null
+	})
+
+	const [step, setStep] = useState(1)
+	const [showAllQuestions, setShowAllQuestions] = useState(false)
 
 	const inputRef = useRef()
 
@@ -107,7 +112,9 @@ function UploadQuiz() {
 					return h.toLocaleLowerCase().replace(' ', '').trim()
 				},
 				transform: function (v, f) {
-					return f === 'correctoption' ? parseFloat(v) : v.trim()
+					return f === 'correctoption'
+						? parseFloat(v)
+						: encodeURI(v.trim())
 				}
 			})
 
@@ -126,6 +133,7 @@ function UploadQuiz() {
 				.then((file) => {
 					setQuestions(file)
 					setUploading(false)
+					setStep(2)
 				})
 				.catch((error) => {
 					setUploading(false)
@@ -134,20 +142,6 @@ function UploadQuiz() {
 		}
 
 		reader.readAsText(file)
-	}
-
-	const findCourse = () => {
-		return courses.filter((course) => {
-			return course._id === toggleCourseID
-		})[0]
-	}
-
-	const findChapter = () => {
-		const selectedCourse = findCourse()
-		selectedCourse.stages.filter((stage) => {
-			console.log(stage)
-			return stage._id === toggleChapterID
-		})[0]
 	}
 
 	const getChapters = async (courseID) => {
@@ -159,6 +153,20 @@ function UploadQuiz() {
 		} catch (error) {
 			throw new Error(error)
 		}
+	}
+
+	const getCourseName = () => {
+		const course = courses.filter((course) => {
+			return course._id === selectedCourseID
+		})[0]
+		return course.title
+	}
+
+	const getChapterName = () => {
+		const chapter = chapters.filter((chapter) => {
+			return chapter._id === selectedStageID
+		})[0]
+		return chapter.title
 	}
 
 	useEffect(() => {
@@ -229,8 +237,7 @@ function UploadQuiz() {
 	const createQuestions = (event) => {
 		event.preventDefault()
 		try {
-			setLoading(true)
-
+			setUploadingQuestions(true)
 			questions.forEach(async (question, questionIndex) => {
 				try {
 					const answers = createSchemaFromQuestions(questionIndex)
@@ -252,13 +259,11 @@ function UploadQuiz() {
 							}
 						]
 					})
-					return
 				} catch (error) {
 					throw new Error(error)
 				}
 			})
-
-			setLoading(false)
+			setUploadingQuestions(false)
 		} catch (error) {
 			throw new Error(error)
 		}
@@ -279,258 +284,411 @@ function UploadQuiz() {
 				questions: quizSchemaQuestions
 			})
 			setLoading(false)
+			setStep(5)
 		} catch (error) {
 			throw new Error(error)
 		}
 	}
 
+	const quizOptions = Array(10).fill(undefined)
+
 	return loading ? (
 		<Loader />
 	) : (
-		<div className="w-full">
-			<Upload
-				uploading={uploading}
-				inputRef={inputRef}
-				handleUploadCSV={handleUploadCSV}
-				header={header}
-				setHeader={setHeader}
-			/>
-			{questions ? (
-				<section className="flex gap-1 my-5">
-					<select
-						name="course"
-						onChange={handleCourseChange}
-						value={selectedCourse}
-					>
-						<option value="">Select a Course</option>
-						{courses?.map((course, courseIndex) => {
-							return (
-								<option key={courseIndex} value={course._id}>
-									{course.title}
-								</option>
-							)
-						})}
-					</select>
-					{selectedCourseID && chapters ? (
-						<select name="stage" onChange={handleStgeChange}>
-							<option value="">Select a Chapter</option>
-							{chapters.map((chapter, chapterIndex) => {
+		<div className="w-full flex flex-col items-center justify-center">
+			{step === 1 && (
+				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
+					<div className="flex gap-2 items-center">
+						<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
+							<span className="text-lg text-gray-400 aspect-square">
+								{step}
+							</span>
+						</div>
+						<h1 className="text-2xl font-medium">
+							Upload your CSV file
+						</h1>
+					</div>
+					{uploading ? (
+						<Loader />
+					) : (
+						<Upload
+							uploading={uploading}
+							inputRef={inputRef}
+							handleUploadCSV={handleUploadCSV}
+							header={header}
+							setHeader={setHeader}
+						/>
+					)}
+				</section>
+			)}
+			{step === 2 ? (
+				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
+					<div className="flex gap-2 items-center">
+						<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
+							<span className="text-lg text-gray-400 aspect-square">
+								{step}
+							</span>
+						</div>
+						<h1 className="text-2xl font-medium">
+							Select the course and chapter you want to add the
+							quiz to
+						</h1>
+					</div>
+					<section className="flex flex-col gap-1 my-5 w-full px-2 md:px-10 mx-auto">
+						<select
+							className="w-full rounded-lg border-gray-300"
+							name="course"
+							onChange={handleCourseChange}
+							value={selectedCourseID}
+						>
+							<option value="">Select a Course</option>
+							{courses?.map((course, courseIndex) => {
 								return (
 									<option
-										key={chapterIndex}
-										value={chapter._id}
+										key={courseIndex}
+										value={course._id}
 									>
-										{chapter.title}
+										{course.title}
 									</option>
 								)
 							})}
 						</select>
-					) : null}
+						{selectedCourseID && chapters ? (
+							<select
+								name="stage"
+								onChange={handleStgeChange}
+								className="w-full rounded-lg border-gray-300"
+								value={selectedStageID}
+							>
+								<option value="">Select a Chapter</option>
+								{chapters.map((chapter, chapterIndex) => {
+									return (
+										<option
+											key={chapterIndex}
+											value={chapter._id}
+										>
+											{chapter.title}
+										</option>
+									)
+								})}
+							</select>
+						) : null}
+						<div className="flex justify-between w-full">
+							<button
+								className="px-4 py-3 w-1/3 bg-ncrma-200 rounded text-white hover:bg-ncrma-400"
+								onClick={() => setStep(step - 1)}
+								type="button"
+							>
+								Back
+							</button>
+							<button
+								className={`px-4 py-3 w-1/3 bg-orange-400 uppercase font-bold tracking-wide leading-loose rounded text-white ${
+									!selectedCourseID || !selectedStageID
+										? 'opacity-25 cursor-not-allowed'
+										: 'opacity-100 cursor-pointer hover:bg-orange-600'
+								}`}
+								onClick={() => setStep(3)}
+								disabled={
+									!selectedCourseID || !selectedStageID
+										? true
+										: false
+								}
+							>
+								Save Settings
+							</button>
+						</div>
+					</section>
 				</section>
 			) : null}
-			{questions ? (
-				<section className="flex flex-col gap-2">
-					<div className="flex justify-between">
-						<span>{courses.title}</span>
-						<span></span>
-						<form action="">
-							<input
-								type="text"
-								placeholder="Quiz title"
-								className=""
-								onChange={(e) => {
-									setQuiz((prevState) => {
-										return {
-											...prevState,
-											title: e.target.value
-										}
-									})
-								}}
-								required
-							/>
-							<input
-								type="number"
-								placeholder="Minimum Score"
-								min={0}
-								max={100}
-								maxLength={3}
-								minLength={1}
-								required
-								className=""
-								onChange={(e) => {
-									setQuiz((prevState) => {
-										return {
-											...prevState,
-											minimumScore: e.target.value
-										}
-									})
-								}}
-							/>
-							{selectedStageID && questions ? (
-								<button
-									className="px-4 py-3 bg-ncrma-400 rounded text-white hover:bg-ncrma-600"
-									onClick={createQuestions}
-									type="submit"
-								>
-									Finalize Questions
-								</button>
-							) : null}
-							{selectedStageID && questions ? (
-								<button
-									className="px-4 py-3 bg-ncrma-400 rounded text-white hover:bg-ncrma-600"
-									onClick={handleQuizUpload}
-									type="submit"
-								>
-									Upload quiz
-								</button>
-							) : null}
-						</form>
-					</div>
-					{questions.map((questions, questionIndex) => (
-						<div
-							className="flex w-full bg-gray-100 rounded px-4 py-4"
-							key={questionIndex}
-						>
-							<div className="flex flex-col gap-2 w-full">
-								<div className="flex justify-between items-center">
-									<span>{questions.question}</span>
-									<span>{questions.weight} points</span>
-								</div>
-								<button
-									className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-white inline-block w-fit"
-									onClick={() =>
-										setToggleQuestion(!toggleQuestion)
-									}
-								>
-									Show Questions
-								</button>
-								{toggleQuestion ? (
-									<ul className="list-disc ml-6">
-										{questions.option1 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													1
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option1}
-											</li>
-										) : null}
-										{questions.option2 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													2
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option2}
-											</li>
-										) : null}
-										{questions.option3 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													3
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option3}
-											</li>
-										) : null}
-										{questions.option4 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													4
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option4}
-											</li>
-										) : null}
-										{questions.option5 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													5
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option5}
-											</li>
-										) : null}
-										{questions.option6 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													6
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option6}
-											</li>
-										) : null}
-										{questions.option7 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													7
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option7}
-											</li>
-										) : null}
-										{questions.option8 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													8
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option8}
-											</li>
-										) : null}
-										{questions.option9 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													9
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option9}
-											</li>
-										) : null}
-										{questions.option10 ? (
-											<li
-												className={`${
-													questions.correctoption ===
-													10
-														? 'text-red-500'
-														: ''
-												}`}
-											>
-												{questions.option10}
-											</li>
-										) : null}
-									</ul>
-								) : null}
+			{step === 3 ? (
+				<>
+					<section className="flex flex-col gap-2 w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
+						<div className="flex gap-2 items-center">
+							<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
+								<span className="text-lg text-gray-400 aspect-square">
+									{step}
+								</span>
+							</div>
+							<div className="flex flex-col">
+								<h1 className="text-2xl font-medium">
+									Finalize your quiz and it&apos;s settings
+								</h1>
+								<h2 className="text-sm font-light text-gray-600">
+									You also have the ability to look over all
+									your questions by clicking the button below.
+								</h2>
 							</div>
 						</div>
-					))}
+						<div className="flex justify-between">
+							<form className="flex flex-col items-center justify-center w-full gap-2 px-2 md:px-10">
+								<input
+									type="text"
+									placeholder="Quiz title"
+									className="w-full rounded-lg border-gray-300 "
+									value={quiz.title ?? ''}
+									onChange={(e) => {
+										setQuiz((prevState) => {
+											return {
+												...prevState,
+												title: encodeURI(e.target.value)
+											}
+										})
+									}}
+									required
+								/>
+								<input
+									type="number"
+									placeholder="Minimum Score"
+									min={'0'}
+									max={'100'}
+									maxLength={3}
+									minLength={1}
+									required
+									className="w-1/3 rounded-lg border-gray-300"
+									value={quiz.minimumScore ?? 0}
+									onChange={(e) => {
+										setQuiz((prevState) => {
+											return {
+												...prevState,
+												minimumScore: e.target.value
+											}
+										})
+									}}
+								/>
+								<a
+									href="#"
+									className="my-2 w-1/3 underline text-sm text-center rounded text-black text-opacity-70 hover:text-opacity-100 hover:border-gray-400"
+									onClick={() =>
+										setShowAllQuestions(!showAllQuestions)
+									}
+									type="button"
+								>
+									{showAllQuestions
+										? 'Hide Questions'
+										: 'Show Questions'}
+								</a>
+								<div className="flex justify-between w-full">
+									<button
+										className="px-4 py-3 w-1/3 bg-ncrma-200 rounded text-white hover:bg-ncrma-400"
+										onClick={() => setStep(step - 1)}
+										type="button"
+									>
+										Back
+									</button>
+									<button
+										className={`px-4 py-3 w-1/3 bg-orange-400 uppercase font-bold tracking-wide leading-loose rounded text-white ${
+											quiz.minimumScore === null ||
+											quiz.title === null
+												? 'opacity-25 cursor-not-allowed'
+												: 'opacity-100 cursor-pointer hover:bg-orange-600'
+										}`}
+										onClick={() => setStep(4)}
+										disabled={
+											quiz.minimumScore === null ||
+											quiz.title === null
+												? true
+												: false
+										}
+									>
+										Save Settings
+									</button>
+								</div>
+							</form>
+						</div>
+					</section>
+					<section className="mt-5 flex flex-col gap-2 w-full">
+						<>
+							{showAllQuestions
+								? questions.map((question, questionIndex) => (
+										<div
+											className="flex w-full bg-gray-100 rounded px-4 py-4"
+											key={questionIndex}
+										>
+											<div className="flex flex-col gap-2 w-full">
+												<div className="flex justify-between items-center">
+													<span>
+														{question.question}
+													</span>
+													<span>
+														{question.weight} points
+													</span>
+												</div>
+												<button
+													className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-white inline-block w-fit"
+													onClick={() =>
+														setToggleQuestion(
+															!toggleQuestion
+														)
+													}
+												>
+													Show Questions
+												</button>
+												{toggleQuestion ? (
+													<ul className="list-disc ml-6">
+														{quizOptions.map(
+															(
+																option,
+																questionKey
+															) => {
+																const currentOption =
+																	question[
+																		`option${
+																			questionKey +
+																			1
+																		}`
+																	]
+																return currentOption !==
+																	'' ? (
+																	<li
+																		key={
+																			questionKey
+																		}
+																		className={`${
+																			question.correctoption ===
+																			questionKey +
+																				1
+																				? 'text-red-500'
+																				: ''
+																		}`}
+																	>
+																		{
+																			currentOption
+																		}
+																	</li>
+																) : null
+															}
+														)}
+													</ul>
+												) : null}
+											</div>
+										</div>
+								  ))
+								: null}
+							{showAllQuestions ? (
+								<button
+									className="fixed right-2 bottom-10 h-12 w-12 flex items-center rounded-full aspect-square  bg-blue-500 justify-center cursor-pointer focus:ring-2"
+									onClick={() => {
+										window.scrollTo(0, 0)
+									}}
+								>
+									<BsCaretUpFill />
+								</button>
+							) : null}
+						</>
+					</section>
+				</>
+			) : null}
+			{step === 4 ? (
+				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
+					<div className="flex gap-2 items-center">
+						<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
+							<span className="text-lg text-gray-400 aspect-square">
+								{step}
+							</span>
+						</div>
+						<h1 className="text-2xl font-medium">
+							Review your quiz
+						</h1>
+					</div>
+					<div className="flex flex-col px-2 mt-5 md:px-10">
+						<p className="font-medium ">
+							<span className="text-gray-400 font-light text-sm">
+								Course:
+							</span>{' '}
+							{getCourseName()}
+						</p>
+						<p className="font-medium ">
+							<span className="text-gray-400 font-light text-sm">
+								Chapter:
+							</span>{' '}
+							{getChapterName()}
+						</p>
+						<p className="font-medium ">
+							<span className="text-gray-400 font-light text-sm">
+								Quiz title:{' '}
+							</span>
+							{quiz.title}
+						</p>
+						<p className="font-medium ">
+							<span className="text-gray-400 font-light text-sm">
+								Minimum score to pass:{' '}
+							</span>
+							{quiz.minimumScore}
+						</p>
+						<p className="font-medium ">
+							<span className="text-gray-400 font-light text-sm">
+								Number of questions:{' '}
+							</span>
+							{questions.length}
+						</p>
+					</div>
+					<div className="flex flex-col items-center justify-center gap-2">
+						{uploadingQuestions ? (
+							<Loader />
+						) : (
+							<>
+								{quizSchemaQuestions.length > 0 ? (
+									<div className="flex items-center justify-center gap-2 w-3/4 rounded-lg px-5 py-2 my-3 bg-green-100">
+										<BsCheck
+											size={32}
+											className="text-green-800 opacity-50"
+										/>
+										<h3 className="font-medium text-green-800">
+											Your quiz questions passed
+											verification!
+										</h3>
+									</div>
+								) : (
+									<div className="flex justify-between w-full mt-2 md:px-10">
+										<button
+											className="px-4 py-3 w-1/3 bg-ncrma-200 rounded text-white hover:bg-ncrma-400"
+											onClick={() => setStep(step - 1)}
+											type="button"
+										>
+											Back
+										</button>
+										<button
+											className="px-4 py-3 w-1/3 bg-ncrma-400 rounded text-white hover:bg-ncrma-600"
+											onClick={createQuestions}
+											type="submit"
+										>
+											Finalize Questions
+										</button>
+									</div>
+								)}
+							</>
+						)}
+						{quizSchemaQuestions.length > 0 ? (
+							<button
+								className="px-4 py-3 bg-orange-400 rounded text-white hover:bg-orange-600 uppercase font-bold tracking-wide leading-loose"
+								onClick={handleQuizUpload}
+								type="submit"
+							>
+								Upload quiz
+							</button>
+						) : null}
+					</div>
+				</section>
+			) : null}
+			{step === 5 ? (
+				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
+					<span className="flex items-center justify-center mx-auto bg-green-100 h-44 w-44 rounded-full shadow-lg">
+						<BsCheck size={200} className="text-green-400" />
+					</span>
+					<div className="flex flex-col text-center items-center justify-center my-5">
+						<h1 className="text-2xl font-bold">
+							You have successfully uploaded your quiz!
+						</h1>
+						<h2 className="font-light text-sm">
+							Users are now able to take quiz if they are enrolled
+							in the course you assigned it to.
+						</h2>
+					</div>
+					<Link href="/missions" passHref={false}>
+						<a className="block w-1/3 mx-auto text-center px-4 py-3 bg-ncrma-400 rounded text-white hover:bg-ncrma-600">
+							Go to my courses
+						</a>
+					</Link>
 				</section>
 			) : null}
 		</div>
