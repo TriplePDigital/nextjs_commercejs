@@ -14,29 +14,11 @@ import { nanoid } from 'nanoid'
 import { BsCaretUpFill, BsCheck } from 'react-icons/bs'
 import Link from 'next/link'
 
-function Quiz({ quizAttempts }) {
-	const [tabIndex, setTabIndex] = useState(1)
-
+function Quiz({ quizAttempts, tabIndex }) {
 	return (
 		<section className="flex flex-col md:flex-row gap-5">
 			<AdminSidebar />
 			<section className="w-full my-5">
-				<div className="flex items-center w-full mx-auto justify-between mb-2">
-					<div className="flex gap-3">
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5`}
-							onClick={() => setTabIndex(0)}
-						>
-							Latest Quiz Attempts
-						</button>
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5`}
-							onClick={() => setTabIndex(1)}
-						>
-							Quiz Upload Wizard
-						</button>
-					</div>
-				</div>
 				<div className="w-full mx-auto">
 					{tabIndex === 0 && (
 						<AllQuizAttempts quizAttempts={quizAttempts} />
@@ -60,9 +42,7 @@ function UploadQuiz() {
 	const [toggleQuestion, setToggleQuestion] = useState(false)
 	const [uploadingQuestions, setUploadingQuestions] = useState(false)
 
-	const [selectedCourse, setSelectedCourse] = useState(null)
 	const [selectedCourseID, setSelectedCourseID] = useState(null)
-	const [selectedStage, setSelectedStage] = useState(null)
 	const [selectedStageID, setSelectedStageID] = useState(null)
 	const [quiz, setQuiz] = useState({
 		minimumScore: null,
@@ -791,6 +771,7 @@ function AllQuizAttempts({ quizAttempts }) {
 }
 
 export async function getServerSideProps(context) {
+	const { tabIndex } = context.query
 	const session = await getSession(context)
 	if (!session) {
 		return {
@@ -805,7 +786,8 @@ export async function getServerSideProps(context) {
 			const quizAttempts = await getQuizAttempts()
 			return {
 				props: {
-					quizAttempts
+					quizAttempts,
+					tabIndex: tabIndex ? parseInt(tabIndex) : 0
 				}
 			}
 		} else {

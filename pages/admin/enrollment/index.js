@@ -13,12 +13,11 @@ import Papa from 'papaparse'
 import { configuredSanityClient as client } from '@/util/img'
 import AdminSidebar from '@/components/Nav/AdminSidebar'
 
-function EnrollmentReportPage({ enrollments, latestEnrollments }) {
+function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 	const [filteredEnrollment, setFilteredEnrollment] = useState(enrollments)
 	const [filteredLatestEnrollments, setFilteredLatestEnrollments] =
 		useState(latestEnrollments)
 	const [searchTerm, setSearchTerm] = useState('')
-	const [tabIndex, setTabIndex] = useState(0)
 	const [loading, setLoading] = useState(false)
 
 	const handleSearch = (event) => {
@@ -61,28 +60,7 @@ function EnrollmentReportPage({ enrollments, latestEnrollments }) {
 			}
 		}
 	}
-	const handleTabChange = (index) => {
-		setLoading(true)
-		if (index === 0) {
-			setTabIndex(index)
-			setFilteredEnrollment(enrollments)
-			setLoading(false)
-		}
-		if (index === 1) {
-			setTabIndex(index)
-			setFilteredLatestEnrollments(latestEnrollments)
-			setLoading(false)
-		}
-		if (index === 2) {
-			setTabIndex(index)
-			setLoading(false)
-		}
-	}
-	useEffect(() => {}, [
-		tabIndex,
-		filteredEnrollment,
-		filteredLatestEnrollments
-	])
+	useEffect(() => {}, [filteredEnrollment, filteredLatestEnrollments])
 	return (
 		<section className="flex flex-col md:flex-row gap-5">
 			<AdminSidebar />
@@ -109,32 +87,6 @@ function EnrollmentReportPage({ enrollments, latestEnrollments }) {
 							Search
 						</button>
 					</form>
-					<div className="flex gap-3">
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5 ${
-								tabIndex === 0 ? 'bg-ncrma-500' : ''
-							} `}
-							onClick={() => handleTabChange(0)}
-						>
-							Enrollments Per User
-						</button>
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5 ${
-								tabIndex === 1 ? 'bg-ncrma-500' : ''
-							} `}
-							onClick={() => handleTabChange(1)}
-						>
-							Latest Enrollments
-						</button>
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5 ${
-								tabIndex === 2 ? 'bg-ncrma-500' : ''
-							} `}
-							onClick={() => handleTabChange(2)}
-						>
-							Enroll Students
-						</button>
-					</div>
 				</div>
 				{loading ? (
 					<Loader />
@@ -685,6 +637,7 @@ function EnrollStudents({}) {
 export default EnrollmentReportPage
 
 export async function getServerSideProps(context) {
+	const { tabIndex } = context.query
 	const session = await getSession(context)
 	if (!session) {
 		return {
@@ -701,7 +654,8 @@ export async function getServerSideProps(context) {
 			return {
 				props: {
 					enrollments,
-					latestEnrollments
+					latestEnrollments,
+					tabIndex: tabIndex ? parseInt(tabIndex) : 0
 				}
 			}
 		} else {
