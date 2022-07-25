@@ -7,10 +7,7 @@ import {
 } from 'react-icons/ai'
 import { MdOutlineQuiz } from 'react-icons/md'
 import isVideo from '@/util/isVideo'
-import { Loader } from '../util'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { duration } from 'moment'
+import moment from 'moment'
 
 const getProgressForCheckpoint = (stageID, checkpointID, enrollment) => {
 	const progress = enrollment.progress
@@ -65,10 +62,6 @@ export default function Stages({
 							<>
 								{stage.checkpoints.map(
 									(checkpoint, cntIndex) => {
-										const durr = duration(
-											checkpoint.type?.duration,
-											'm'
-										)._data
 										return (
 											<>
 												<div
@@ -144,15 +137,16 @@ export default function Stages({
 														{isVideo(
 															checkpoint.type
 														)
-															? `${
-																	durr.hours >
-																	0
-																		? `${durr.hours}:`
-																		: ''
-															  }
-															  ${durr.minutes > 0 ? durr.minutes : '00'}
-															  :
-															  ${durr.seconds > 0 ? durr.seconds : '00'}`
+															? `${moment
+																	.utc(
+																		checkpoint
+																			.type
+																			?.duration *
+																			1000
+																	)
+																	.format(
+																		'HH:mm:ss'
+																	)}`
 															: null}
 													</span>
 												</div>

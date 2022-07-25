@@ -30,7 +30,7 @@ export default async function getEnrollmentByStudentIDandCourseID(
                 type-> {
                     _id,
                     body,
-                    duration,
+                    "duration": vimeoVideo.oEmbedData.duration,
                     vimeoVideo,
                     attempts[]->,
                     minimumScore,
