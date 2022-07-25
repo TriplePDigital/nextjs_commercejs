@@ -20,6 +20,7 @@ import ReactMarkdown from 'react-markdown'
 import mdConfig from '@/util/md'
 import Link from 'next/link'
 import Content from '@/components/Course/Content'
+import moment from 'moment'
 
 // const getLatestProgress = (stages) => {
 // 	let progress = []
@@ -47,6 +48,9 @@ function MissionSlug({ session, mission, user, enrollment }) {
 			: null
 	)
 
+	const [numberOfCheckpoints, setNumberOfCheckpoints] = useState(0)
+	const [courseDuration, setCourseDuration] = useState(0)
+
 	const router = useRouter()
 	const checkpointIDQuery = router.query?.checkpointID
 
@@ -54,11 +58,14 @@ function MissionSlug({ session, mission, user, enrollment }) {
 		setLoading(true)
 		setCurrentCheckpoint(
 			enrollment
-			? enrollment.course.stages[stageContext].checkpoints[
-				checkpointContext
-			] : null
+				? enrollment.course.stages[stageContext].checkpoints[
+						checkpointContext
+				  ]
+				: null
 		)
 		skipToCheckpoint(checkpointIDQuery)
+		countNumberOfCheckpoints(mission.stages)
+		countCourseDuration(mission.stages)
 		return () => {}
 	}, [stageContext, checkpointContext, enrollment])
 
@@ -80,14 +87,30 @@ function MissionSlug({ session, mission, user, enrollment }) {
 			const chosenStage = stageIndex.find((stage) => {
 				return stage.checkpointIndex !== undefined
 			})
-			console.log({
-				stage: chosenStage.stageIndex,
-				checkpoint: chosenStage.checkpointQueryIndex
-			})
 			setStageContext(chosenStage.stageIndex)
 			setCheckpointContext(chosenStage.checkpointQueryIndex)
 		}
 		setLoading(false)
+	}
+
+	const countNumberOfCheckpoints = (stages) => {
+		let count = 0
+		stages.map((stage) => {
+			stage.checkpoints.map(() => {
+				count++
+			})
+		})
+		setNumberOfCheckpoints(count)
+	}
+
+	const countCourseDuration = (stages) => {
+		let count = 0
+		stages.map((stage) => {
+			stage.checkpoints.map((checkpoint) => {
+				count += checkpoint.type.duration
+			})
+		})
+		setCourseDuration(moment.utc(count * 1000).format('HH:mm:ss'))
 	}
 
 	return loading ? (
@@ -106,17 +129,37 @@ function MissionSlug({ session, mission, user, enrollment }) {
 			/>
 		</div>
 	) : (
-		<div className="flex mx-auto w-full">
+		<div className="flex mx-auto w-full my-3">
 			<div className="w-8/12 mr-8">
-				<h1 className="text-4xl leading-loose tracking-wide font-bold">
+				<h1 className="text-4xl tracking-wide font-bold">
 					{mission.title}
 				</h1>
-				<h2 className="text-lg leading-loose tracking-wide font-medium text-gray-600">
+				<h2 className="text-lg font-medium text-gray-600">
 					{mission.blurb}
 				</h2>
-				<ul className="mt-2 flex">
-					{/* TODO: This is where we are going to create the course accordion */}
-				</ul>
+				<div className="flex justify-between items-center">
+					<div className=" flex items-center">
+						<AiFillStar className="text-yellow-500 mr-2" />
+						<span className="text-lg font-semibold mr-1">
+							{5}.0
+						</span>
+						<span className="text-gray-500">(1512 Reviews)</span>
+					</div>
+					<div className="text-gray-500 flex items-center gap-1">
+						<RiBook2Line className="" />
+						<span className="font-medium">Lessons</span>
+						{mission.stages?.length}
+					</div>
+					<div className="text-gray-500 flex items-center gap-1">
+						<MdOutlineAssignment />
+						<span className="font-medium">Chapters</span>
+						{numberOfCheckpoints}
+					</div>
+					<div className="text-gray-500 flex items-center gap-1">
+						<AiOutlineClockCircle />
+						{courseDuration}
+					</div>
+				</div>
 				<div className="relative h-full w-full mt-6">
 					{/* TODO: Either show cover image or preview video if available */}
 					<Image
@@ -134,7 +177,6 @@ function MissionSlug({ session, mission, user, enrollment }) {
 				</h2>
 				<div className="flex flex-row items-center justify-between mt-6">
 					{mission.instructors.map((instructor, index) => {
-						console.log(instructor)
 						return (
 							<div key={index} className="flex flex-col">
 								<div className="flex items-center gap-4">
@@ -176,59 +218,13 @@ function MissionSlug({ session, mission, user, enrollment }) {
 				<ReactMarkdown components={mdConfig}>
 					{mission?.description}
 				</ReactMarkdown>
+				<ul className="mt-2 flex">
+					{/* TODO: This is where we are going to create the course accordion */}
+				</ul>
 			</div>
 			<div className="w-4/12 p-5 bg-white border-l border-gray-200 flex flex-col gap-3">
 				{/* TODO: Add ability to give feedback on courses before tackling this... */}
-				{/* <div className=" flex items-center">
-					<AiFillStar className="text-yellow-500 mr-2" />
-					<span className="text-lg font-semibold mr-1">{5}.0</span>
-					<span className="text-gray-500">(1512 Reviews)</span>
-				</div> */}
-				<div className="text-gray-500 flex items-center gap-4">
-					<RiBook2Line className="mr-1" />
-					<div className="flex flex-col">
-						<span className="font-medium">Lessons</span>
-						<ol className="list-decimal">
-							{mission.stages.map((stage, index) => {
-								return (
-									<li
-										key={index}
-										className="text-sm text-gray-800 ml-6"
-									>
-										{stage.title}
-									</li>
-								)
-							})}
-						</ol>
-					</div>
-				</div>
-				<div className="text-gray-500 flex items-center gap-4">
-					<MdOutlineAssignment className="mr-1" />
-					<div className="flex flex-col">
-						<span className="font-medium">Chapters</span>
-						<ol className="list-decimal">
-							{mission.stages.map((stage) => {
-								return stage.checkpoints.map(
-									(checkpoint, j) => {
-										return (
-											<li
-												key={j}
-												className="text-sm text-gray-800 ml-6"
-											>
-												{checkpoint.title}
-											</li>
-										)
-									}
-								)
-							})}
-						</ol>
-					</div>
-				</div>
-				<div className="text-gray-500 flex items-center gap-4">
-					<AiOutlineClockCircle className="mr-1" />
-					2h 10m
-				</div>
-				<div className="text-gray-500 flex items-center gap-4">
+				{/* <div className="text-gray-500 flex items-center gap-4">
 					<BsTagsFill className="mr-1" />
 					<div className="gap-2 flex">
 						{mission.categories.map((category, index) => {
@@ -242,7 +238,10 @@ function MissionSlug({ session, mission, user, enrollment }) {
 							)
 						})}
 					</div>
-				</div>
+				</div> */}
+				<button className="bg-ncrma-400 hover:bg-ncrma-600 text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3">
+					Coming Soon!
+				</button>
 			</div>
 		</div>
 	)

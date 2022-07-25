@@ -20,10 +20,10 @@ export default async function getMissionBySlug(slug) {
           },
           "coverImage": coverImage.asset->,
           "slug": slug.current,
-          "stages": *[_type == 'stage' && references(^._id)] | order(order){
+          "stages": *[_type == 'stage' && references(^._id)] | order(order asc){
             title,
             "slug": slug.current,
-            "checkpoints": *[_type == 'checkpoint' && references(^._id)] | order(order){
+            "checkpoints": *[_type == 'checkpoint' && references(^._id)] | order(order asc){
               _id,
               title,
               "slug": slug.current,
