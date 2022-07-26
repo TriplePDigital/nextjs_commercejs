@@ -11,17 +11,13 @@ import { Loader } from '@/components/util'
 import { BsSearch } from 'react-icons/bs'
 import Papa from 'papaparse'
 import { configuredSanityClient as client } from '@/util/img'
-import Link from 'next/link'
-import { MdOutlineDashboard, MdQuiz } from 'react-icons/md'
-import { GrUserAdmin } from 'react-icons/gr'
-import { BsGraphUp } from 'react-icons/bs'
+import AdminSidebar from '@/components/Nav/AdminSidebar'
 
-function EnrollmentReportPage({ enrollments, latestEnrollments }) {
+function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 	const [filteredEnrollment, setFilteredEnrollment] = useState(enrollments)
 	const [filteredLatestEnrollments, setFilteredLatestEnrollments] =
 		useState(latestEnrollments)
 	const [searchTerm, setSearchTerm] = useState('')
-	const [tabIndex, setTabIndex] = useState(0)
 	const [loading, setLoading] = useState(false)
 
 	const handleSearch = (event) => {
@@ -64,59 +60,10 @@ function EnrollmentReportPage({ enrollments, latestEnrollments }) {
 			}
 		}
 	}
-	const handleTabChange = (index) => {
-		setLoading(true)
-		if (index === 0) {
-			setTabIndex(index)
-			setFilteredEnrollment(enrollments)
-			setLoading(false)
-		}
-		if (index === 1) {
-			setTabIndex(index)
-			setFilteredLatestEnrollments(latestEnrollments)
-			setLoading(false)
-		}
-		if (index === 2) {
-			setTabIndex(index)
-			setLoading(false)
-		}
-	}
-	useEffect(() => {}, [
-		tabIndex,
-		filteredEnrollment,
-		filteredLatestEnrollments
-	])
+	useEffect(() => {}, [filteredEnrollment, filteredLatestEnrollments])
 	return (
 		<section className="flex flex-col md:flex-row gap-5">
-			<aside className="h-full bg-gray-50 w-full md:w-2/12 mt-5 rounded flex-col shadow-md border">
-				<Link href="/admin/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer">
-						<MdOutlineDashboard size={20} className="opacity-30" />
-						Management Portal
-					</a>
-				</Link>
-
-				<Link href="/admin/quiz/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-b border-gray-300 font-semibold cursor-pointer">
-						<MdQuiz size={20} className="opacity-30" />
-						Quizzes
-					</a>
-				</Link>
-
-				<Link href="/admin/enrollment/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-gray-300 font-semibold cursor-pointer">
-						<GrUserAdmin size={20} className="opacity-30" />
-						Enrollments
-					</a>
-				</Link>
-
-				<Link href="/admin/progress/">
-					<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer">
-						<BsGraphUp size={20} className="opacity-30" />
-						Progress
-					</a>
-				</Link>
-			</aside>
+			<AdminSidebar />
 			<section className="w-full mt-5">
 				<div className="flex justify-between mb-5">
 					<form
@@ -140,32 +87,6 @@ function EnrollmentReportPage({ enrollments, latestEnrollments }) {
 							Search
 						</button>
 					</form>
-					<div className="flex gap-3">
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5 ${
-								tabIndex === 0 ? 'bg-ncrma-500' : ''
-							} `}
-							onClick={() => handleTabChange(0)}
-						>
-							Enrollments Per User
-						</button>
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5 ${
-								tabIndex === 1 ? 'bg-ncrma-500' : ''
-							} `}
-							onClick={() => handleTabChange(1)}
-						>
-							Latest Enrollments
-						</button>
-						<button
-							className={`bg-ncrma-300 hover:bg-ncrma-500 text-white font-semibold rounded py-2 px-5 ${
-								tabIndex === 2 ? 'bg-ncrma-500' : ''
-							} `}
-							onClick={() => handleTabChange(2)}
-						>
-							Enroll Students
-						</button>
-					</div>
 				</div>
 				{loading ? (
 					<Loader />
@@ -716,6 +637,7 @@ function EnrollStudents({}) {
 export default EnrollmentReportPage
 
 export async function getServerSideProps(context) {
+	const { tabIndex } = context.query
 	const session = await getSession(context)
 	if (!session) {
 		return {
@@ -732,7 +654,8 @@ export async function getServerSideProps(context) {
 			return {
 				props: {
 					enrollments,
-					latestEnrollments
+					latestEnrollments,
+					tabIndex: tabIndex ? parseInt(tabIndex) : 0
 				}
 			}
 		} else {

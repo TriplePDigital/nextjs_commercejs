@@ -1,9 +1,9 @@
 import groq from 'groq'
 import { fetcher } from './fetcher'
 
-export default async function getQuizResultByID(quizID) {
+export default async function getQuizResultByID(quizAttemptID) {
 	const query = groq`
-    *[_type == "quizAttempt" && _id == "${quizID}"]{
+    *[_type == "quizAttempt" && _id == "${quizAttemptID}"]{
         _id,
         score,
         _createdAt,

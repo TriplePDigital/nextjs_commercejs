@@ -1,7 +1,7 @@
 {
 	"name": "nextjs_e-commerce",
 	"private": true,
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
@@ -13,7 +13,7 @@
 	"dependencies": {
 		"@sanity/client": "^2.21.10",
 		"@sanity/image-url": "^1.0.1",
-		"@sentry/nextjs": "^6.19.3",
+		"@sentry/nextjs": "7.7.0",
 		"axios": "^0.24.0",
 		"chart.js": "^3.7.1",
 		"flowbite": "^1.4.7",
