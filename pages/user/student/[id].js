@@ -7,10 +7,13 @@ import { configuredSanityClient as client } from '@/util/img'
 import { useEffect, useState } from 'react'
 import { post, get } from 'axios'
 import { getSession, signOut } from 'next-auth/client'
+import moment from 'moment'
+import ProficiencyMatrix from '@/components/util/ProficiencyMatrix'
 
 function Profile({ profile, account }) {
 	const [user, setUser] = useState({ ...profile })
 	useEffect(() => {}, [])
+	const RMProfile = profile.riskManagerProfile || null
 
 	const syncEdgeInstance = async () => {
 		try {
@@ -55,7 +58,7 @@ function Profile({ profile, account }) {
 	return !profile ? (
 		<Loader />
 	) : (
-		<div className="flex flex-row w-full mt-5">
+		<div className="flex flex-col items-center w-full mt-5">
 			<form
 				className="flex flex-col mx-auto w-1/3"
 				onSubmit={(e) => handleSubmit(e)}
@@ -138,6 +141,204 @@ function Profile({ profile, account }) {
 					Save profile
 				</button>
 			</form>
+			{user.riskManagerProfile ? (
+				<section className="my-5">
+					<div className="flex flex-col items-center">
+						<h2 className="font-medium text-lg">
+							CRP2 Video Training
+						</h2>
+						<div className="flex gap-3">
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Video 1</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.crpVideoTraining
+											.videoNumberOne.updatedAt
+									}
+									status={
+										RMProfile.crpVideoTraining
+											.videoNumberOne.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Video 2</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.crpVideoTraining
+											.videoNumberTwo.updatedAt
+									}
+									status={
+										RMProfile.crpVideoTraining
+											.videoNumberTwo.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Video 3</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.crpVideoTraining
+											.videoNumberThree.updatedAt
+									}
+									status={
+										RMProfile.crpVideoTraining
+											.videoNumberThree.status
+									}
+								/>
+							</div>
+						</div>
+					</div>
+					<div className="flex flex-col items-center mt-3">
+						<h2 className="font-medium text-lg">
+							Training Assessments
+						</h2>
+						<div className="flex gap-3">
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Dispensary</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.trainingAssessments.dispensary
+											.updatedAt
+									}
+									status={
+										RMProfile.trainingAssessments.dispensary
+											.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Express Assessment</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.trainingAssessments
+											.expressAssess.updatedAt
+									}
+									status={
+										RMProfile.trainingAssessments
+											.expressAssess.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Property Premises</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.trainingAssessments
+											.propertyPremises.updatedAt
+									}
+									status={
+										RMProfile.trainingAssessments
+											.propertyPremises.status
+									}
+								/>
+							</div>
+						</div>
+					</div>
+					<div className="flex flex-col items-center mt-3">
+						<h2 className="font-medium text-lg">
+							Shadow Assessment
+						</h2>
+						<div className="flex gap-3">
+							<div className="flex flex-col gap-1 items-center">
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.shadowAssessment.updatedAt
+									}
+									status={RMProfile.shadowAssessment.status}
+								/>
+							</div>
+						</div>
+					</div>
+					<div className="flex flex-col items-center mt-3">
+						<h2 className="font-medium text-lg">
+							Assessment Proficiency
+						</h2>
+						<div className="flex gap-3">
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Health and Safety (OSHA)</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.assessmentProficiency
+											.healthAndSafety.updatedAt
+									}
+									status={
+										RMProfile.assessmentProficiency
+											.healthAndSafety.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Risk Management</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.assessmentProficiency
+											.riskManagement.updatedAt
+									}
+									status={
+										RMProfile.assessmentProficiency
+											.riskManagement.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Insurance</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.assessmentProficiency
+											.insurance.updatedAt
+									}
+									status={
+										RMProfile.assessmentProficiency
+											.insurance.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Quality Assurance (ISO)</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.assessmentProficiency
+											.qualityAssurance.updatedAt
+									}
+									status={
+										RMProfile.assessmentProficiency
+											.qualityAssurance.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">
+									Product and Process (Cannabis)
+								</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.assessmentProficiency
+											.productProcess.updatedAt
+									}
+									status={
+										RMProfile.assessmentProficiency
+											.productProcess.status
+									}
+								/>
+							</div>
+							<div className="flex flex-col gap-1 items-center">
+								<h3 className="">Property and Premises</h3>
+								<ProficiencyMatrix
+									timestamp={
+										RMProfile.assessmentProficiency
+											.propertyAndPremises.updatedAt
+									}
+									status={
+										RMProfile.assessmentProficiency
+											.propertyAndPremises.status
+									}
+								/>
+							</div>
+						</div>
+					</div>
+				</section>
+			) : null}
 		</div>
 	)
 }
@@ -159,6 +360,7 @@ export async function getServerSideProps(ctx) {
 		*[_type == 'user'  && _id == '${id}']{
 			...,
 			achievements[] -> {...},
+			"riskManagerProfile": *[_type == 'riskManagerProfile' && references(^._id)][0],
 			missions[] -> {
 				...,
 				coverImage{
