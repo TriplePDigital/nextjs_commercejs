@@ -53,6 +53,7 @@ function MissionSlug({ session, mission, user, enrollment }) {
 
 	const router = useRouter()
 	const checkpointIDQuery = router.query?.checkpointID
+	const stageIDQuery = router.query?.stageID
 
 	useEffect(() => {
 		setLoading(true)
@@ -64,10 +65,25 @@ function MissionSlug({ session, mission, user, enrollment }) {
 				: null
 		)
 		skipToCheckpoint(checkpointIDQuery)
+		skipToStage(stageIDQuery)
 		countNumberOfCheckpoints(mission.stages)
 		countCourseDuration(mission.stages)
-		return () => {}
+		return () =>
+			function cleanup() {
+				return
+			}
 	}, [stageContext, checkpointContext, enrollment])
+
+	const skipToStage = (stageID) => {
+		if (stageID) {
+			const stageIndex = enrollment.course.stages.findIndex((stage) => {
+				return stage._id === stageID
+			})
+			setStageContext(stageIndex)
+			setCheckpointContext(0)
+		}
+		setLoading(false)
+	}
 
 	const skipToCheckpoint = (checkpointID) => {
 		if (checkpointID) {
