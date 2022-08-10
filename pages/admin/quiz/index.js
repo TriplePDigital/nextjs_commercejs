@@ -13,6 +13,7 @@ import AdminSidebar from '@/components/Nav/AdminSidebar'
 import { nanoid } from 'nanoid'
 import { BsCaretUpFill, BsCheck } from 'react-icons/bs'
 import Link from 'next/link'
+import { notify } from '@/util/notification'
 
 function Quiz({ quizAttempts, tabIndex }) {
 	return (
@@ -45,8 +46,8 @@ function UploadQuiz() {
 	const [selectedCourseID, setSelectedCourseID] = useState(null)
 	const [selectedStageID, setSelectedStageID] = useState(null)
 	const [quiz, setQuiz] = useState({
-		minimumScore: null,
-		title: null
+		minimumScore: 0,
+		title: ''
 	})
 
 	const [step, setStep] = useState(1)
@@ -92,9 +93,7 @@ function UploadQuiz() {
 					return h.toLocaleLowerCase().replace(' ', '').trim()
 				},
 				transform: function (v, f) {
-					return f === 'correctoption'
-						? parseFloat(v)
-						: encodeURI(v.trim())
+					return f === 'correctoption' ? parseFloat(v) : v.trim()
 				}
 			})
 
@@ -253,7 +252,7 @@ function UploadQuiz() {
 		event.preventDefault()
 		setLoading(true)
 		try {
-			await client.create({
+			const quizDoc = await client.create({
 				_type: 'quiz',
 				title: quiz.title,
 				minimumScore: Number(quiz.minimumScore),
@@ -263,11 +262,40 @@ function UploadQuiz() {
 				},
 				questions: quizSchemaQuestions
 			})
+			await client.create({
+				_type: 'checkpoint',
+				title: quiz.title,
+				instance: 'quiz',
+				order: Number(findCheckpointPosition(selectedStageID)) + 1,
+				slug: {
+					_type: 'slug',
+					current: `${quiz.title
+						.toLowerCase()
+						.replace(/ /g, '-')}-${getCourseName()
+						.toLowerCase()
+						.replace(/ /g, '-')}`
+				},
+				type: {
+					_ref: quizDoc._id,
+					_type: 'reference'
+				},
+				stage: {
+					_ref: selectedStageID,
+					_type: 'reference'
+				}
+			})
 			setLoading(false)
 			setStep(5)
 		} catch (error) {
 			throw new Error(error)
 		}
+	}
+
+	const findCheckpointPosition = (stageID) => {
+		const stage = chapters.filter((stage) => {
+			return stage._id === stageID
+		})[0]
+		return stage.checkpoints.length
 	}
 
 	const quizOptions = Array(10).fill(undefined)
@@ -405,12 +433,12 @@ function UploadQuiz() {
 									type="text"
 									placeholder="Quiz title"
 									className="w-full rounded-lg border-gray-300 "
-									value={quiz.title ?? ''}
+									value={quiz.title}
 									onChange={(e) => {
 										setQuiz((prevState) => {
 											return {
 												...prevState,
-												title: encodeURI(e.target.value)
+												title: e.target.value
 											}
 										})
 									}}
@@ -419,15 +447,26 @@ function UploadQuiz() {
 								<input
 									type="number"
 									placeholder="Minimum Score"
-									min={'0'}
-									max={'100'}
+									min={0}
+									max={100}
 									maxLength={3}
 									minLength={1}
 									required
 									className="w-1/3 rounded-lg border-gray-300"
-									value={quiz.minimumScore ?? 0}
+									value={quiz.minimumScore}
 									onChange={(e) => {
 										setQuiz((prevState) => {
+											if (e.target.value > 100) {
+												notify(
+													'error',
+													'Minimum score must be less than or equal to 100!',
+													'min-score-error'
+												)
+												return {
+													title: prevState.title,
+													minimumScore: 100
+												}
+											}
 											return {
 												...prevState,
 												minimumScore: e.target.value
@@ -457,15 +496,13 @@ function UploadQuiz() {
 									</button>
 									<button
 										className={`px-4 py-3 w-1/3 bg-orange-400 uppercase font-bold tracking-wide leading-loose rounded text-white ${
-											quiz.minimumScore === null ||
-											quiz.title === null
+											!quiz.minimumScore || !quiz.title
 												? 'opacity-25 cursor-not-allowed'
 												: 'opacity-100 cursor-pointer hover:bg-orange-600'
 										}`}
 										onClick={() => setStep(4)}
 										disabled={
-											quiz.minimumScore === null ||
-											quiz.title === null
+											!quiz.minimumScore || !quiz.title
 												? true
 												: false
 										}
@@ -705,7 +742,7 @@ function AllQuizAttempts({ quizAttempts }) {
 									</span>
 									<span className="text-sm text-gray-400">
 										{
-											attempt.checkpoint?.stage.mission
+											attempt.checkpoint?.stage?.mission
 												?.title
 										}
 									</span>
