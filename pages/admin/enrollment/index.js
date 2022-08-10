@@ -3,20 +3,17 @@ import Image from 'next/image'
 import imgConstructor from '@/util/img'
 import { getSession } from 'next-auth/client'
 import getUserFromSession from '@/util/getUserFromSession'
-import {
-	getEnrollmentsPerUser,
-	getLatestEnrollments
-} from '@/util/getEnrollments'
+import { getEnrollmentsPerUser, getLatestEnrollments } from '@/util/getEnrollments'
 import { Loader } from '@/components/util'
 import { BsSearch } from 'react-icons/bs'
 import Papa from 'papaparse'
 import { configuredSanityClient as client } from '@/util/img'
 import AdminSidebar from '@/components/Nav/AdminSidebar'
+import { Accordion, Modal } from 'flowbite-react'
 
 function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 	const [filteredEnrollment, setFilteredEnrollment] = useState(enrollments)
-	const [filteredLatestEnrollments, setFilteredLatestEnrollments] =
-		useState(latestEnrollments)
+	const [filteredLatestEnrollments, setFilteredLatestEnrollments] = useState(latestEnrollments)
 	const [searchTerm, setSearchTerm] = useState('')
 	const [loading, setLoading] = useState(false)
 
@@ -66,23 +63,9 @@ function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 			<AdminSidebar />
 			<section className="w-full mt-5">
 				<div className="flex justify-between mb-5">
-					<form
-						onSubmit={(e) => handleSearch(e)}
-						className={`w-1/2 flex gap-5 items-center ${
-							tabIndex === 2 ? 'invisible' : 'visible'
-						}`}
-					>
-						<input
-							type="text"
-							defaultValue={searchTerm}
-							className="border bg-gray-100 shadow rounded py-3 px-4 w-1/2"
-							placeholder="Search by email or name"
-							onChange={(e) => setSearchTerm(e.target.value)}
-						/>
-						<button
-							type="submit"
-							className="min-w-fit w-40 h-full bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-1 rounded px-5 py-2 flex gap-3 justify-center items-center"
-						>
+					<form onSubmit={(e) => handleSearch(e)} className={`w-1/2 flex gap-5 items-center ${tabIndex === 2 ? 'invisible' : 'visible'}`}>
+						<input type="text" defaultValue={searchTerm} className="border bg-gray-100 shadow rounded py-3 px-4 w-1/2" placeholder="Search by email or name" onChange={(e) => setSearchTerm(e.target.value)} />
+						<button type="submit" className="min-w-fit w-40 h-full bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-1 rounded px-5 py-2 flex gap-3 justify-center items-center">
 							<BsSearch size={16} />
 							Search
 						</button>
@@ -92,17 +75,8 @@ function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 					<Loader />
 				) : (
 					<>
-						{tabIndex === 0 && (
-							<AllEnrollments
-								enrollments={filteredEnrollment}
-								loading={loading}
-							/>
-						)}
-						{tabIndex === 1 && (
-							<LatestEnrollments
-								latestEnrollments={filteredLatestEnrollments}
-							/>
-						)}
+						{tabIndex === 0 && <AllEnrollments enrollments={filteredEnrollment} loading={loading} />}
+						{tabIndex === 1 && <LatestEnrollments latestEnrollments={filteredLatestEnrollments} />}
 						{tabIndex === 2 && <EnrollStudents />}
 					</>
 				)}
@@ -134,31 +108,21 @@ function AllEnrollments({ enrollments, loading }) {
 				<thead className="w-full flex bg-gray-200 font-semibold font-sans">
 					<tr className="flex items-center w-full px-4 py-2">
 						<th className="border-r border-gray-500 w-1/4">User</th>
-						<th className="border-x border-gray-500 w-1/4">
-							Number of course enrollments
-						</th>
+						<th className="border-x border-gray-500 w-1/4">Number of course enrollments</th>
 						<th className=" border-gray-500 w-1/4">Progress</th>
-						<th className="border-l border-gray-500 w-1/4">
-							Certificates
-						</th>
+						<th className="border-l border-gray-500 w-1/4">Certificates</th>
 					</tr>
 				</thead>
 				<tbody className="flex flex-col">
 					{enrollments &&
 						enrollments.map((user, userIndex) => (
-							<tr
-								key={userIndex}
-								className="flex items-center py-2 px-5 border border-gray-200 text-center"
-							>
+							<tr key={userIndex} className="flex items-center py-2 px-5 border border-gray-200 text-center">
 								<td className="basis-1/4 items-center flex">
 									<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
 										<Image
-											{...imgConstructor(
-												user.avatar.asset,
-												{
-													fit: 'fill'
-												}
-											)}
+											{...imgConstructor(user.avatar.asset, {
+												fit: 'fill'
+											})}
 											alt="Instructor Avatar"
 											layout="fill"
 											quality={50}
@@ -168,116 +132,62 @@ function AllEnrollments({ enrollments, loading }) {
 									</div>
 									<div className="flex flex-col items-start">
 										<span className="">
-											{user.firstName +
-												' ' +
-												user.lastName}
+											{user.firstName} {user.lastName}
 										</span>
 
-										<span className="text-sm text-gray-500">
-											{user.email}
-										</span>
+										<span className="text-sm text-gray-500">{user.email}</span>
 									</div>
 								</td>
 								<td className="basis-1/4">{user.count}</td>
 								<td className="basis-1/4">
 									<>
-										<button
-											className="bg-ncrma-300 rounded px-5 py-1 min-w-fit"
-											onClick={() =>
-												handleExpand(userIndex)
-											}
-										>
-											{userIndex === expandID && open
-												? 'Hide course progress'
-												: 'Show course progress'}
+										<button className="bg-ncrma-300 rounded px-5 py-1 min-w-fit" onClick={() => handleExpand(userIndex)}>
+											{userIndex === expandID && open ? 'Hide course progress' : 'Show course progress'}
 										</button>
-										<ul
-											className={`flex-col ${
-												userIndex === expandID && open
-													? 'flex'
-													: 'hidden'
-											}`}
-										>
-											{user.enrollment.map(
-												(enrollment) => (
-													<li
-														className="list-disc flex justify-between items-center w-full"
-														key={encodeURI(
-															enrollment._id
-														)}
-													>
-														<div className="w-3/4 text-left flex flex-col font-semibold">
-															{
-																enrollment
-																	.course
-																	.title
-															}
-															<ul className="w-full list-disc font-light text-sm">
-																{enrollment.course.stages.map(
-																	(
-																		stage,
-																		i
-																	) => (
-																		<li
-																			key={
-																				i
-																			}
-																			className="ml-8"
-																		>
-																			<div>
-																				{
-																					stage.title
-																				}
-																				<ul className="w-full list-disc font-light text-sm">
-																					{enrollment.progress.map(
-																						(
-																							progress,
-																							ind
-																						) => (
-																							<>
-																								{progress
-																									.content
-																									.parentStage ===
-																								stage._id ? (
-																									<li
-																										key={
-																											ind
-																										}
-																										className="ml-8"
-																									>
+										<Modal show={userIndex === expandID && open ? true : false} onClose={() => setOpen(!open)}>
+											<Modal.Header>
+												{user.firstName} {user.lastName}
+											</Modal.Header>
+											<Modal.Body>
+												{user.enrollment.map((enrollment, index) => {
+													return enrollment.progress.length !== 0 ? (
+														<Accordion key={index}>
+															<Accordion.Panel>
+																<Accordion.Title>{enrollment.course.title}</Accordion.Title>
+																<Accordion.Content>
+																	<ul className="w-full list-disc font-light text-sm">
+																		{enrollment.course.stages.map((stage, i) => {
+																			return enrollment.progress.length !== 0 ? (
+																				<li key={i} className="ml-8">
+																					<div>
+																						{stage.title}
+																						<ul className="w-full list-disc font-light text-sm">
+																							{enrollment.progress.map((progress, ind) => {
+																								return progress.content.parentStage === stage._id && progress.status !== 0 ? (
+																									<li key={ind} className="ml-8">
 																										<div className="flex justify-between items-center">
-																											<span>
-																												{
-																													progress
-																														.content
-																														.title
-																												}
-																											</span>
-																											<span>
-																												{`${progress.status}%`}
-																											</span>
+																											<span>{progress.content.title}</span>
+																											<span>{`${progress.status}%`}</span>
 																										</div>
 																									</li>
-																								) : null}
-																							</>
-																						)
-																					)}
-																				</ul>
-																			</div>
-																		</li>
-																	)
-																)}
-															</ul>
-														</div>
-													</li>
-												)
-											)}
-										</ul>
+																								) : null
+																							})}
+																						</ul>
+																					</div>
+																				</li>
+																			) : null
+																		})}
+																	</ul>
+																</Accordion.Content>
+															</Accordion.Panel>
+														</Accordion>
+													) : null
+												})}
+											</Modal.Body>
+										</Modal>
 									</>
 								</td>
-								<td className="basis-1/4">
-									{user?.achievements?.length || 0}
-								</td>
+								<td className="basis-1/4">{user?.achievements?.length || 0}</td>
 							</tr>
 						))}
 				</tbody>
@@ -303,19 +213,14 @@ function LatestEnrollments({ latestEnrollments }) {
 					<tr className="flex items-center w-full px-4 py-2">
 						<span className=""></span>
 						<th className="w-1/3">Student</th>
-						<th className="w-1/3 border-x border-gray-500">
-							Course
-						</th>
+						<th className="w-1/3 border-x border-gray-500">Course</th>
 						<th className="w-1/3">Track</th>
 					</tr>
 				</thead>
 				<tbody className="flex flex-col">
 					{latestEnrollments &&
 						latestEnrollments.map((enrollment) => (
-							<tr
-								key={encodeURI(enrollment._id)}
-								className="flex py-2 px-5 items-center border border-gray-200 text-center relative"
-							>
+							<tr key={encodeURI(enrollment._id)} className="flex py-2 px-5 items-center border border-gray-200 text-center relative">
 								<span
 									className="block w-2 h-full absolute left-0 top-0"
 									style={{
@@ -326,12 +231,9 @@ function LatestEnrollments({ latestEnrollments }) {
 									<div className="flex gap-2 items-center justify-center">
 										<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
 											<Image
-												{...imgConstructor(
-													enrollment?.student?.avatar,
-													{
-														fit: 'fill'
-													}
-												)}
+												{...imgConstructor(enrollment?.student?.avatar, {
+													fit: 'fill'
+												})}
 												alt="Instructor Avatar"
 												layout="fill"
 												quality={50}
@@ -339,37 +241,20 @@ function LatestEnrollments({ latestEnrollments }) {
 											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 										</div>
 										<div className="flex flex-col text-left">
-											<span>
-												{enrollment.student.firstName +
-													' ' +
-													enrollment.student.lastName}
-											</span>
-											<span className="text-gray-500 font-light text-sm">
-												{enrollment.student.email}
-											</span>
+											<span>{enrollment.student.firstName + ' ' + enrollment.student.lastName}</span>
+											<span className="text-gray-500 font-light text-sm">{enrollment.student.email}</span>
 										</div>
 									</div>
 								</td>
 								<td className="w-1/3 px-4 py-2">
 									<div className="flex flex-col">
-										<div className="">
-											{enrollment.course.title}
-										</div>
-										<div className="text-gray-500 font-light text-sm">
-											Enrollment date:{' '}
-											{formatEnrollmentDate(
-												enrollment._createdAt
-											)}
-										</div>
+										<div className="">{enrollment.course.title}</div>
+										<div className="text-gray-500 font-light text-sm">Enrollment date: {formatEnrollmentDate(enrollment._createdAt)}</div>
 									</div>
 								</td>
 								<td className="w-1/3 px-4 py-2">
 									<div className="flex flex-col">
-										<div className="">
-											{enrollment.course.track
-												? enrollment.course.track.name
-												: 'N/A'}
-										</div>
+										<div className="">{enrollment.course.track ? enrollment.course.track.name : 'N/A'}</div>
 										<div className="text-gray-500 font-light text-sm"></div>
 									</div>
 								</td>
@@ -450,9 +335,7 @@ function EnrollStudents({}) {
 	const handleEnrollment = async (event) => {
 		try {
 			const currentUser = students[event.target.value]
-			const res = await client.fetch(
-				`*[_type == 'user' && email == '${currentUser.email}']{_id}[0]`
-			)
+			const res = await client.fetch(`*[_type == 'user' && email == '${currentUser.email}']{_id}[0]`)
 			if (res) {
 				//link existing user to new enrollment
 				await currentUser.course.map(async (course) => {
@@ -496,10 +379,7 @@ function EnrollStudents({}) {
 		<div className="w-full">
 			<section className="flex gap-5 items-center">
 				<div className="text-sm font-light w-1/4">
-					<label
-						className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-						htmlFor="csv_upload"
-					>
+					<label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300" htmlFor="csv_upload">
 						Upload file
 					</label>
 					<input
@@ -510,21 +390,11 @@ function EnrollStudents({}) {
 						disabled={uploading}
 						ref={inputRef}
 					/>
-					<div
-						className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-						id="csv_upload_help"
-					>
-						Upload a CSV file with your desired students. After, you
-						will have the ability to select which courses they will
-						be enrolled in.
+					<div className="mt-1 text-sm text-gray-500 dark:text-gray-300" id="csv_upload_help">
+						Upload a CSV file with your desired students. After, you will have the ability to select which courses they will be enrolled in.
 					</div>
 				</div>
-				<button
-					onClick={handleUploadCSV}
-					disabled={uploading}
-					className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-white"
-					type="button"
-				>
+				<button onClick={handleUploadCSV} disabled={uploading} className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-white" type="button">
 					{uploading ? (
 						<span className="relative max-h-14 flex gap-2 items-center text-white">
 							<Loader size={16} color={'#eee'} />
@@ -534,15 +404,8 @@ function EnrollStudents({}) {
 						'Load CSV File'
 					)}
 				</button>
-				<label
-					htmlFor=""
-					className="flex items-center gap-2 text-sm text-gray-500"
-				>
-					<input
-						type="checkbox"
-						onChange={() => setHeader(!header)}
-						checked={header}
-					/>
+				<label htmlFor="" className="flex items-center gap-2 text-sm text-gray-500">
+					<input type="checkbox" onChange={() => setHeader(!header)} checked={header} />
 					Include headers?
 				</label>
 			</section>
@@ -550,31 +413,18 @@ function EnrollStudents({}) {
 				<thead className="w-full text-center font-semibold">
 					{students ? (
 						<tr className="w-full bg-gray-200 items-center px-5 py-2">
-							<th className="px-4 py-2 border-gray-500 border-r ">
-								Email
-							</th>
-							<th className="px-4 py-2 border-gray-500 border-r ">
-								First Name
-							</th>
-							<th className="px-4 py-2 border-gray-500 border-r ">
-								Last Name
-							</th>
-							<th className="px-4 py-2 border-gray-500 border-r ">
-								Role
-							</th>
-							<th className="px-4 py-2 border-gray-500 border-r ">
-								Course
-							</th>
+							<th className="px-4 py-2 border-gray-500 border-r ">Email</th>
+							<th className="px-4 py-2 border-gray-500 border-r ">First Name</th>
+							<th className="px-4 py-2 border-gray-500 border-r ">Last Name</th>
+							<th className="px-4 py-2 border-gray-500 border-r ">Role</th>
+							<th className="px-4 py-2 border-gray-500 border-r ">Course</th>
 							<th className="px-4 py-2 ">Action</th>
 						</tr>
 					) : null}
 				</thead>
 				<tbody>
 					{students?.map((student, studentIndex) => (
-						<tr
-							key={studentIndex}
-							className="border-b px-5 py-2 items-center relative"
-						>
+						<tr key={studentIndex} className="border-b px-5 py-2 items-center relative">
 							<td className="px-4 py-2">{student.email}</td>
 							<td className="px-4 py-2">{student.firstName}</td>
 							<td className="px-4 py-2">{student.lastName}</td>
@@ -583,32 +433,11 @@ function EnrollStudents({}) {
 								<div className="text-sm flex flex-col">
 									{courses ? (
 										courses.map((course, courseIndex) => (
-											<div
-												className="flex justify-between"
-												key={courseIndex}
-											>
-												<label
-													htmlFor={`default-toggle-${studentIndex}-${courseIndex}`}
-													className="relative inline-flex items-center mb-4 cursor-pointer"
-												>
-													<input
-														type="checkbox"
-														id={`default-toggle-${studentIndex}-${courseIndex}`}
-														className="sr-only peer"
-														name={studentIndex}
-														value={course._id}
-														title={course.title}
-														key={courseIndex}
-														onChange={(e) =>
-															handleCourseSelection(
-																e
-															)
-														}
-													/>
+											<div className="flex justify-between" key={courseIndex}>
+												<label htmlFor={`default-toggle-${studentIndex}-${courseIndex}`} className="relative inline-flex items-center mb-4 cursor-pointer">
+													<input type="checkbox" id={`default-toggle-${studentIndex}-${courseIndex}`} className="sr-only peer" name={studentIndex} value={course._id} title={course.title} key={courseIndex} onChange={(e) => handleCourseSelection(e)} />
 													<div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-													<span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-														{course.title}
-													</span>
+													<span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{course.title}</span>
 												</label>
 											</div>
 										))
@@ -618,11 +447,7 @@ function EnrollStudents({}) {
 								</div>
 							</td>
 							<td className="px-4 py-2">
-								<button
-									value={studentIndex}
-									onClick={(e) => handleEnrollment(e)}
-									className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-black hover:text-white"
-								>
+								<button value={studentIndex} onClick={(e) => handleEnrollment(e)} className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-black hover:text-white">
 									Enroll Student
 								</button>
 							</td>
