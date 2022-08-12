@@ -1,11 +1,7 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-	purge: [
-		'./pages/**/*.{js,ts,jsx,tsx}',
-		'./components/**/*.{js,ts,jsx,tsx}',
-		'node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
-	],
+	purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}', './node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'],
 	plugins: [require('flowbite/plugin')],
 	mode: 'jit',
 	darkMode: 'media', // or 'media' or 'class'

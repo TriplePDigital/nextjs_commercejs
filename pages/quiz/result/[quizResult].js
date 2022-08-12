@@ -153,11 +153,11 @@ const QuizResult = ({ result }) => {
 					<Link
 						href={`/mission/${
 							result.checkpoint.stage.mission.slug
-						}?checkpointID=${getNextStage(
+						}?stageID=${getNextStage(
 							result.checkpoint.stage.mission?.nextStage
 						)}`}
 					>
-						<a className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center">
+						<a className="bg-ncrma-400 hover:bg-ncrma-600 text-white px-6 py-4 rounded-lg">
 							Proceed to next Stage
 						</a>
 					</Link>

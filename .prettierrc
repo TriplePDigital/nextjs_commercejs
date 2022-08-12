@@ -3,10 +3,11 @@
 	"semi": false,
 	"bracketSpacing": true,
 	"singleQuote": true,
-	"tabWidth": 4,
+	"tabWidth": 2,
 	"useTabs": true,
 	"pluginSearchDirs": ["./node_modules"],
 	"plugins": [
 		"prettier-plugin-groq"
-	]
+	],
+	"printWidth": 250
 }
