@@ -40,13 +40,7 @@ function MissionSlug({ session, mission, user, enrollment }) {
 	const [loading, setLoading] = useState(false)
 	const [stageContext, setStageContext] = useState(0)
 	const [checkpointContext, setCheckpointContext] = useState(0)
-	const [currentCheckpoint, setCurrentCheckpoint] = useState(
-		enrollment
-			? enrollment.course.stages[stageContext].checkpoints[
-					checkpointContext
-			  ]
-			: null
-	)
+	const [currentCheckpoint, setCurrentCheckpoint] = useState(enrollment ? enrollment.course.stages[stageContext].checkpoints[checkpointContext] : null)
 
 	const [numberOfCheckpoints, setNumberOfCheckpoints] = useState(0)
 	const [courseDuration, setCourseDuration] = useState(0)
@@ -57,13 +51,7 @@ function MissionSlug({ session, mission, user, enrollment }) {
 
 	useEffect(() => {
 		setLoading(true)
-		setCurrentCheckpoint(
-			enrollment
-				? enrollment.course.stages[stageContext].checkpoints[
-						checkpointContext
-				  ]
-				: null
-		)
+		setCurrentCheckpoint(enrollment ? enrollment.course.stages[stageContext].checkpoints[checkpointContext] : null)
 		skipToCheckpoint(checkpointIDQuery)
 		skipToStage(stageIDQuery)
 		countNumberOfCheckpoints(mission.stages)
@@ -87,19 +75,13 @@ function MissionSlug({ session, mission, user, enrollment }) {
 
 	const skipToCheckpoint = (checkpointID) => {
 		if (checkpointID) {
-			const stageIndex = enrollment.course.stages.map(
-				(stage, stageIndex) => {
-					const checkpointIndex = stage.checkpoints.find(
-						(checkpoint) => {
-							return checkpoint._id === checkpointID
-						}
-					)
-					const checkpointQueryIndex = stage.checkpoints.findIndex(
-						(check) => check._id === checkpointID
-					)
-					return { checkpointIndex, stageIndex, checkpointQueryIndex }
-				}
-			)
+			const stageIndex = enrollment.course.stages.map((stage, stageIndex) => {
+				const checkpointIndex = stage.checkpoints.find((checkpoint) => {
+					return checkpoint._id === checkpointID
+				})
+				const checkpointQueryIndex = stage.checkpoints.findIndex((check) => check._id === checkpointID)
+				return { checkpointIndex, stageIndex, checkpointQueryIndex }
+			})
 			const chosenStage = stageIndex.find((stage) => {
 				return stage.checkpointIndex !== undefined
 			})
@@ -133,32 +115,18 @@ function MissionSlug({ session, mission, user, enrollment }) {
 		<Loader />
 	) : enrollment ? (
 		<div className="flex flex-row">
-			<Content
-				currentCheckpoint={currentCheckpoint}
-				enrollment={enrollment}
-			/>
-			<Stages
-				enrollment={enrollment}
-				setCheckpointContext={setCheckpointContext}
-				setStageContext={setStageContext}
-				setCurrentCheckpoint={setCurrentCheckpoint}
-			/>
+			<Content currentCheckpoint={currentCheckpoint} enrollment={enrollment} setCheckpointContext={setCheckpointContext} setStageContext={setStageContext} />
+			<Stages enrollment={enrollment} setCheckpointContext={setCheckpointContext} setStageContext={setStageContext} setCurrentCheckpoint={setCurrentCheckpoint} />
 		</div>
 	) : (
 		<div className="flex mx-auto w-full my-3">
 			<div className="w-8/12 mr-8">
-				<h1 className="text-4xl tracking-wide font-bold">
-					{mission.title}
-				</h1>
-				<h2 className="text-lg font-medium text-gray-600">
-					{mission.blurb}
-				</h2>
+				<h1 className="text-4xl tracking-wide font-bold">{mission.title}</h1>
+				<h2 className="text-lg font-medium text-gray-600">{mission.blurb}</h2>
 				<div className="flex justify-between items-center">
 					<div className=" flex items-center">
 						<AiFillStar className="text-yellow-500 mr-2" />
-						<span className="text-lg font-semibold mr-1">
-							{5}.0
-						</span>
+						<span className="text-lg font-semibold mr-1">{5}.0</span>
 						<span className="text-gray-500">(1512 Reviews)</span>
 					</div>
 					<div className="text-gray-500 flex items-center gap-1">
@@ -188,9 +156,7 @@ function MissionSlug({ session, mission, user, enrollment }) {
 						quality={50}
 					/>
 				</div>
-				<h2 className="text-xl leading-loose tracking-wide font-bold mb-1 mt-6">
-					About The Instructors
-				</h2>
+				<h2 className="text-xl leading-loose tracking-wide font-bold mb-1 mt-6">About The Instructors</h2>
 				<div className="flex flex-row items-center justify-between mt-6">
 					{mission.instructors.map((instructor, index) => {
 						return (
@@ -198,45 +164,29 @@ function MissionSlug({ session, mission, user, enrollment }) {
 								<div className="flex items-center gap-4">
 									<div className="relative w-14 h-14 rounded-full overflow-hidden">
 										<Image
-											{...imgConstructor(
-												instructor.avatar,
-												{
-													fit: 'fill'
-												}
-											)}
+											{...imgConstructor(instructor.avatar, {
+												fit: 'fill'
+											})}
 											placeholder="blur"
 											alt="the instructors avatar image in the shape of a circle"
 										/>
 										<div className="rounded-full absolute top-0 left-0 h-full w-full bg-ncrma-500 opacity-40"></div>
 									</div>
 									<div className="flex flex-col gap-1 text-sm text-gray-700">
-										<span className="block font-medium">
-											{instructor.name}
-										</span>
-										<span className="block underline lowercase">
-											{instructor.email}
-										</span>
+										<span className="block font-medium">{instructor.name}</span>
+										<span className="block underline lowercase">{instructor.email}</span>
 									</div>
 								</div>
-								<ReactMarkdown
-									components={mdConfig}
-									className="my-2"
-								>
+								<ReactMarkdown components={mdConfig} className="my-2">
 									{instructor.bio}
 								</ReactMarkdown>
 							</div>
 						)
 					})}
 				</div>
-				<h2 className="text-xl leading-loose tracking-wide font-bold mb-1 mt-6">
-					About This Course
-				</h2>
-				<ReactMarkdown components={mdConfig}>
-					{mission?.description}
-				</ReactMarkdown>
-				<ul className="mt-2 flex">
-					{/* TODO: This is where we are going to create the course accordion */}
-				</ul>
+				<h2 className="text-xl leading-loose tracking-wide font-bold mb-1 mt-6">About This Course</h2>
+				<ReactMarkdown components={mdConfig}>{mission?.description}</ReactMarkdown>
+				<ul className="mt-2 flex">{/* TODO: This is where we are going to create the course accordion */}</ul>
 			</div>
 			<div className="w-4/12 p-5 bg-white border-l border-gray-200 flex flex-col gap-3">
 				{/* TODO: Add ability to give feedback on courses before tackling this... */}
@@ -255,9 +205,7 @@ function MissionSlug({ session, mission, user, enrollment }) {
 						})}
 					</div>
 				</div> */}
-				<button className="bg-ncrma-400 hover:bg-ncrma-600 text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3">
-					Coming Soon!
-				</button>
+				<button className="bg-ncrma-400 hover:bg-ncrma-600 text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3">Coming Soon!</button>
 			</div>
 		</div>
 	)
@@ -278,10 +226,7 @@ export async function getServerSideProps(ctx) {
 	const user = await getUserFromSession(session?.user?.email)
 	const mission = await getMissionBySlug(ctx.params.slug)
 	try {
-		const enrollment = await getEnrollmentByStudentIDandCourseID(
-			user._id,
-			mission._id
-		)
+		const enrollment = await getEnrollmentByStudentIDandCourseID(user._id, mission._id)
 		return {
 			props: {
 				session,
