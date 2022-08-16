@@ -2,23 +2,18 @@
 import { getSession, options } from 'next-auth/client'
 import getMissionBySlug from '@/util/getMissionBySlug'
 import { useRouter } from 'next/router'
-import { useState, useEffect, useRef } from 'react'
-import ReactPlayer from 'react-player'
+import { useState, useEffect } from 'react'
 import { Loader } from '@/components/util'
 import Image from 'next/image'
-import imgConstructor, { configuredSanityClient as client } from '@/util/img'
+import imgConstructor from '@/util/img'
 import Stages from '@/components/Course/Stages'
-import isVideo from '@/util/isVideo'
 import getUserFromSession from '@/util/getUserFromSession'
 import getEnrollmentByStudentIDandCourseID from '@/util/getEnrollmentByStudentIDandCourseID'
 import { MdOutlineAssignment } from 'react-icons/md'
 import { AiFillStar, AiOutlineClockCircle } from 'react-icons/ai'
-import { FaBook } from 'react-icons/fa'
-import { BsTagsFill } from 'react-icons/bs'
-import { RiBook2Line, RiDoubleQuotesL } from 'react-icons/ri'
+import { RiBook2Line } from 'react-icons/ri'
 import ReactMarkdown from 'react-markdown'
 import mdConfig from '@/util/md'
-import Link from 'next/link'
 import Content from '@/components/Course/Content'
 import moment from 'moment'
 
@@ -115,8 +110,18 @@ function MissionSlug({ session, mission, user, enrollment }) {
 		<Loader />
 	) : enrollment ? (
 		<div className="flex flex-row">
-			<Content currentCheckpoint={currentCheckpoint} enrollment={enrollment} setCheckpointContext={setCheckpointContext} setStageContext={setStageContext} />
-			<Stages enrollment={enrollment} setCheckpointContext={setCheckpointContext} setStageContext={setStageContext} setCurrentCheckpoint={setCurrentCheckpoint} />
+			<Content
+				currentCheckpoint={currentCheckpoint}
+				enrollment={enrollment}
+				setCheckpointContext={setCheckpointContext}
+				setStageContext={setStageContext}
+			/>
+			<Stages
+				enrollment={enrollment}
+				setCheckpointContext={setCheckpointContext}
+				setStageContext={setStageContext}
+				setCurrentCheckpoint={setCurrentCheckpoint}
+			/>
 		</div>
 	) : (
 		<div className="flex mx-auto w-full my-3">
@@ -160,7 +165,10 @@ function MissionSlug({ session, mission, user, enrollment }) {
 				<div className="flex flex-row items-center justify-between mt-6">
 					{mission.instructors.map((instructor, index) => {
 						return (
-							<div key={index} className="flex flex-col">
+							<div
+								key={index}
+								className="flex flex-col"
+							>
 								<div className="flex items-center gap-4">
 									<div className="relative w-14 h-14 rounded-full overflow-hidden">
 										<Image
@@ -177,7 +185,10 @@ function MissionSlug({ session, mission, user, enrollment }) {
 										<span className="block underline lowercase">{instructor.email}</span>
 									</div>
 								</div>
-								<ReactMarkdown components={mdConfig} className="my-2">
+								<ReactMarkdown
+									components={mdConfig}
+									className="my-2"
+								>
 									{instructor.bio}
 								</ReactMarkdown>
 							</div>

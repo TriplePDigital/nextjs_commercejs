@@ -70,13 +70,9 @@ const options = {
 
 					transporter.verify(function (error, success) {
 						if (error) {
-							console.log(`Transport verify error: ${error}`);
 							throw new Error(error)
 						} else {
 							if (success) {
-								console.log(
-									'Server is ready to take our messages'
-								)
 								transporter.sendMail(
 									{
 										to: email,

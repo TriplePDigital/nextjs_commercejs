@@ -98,7 +98,39 @@ function AllEnrollments({ enrollments, loading }) {
 		setOpen(!open)
 	}
 
-	useEffect(() => {}, [enrollments])
+	const filterDuplicateProgressReports = (arr) => {
+		// arr.map((obj) => {
+		// 	if (obj.firstName === 'Diana') {
+		// 		obj.enrollment.map((enrDoc) => {
+		// 			if (enrDoc.progress?.length > 1) {
+		// 				const contentIDs = enrDoc.progress.map((progress) => {
+		// 					return progress.content._id
+		// 				})
+		// 				console.log(contentIDs)
+		// 				const uniqueContentIDs = []
+		// 				const filteredProgress = enrDoc.progress.filter(
+		// 					(v, index, self) => {
+		// 						const isDuplicate = contentIDs.includes(
+		// 							v.content._id
+		// 						)
+		// 						if (!isDuplicate) {
+		// 							uniqueContentIDs.push(v.content._id)
+		// 							return true
+		// 						}
+		// 						return false
+		// 					}
+		// 				)
+		// 				console.log(uniqueContentIDs)
+		// 				console.log(filteredProgress)
+		// 			}
+		// 		})
+		// 	}
+		// })
+	}
+
+	useEffect(() => {
+		filterDuplicateProgressReports(enrollments)
+	}, [enrollments])
 
 	return loading ? (
 		<Loader />
@@ -144,11 +176,11 @@ function AllEnrollments({ enrollments, loading }) {
 										<button className="bg-ncrma-300 rounded px-5 py-1 min-w-fit" onClick={() => handleExpand(userIndex)}>
 											{userIndex === expandID && open ? 'Hide course progress' : 'Show course progress'}
 										</button>
-										<Modal show={userIndex === expandID && open ? true : false} onClose={() => setOpen(!open)}>
+										<Modal show={userIndex === expandID && open ? true : false} onClose={() => setOpen(!open)} size={'2xl'} placement='center'>
 											<Modal.Header>
 												{user.firstName} {user.lastName}
 											</Modal.Header>
-											<Modal.Body>
+											<Modal.Body className='max-h-screen overflow-y-scroll'>
 												{user.enrollment.map((enrollment, index) => {
 													return enrollment.progress.length !== 0 ? (
 														<Accordion key={index}>
