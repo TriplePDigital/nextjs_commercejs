@@ -8,7 +8,8 @@ const moduleExports = {
 			'lh3.googleusercontent.com',
 			'images.unsplash.com',
 			'localhost',
-			'via.placeholder.com'
+			'via.placeholder.com',
+			'i.vimeocdn.com'
 		]
 	},
 	env: {VERSION: process.env.npm_package_version}

@@ -1,10 +1,7 @@
 import { fetcher } from './fetcher'
 import groq from 'groq'
 
-export default async function getEnrollmentByStudentIDandCourseID(
-	userID,
-	courseID
-) {
+export default async function getEnrollmentByStudentIDandCourseID(userID, courseID) {
 	const query = groq`
     *[_type == 'enrollment' && references('${userID}') && references('${courseID}')]{
     _id,
@@ -38,6 +35,7 @@ export default async function getEnrollmentByStudentIDandCourseID(
                     title,
                     instructor -> {name, email, _id, "avatar":avatar.asset->, stages[]->}
                 },
+                "currentStage": stage->_id,
                 order,
                 title,
                 _id,
