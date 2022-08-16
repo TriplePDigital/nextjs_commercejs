@@ -9,5 +9,6 @@
 	"plugins": [
 		"prettier-plugin-groq"
 	],
-	"printWidth": 250
+	"printWidth": 250,
+	"singleAttributePerLine": true
 }

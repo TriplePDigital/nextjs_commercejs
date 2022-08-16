@@ -95,7 +95,11 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 			}
 		}
 		//TODO: This might break if the quiz is not the last checkpoint in the stage
-		if (enrollment.course.stages[stageIndex]?.checkpoints[checkpointIndex + 1].instance === 'quiz' || enrollment.course.stages[stageIndex + 1]?.checkpoints[0].instance === 'quiz') {
+		if (
+			enrollment.course.stages[stageIndex]?.checkpoints.length > 1 && enrollment.course.stages[stageIndex]?.checkpoints[checkpointIndex + 1].instance === 'quiz' 
+			|| 
+			enrollment.course.stages[stageIndex + 1]?.checkpoints.length === 1 && enrollment.course.stages[stageIndex + 1]?.checkpoints[0].instance === 'quiz'
+			) {
 			obj = {
 				stageIndex: 'quiz',
 				checkpointIndex: 'quiz',
