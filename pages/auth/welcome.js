@@ -190,27 +190,44 @@ export async function getServerSideProps(ctx) {
 		}
 
 		const query = `*[_type == "user" && email == "${email}"]{_id, active, email, account_id}[0]`
-		const userCheck = await fetcher(query)
+		//If user check is true, that means a profile in the CMS exists for the user
+		const userCheck = await fetcher(query, true)
 
-		if (userCheck) {
-			if (userCheck.active) {
+		let res = await axios.get(
+			`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
+			{
+				params: { email }
+			}
+		)
+
+		const edgeProfile = JSON.parse(res.data)
+
+		if(userCheck){
+			// user has a profile already
+			if(userCheck.active){
+				// user has logged in before
 				return {
 					redirect: {
 						destination: '/missions',
 						permanent: true
 					}
 				}
-			} else {
-				let res = await axios.get(
-					`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
-					{
-						params: { email }
-					}
-				)
-
-				const edgeProfile = JSON.parse(res.data)
-
-				if (edgeProfile) {
+			}
+			else{
+				// we set up a profile for the user
+				if(edgeProfile){
+					// they have logged in before
+					return {
+							props: {
+								error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
+								userID: userCheck.account_id,
+								active: userCheck.active,
+								email: userCheck.email
+							}
+						}
+				}
+				else{
+					// they have not logged in before
 					return {
 						props: {
 							userID: edgeProfile?._id,
@@ -219,15 +236,14 @@ export async function getServerSideProps(ctx) {
 							active: false
 						}
 					}
-				} else {
-					return {
-						props: {
-							error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
-							userID: userCheck.account_id,
-							active: userCheck.active,
-							email: userCheck.email
-						}
-					}
+				}
+			}
+		}
+		else{
+			// user has no profile in the CMS
+			return {
+				redirect: {
+					destination: `/auth/login?error=${encodeURI('We do not have an account with your email address. Please confirm that your email address is correct, and that your team has created an account for you.')}&email=${email}`,
 				}
 			}
 		}

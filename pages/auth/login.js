@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useEffect, useState} from 'react'
 import { signIn } from 'next-auth/client'
-import { FcGoogle } from 'react-icons/fc'
 import { FaMagic } from 'react-icons/fa'
 import { Loader } from '@/components/util'
+import { useRouter } from 'next/router'
+import { notify } from '@/util/notification'
 
 // eslint-disable-next-line no-unused-vars
 function getCallbackUrl(email) {
@@ -20,6 +21,7 @@ function getCallbackUrl(email) {
 function EmailForm({ onSubmit }) {
 	const [email, setEmail] = useState('')
 	const [loading, setLoading] = useState(false)
+	const router = useRouter()
 
 	const handleSignIn = async (e) => {
 		e.preventDefault()
@@ -30,6 +32,18 @@ function EmailForm({ onSubmit }) {
 		})
 		onSubmit(email)
 	}
+
+	useEffect(() => {
+		if(router.query.error) {
+			setLoading(false)
+			setEmail(router.query.email)
+			notify(
+				'error',
+				decodeURI(router.query.error),
+				'welcome-page-error'
+			)
+		}
+	}, [])
 
 	return loading ? (
 		<Loader size={96} />
