@@ -12,7 +12,7 @@ export default function ListOfCourses({ course, index, progress }) {
 		<Loader />
 	) : (
 		<div className="inline-block px-3">
-			<Link href={`/mission/${course.slug.current}`} passHref={false}>
+			<Link href={course.fallbackURL ? course.fallbackURL : `/mission/${course.slug.current}`} passHref={false}>
 				<a className="w-72 h-fit xl:max-w-xl lg:max-w-lg md:max-w-md max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out block">
 					<span className="text-black font-bold text-xl">
 						<div className="relative h-44 w-full">
