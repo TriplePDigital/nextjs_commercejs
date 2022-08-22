@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/router'
 import { configuredSanityClient as client } from '@/util/img'
+import { Loader } from '@/components/util'
 
 function Quiz({ quizID, session, content }) {
 	const quiz = content.type
@@ -15,6 +16,7 @@ function Quiz({ quizID, session, content }) {
 	const [enrollment, setEnrollment] = useState(null)
 	const [score, setScore] = useState(0)
 	const [showScore, setShowScore] = useState(false)
+	const [loading, setLoading] = useState(true)
 
 	const LENGTH = quiz.questions.length - 1
 
@@ -32,22 +34,35 @@ function Quiz({ quizID, session, content }) {
 		next < quiz.questions.length && setCurrentQuestion(next)
 	}
 
-	const handleAnswerOption = (answer) => {
-		setQuizResponse([
-			(quizResponse[currentQuestion] = { answerByUser: answer })
-		])
-		setQuizResponse([...quizResponse])
+	const handleAnswerOption = (event) => {
+		// get quiz responses
+		// check for current question's answer
+		// if answer is there, push answer to current response index in array
+		// if answer is already there, remove the answer from the array
+		// else add answer to array of the current question index
+
+		const answer = event.target.value
+
+		let responses = quizResponse
+
+		if (responses[currentQuestion]) {
+			let index = responses[currentQuestion].findIndex((resp) => resp === answer)
+			if (index === -1) {
+				responses[currentQuestion].push(answer)
+			} else {
+				responses[currentQuestion].splice(index, 1)
+			}
+		} else {
+			responses[currentQuestion] = [answer]
+		}
+
+		setQuizResponse([...responses])
 	}
 
 	const handleSubmit = () => {
 		let newScore = 0
 		for (let i = 0; i < quiz.questions.length; i++) {
-			quiz.questions[i].answers.map(
-				(answer) =>
-					answer.correct &&
-					answer.answers === quizResponse[i]?.answerByUser &&
-					(newScore += 1)
-			)
+			quiz.questions[i].answers.map((answer) => answer.correct && answer.answers === quizResponse[i]?.answerByUser && (newScore += 1))
 		}
 		setScore(newScore)
 		setShowScore(true)
@@ -84,21 +99,17 @@ function Quiz({ quizID, session, content }) {
 				}
 			})
 			// setAttempt(quizAttempt)
-			router.push(
-				`/quiz/result/[quizResult]`,
-				`/quiz/result/${quizAttempt._id}`
-			)
+			router.push(`/quiz/result/[quizResult]`, `/quiz/result/${quizAttempt._id}`)
 		}
 	}
 
 	useEffect(() => {
-		const enrollment = client.fetch(
-			`*[_type == "enrollment" && references('${session._id}') && references('${content.stage.mission._id}')][0]`
-		)
+		const enrollment = client.fetch(`*[_type == "enrollment" && references('${session._id}') && references('${content.stage.mission._id}')][0]`)
 
 		enrollment
 			.then((res) => {
 				setEnrollment(res)
+				setLoading(false)
 			})
 			.catch((err) => {
 				throw new Error(err)
@@ -106,58 +117,42 @@ function Quiz({ quizID, session, content }) {
 		return () => {}
 	}, [session, content])
 
-	return (
+	return loading ? (
+		<Loader />
+	) : (
 		<>
 			<div className="bg-gray-100 shadow-md border rounded p-5 my-4 w-2/3 mx-auto">
-				<p>
-					Number of previous attempts by you: {quiz.attempts.length}
-				</p>
+				<p>Number of previous attempts by you: {quiz.attempts.length}</p>
 				<p>Minimum percentage to pass: {quiz.minimumScore}%</p>
 				<p>Number of question: {quiz.questions.length}</p>
 			</div>
 			<div className="flex flex-col w-2/3 mx-auto">
-				<form>
+				<form onChange={(e) => handleAnswerOption(e)}>
 					<div className="py-1.5 border-b border-gray-100 last:mb-3">
 						<div className="flex justify-between items-center">
 							<div>
 								<p className="text-gray-500">
-									Question {currentQuestion + 1} of{' '}
-									{quiz.questions.length}
+									Question {currentQuestion + 1} of {quiz.questions.length}
 								</p>
-								<p className="font-semibold">
-									{quiz.questions[currentQuestion].title}
-								</p>
+								<p className="font-semibold">{quiz.questions[currentQuestion].title}</p>
 							</div>
-							<p className="text-gray-500">
-								Point: {100 / quiz.questions.length}
-							</p>
+							<p className="text-gray-500">Point: {100 / quiz.questions.length}</p>
 						</div>
 						<div className="flex flex-col">
-							{quiz.questions[currentQuestion].answers.map(
-								(answer, i) => {
-									return (
-										<label key={nanoid()}>
-											<input
-												type="radio"
-												name={i}
-												value={answer.answers}
-												onChange={(e) =>
-													handleAnswerOption(
-														answer.answers
-													)
-												}
-												checked={
-													answer.answers ===
-													quizResponse[
-														currentQuestion
-													]?.answerByUser
-												}
-											/>
-											{answer.answers}
-										</label>
-									)
-								}
-							)}
+							{quiz.questions[currentQuestion].answers.map((answer, i) => {
+								return (
+									<label key={nanoid()}>
+										<input
+											type="checkbox"
+											name={currentQuestion}
+											value={answer.answers}
+											// onChange={(e) => handleAnswerOption(e.target.value)}
+											checked={quizResponse[currentQuestion]?.includes(answer.answers)}
+										/>
+										{answer.answers}
+									</label>
+								)
+							})}
 						</div>
 					</div>
 
@@ -170,16 +165,10 @@ function Quiz({ quizID, session, content }) {
 							Previous
 						</button>
 						<button
-							onClick={
-								currentQuestion + 1 === quiz.questions.length
-									? (e) => sendQuizResults(e)
-									: (e) => handleNext(e)
-							}
+							onClick={currentQuestion + 1 === quiz.questions.length ? (e) => sendQuizResults(e) : (e) => handleNext(e)}
 							className="text-black hover:text-white bg-ncrma-400 focus:bg-ncrma-600 hover:bg-ncrma-600 px-3 py-1.5 rounded block w-1/5 min-w-fit transition-all"
 						>
-							{currentQuestion + 1 === quiz.questions.length
-								? 'Submit'
-								: 'Next'}
+							{currentQuestion + 1 === quiz.questions.length ? 'Submit' : 'Next'}
 						</button>
 					</div>
 				</form>
