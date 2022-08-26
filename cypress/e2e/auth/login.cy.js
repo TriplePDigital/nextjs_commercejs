@@ -1,7 +1,5 @@
 /// <reference types="cypress" />
 
-import { sign, verify } from 'jsonwebtoken'
-
 describe('The login field renders', () => {
 	beforeEach(() => {
 		cy.visit('http://localhost:3000/auth/login')
@@ -22,20 +20,19 @@ describe('The login field renders', () => {
 	})
 })
 
-// describe('The login let users sign in', () => {
-//   beforeEach(() => {
-//     cy.visit('http://localhost:3000/auth/login')
-//   })
-//   it('user gets prompted for verification code on valid login', () => {
-//     cy.get('[name=email]').type('dpapp001@odu.edu')
-//     cy.get('[type=submit]').click()
-//     cy.get('[name=token]').should('be.visible')
-//     cy.request({
-//       method: 'GET',
-//       url: 'http://localhost:3000/api/auth/csrf',
-//     }).then((response) => {
-//       const csrf = response.body.csrfToken
-//       return csrf
-//     })
-//   })
-// })
+describe('The login let users sign in', () => {
+	it('user gets prompted for verification code on valid login', () => {
+		cy.visit('http://localhost:3000/auth/login')
+		cy.get('[name=email]').type('dpapp001@odu.edu')
+		cy.get('[type=submit]').click()
+		cy.get('[name=token]').should('be.visible')
+	})
+	it('user gets redirected to missions page on successful login', () => {
+		cy.login()
+		cy.url().should('include', '/missions')
+	})
+	it('user gets redirected to error page on unsuccessful login', () => {
+		cy.login(undefined, '123456')
+		cy.url().should('include', '/api/auth/error')
+	})
+})

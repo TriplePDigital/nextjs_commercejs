@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer'
 function generateRandomNumber() {
 	const minm = 100000
 	const maxm = 999999
-	return Math.floor(Math.random() * (maxm - minm + 1)) + minm
+	return process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_LOCAL_PASSWORD : Math.floor(Math.random() * (maxm - minm + 1)) + minm
 }
 
 const mailjetServerConfig = {
@@ -20,20 +20,11 @@ const mailjetServerConfig = {
 }
 
 const transporterConfigMailtrap = {
-	host:
-		process.env.NODE_ENV === 'production'
-			? 'in-v3.mailjet.com'
-			: 'smtp.mailtrap.io',
+	host: process.env.NODE_ENV === 'production' ? 'in-v3.mailjet.com' : 'smtp.mailtrap.io',
 	port: process.env.NODE_ENV === 'production' ? 587 : 2525,
 	auth: {
-		user:
-			process.env.NODE_ENV === 'production'
-				? process.env.NEXT_PUBLIC_MAILJET_API_KEY
-				: '9e0c155ae8f9b0',
-		pass:
-			process.env.NODE_ENV === 'production'
-				? process.env.NEXT_PUBLIC_MAILJET_API_SECRET
-				: '5cf722b6a809ae'
+		user: process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_MAILJET_API_KEY : '9e0c155ae8f9b0',
+		pass: process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_MAILJET_API_SECRET : '5cf722b6a809ae'
 	}
 }
 
@@ -47,26 +38,16 @@ const options = {
 		// 		'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code'
 		// }),
 		Providers.Email({
-			server:
-				process.env.NODE_ENV === 'production'
-					? mailjetServerConfig
-					: process.env.EMAIL_SERVER,
+			server: process.env.NODE_ENV === 'production' ? mailjetServerConfig : process.env.EMAIL_SERVER,
 			from: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
 			generateVerificationToken: () => {
 				const token = generateRandomNumber()
 				return token
 			},
-			sendVerificationRequest: ({
-				identifier: email,
-				url,
-				token,
-				provider
-			}) => {
+			sendVerificationRequest: ({ identifier: email, url, token, provider }) => {
 				return new Promise((resolve, reject) => {
 					const { from } = provider
-					let transporter = nodemailer.createTransport(
-						transporterConfigMailtrap
-					)
+					let transporter = nodemailer.createTransport(transporterConfigMailtrap)
 
 					transporter.verify(function (error, success) {
 						if (error) {
@@ -115,21 +96,13 @@ const options = {
 									},
 									(error) => {
 										if (error) {
-											return reject(
-												new Error(
-													`SEND_VERIFICATION_EMAIL_ERROR ${error}`
-												)
-											)
+											return reject(new Error(`SEND_VERIFICATION_EMAIL_ERROR ${error}`))
 										}
 										return resolve()
 									}
 								)
 							} else {
-								return reject(
-									new Error(
-										'There was an error while sending your magic password email.'
-									)
-								)
+								return reject(new Error('There was an error while sending your magic password email.'))
 							}
 						}
 					})
@@ -158,4 +131,4 @@ const options = {
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default (req, res) =>NextAuth(req, res, options)
+export default (req, res) => NextAuth(req, res, options)

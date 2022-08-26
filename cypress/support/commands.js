@@ -10,7 +10,13 @@
 //
 //
 // -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
+Cypress.Commands.add('login', (email = 'dpapp001@odu.edu', token = '111111') => {
+	cy.visit('http://localhost:3000/auth/login')
+	cy.get('[name=email]').type(email)
+	cy.get('[type=submit]').click()
+	cy.get('[name=token]').type(token)
+	cy.get('[type=submit]').click()
+})
 //
 //
 // -- This is a child command --
