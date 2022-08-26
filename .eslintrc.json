@@ -18,5 +18,8 @@
 	},
 	"env": {
 		"es6": true
-	}
+	},
+	"plugins": [
+		"cypress"
+	]
 }
