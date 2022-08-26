@@ -162,14 +162,14 @@ function MissionSlug({ session, mission, user, enrollment }) {
 					/>
 				</div>
 				<h2 className="text-xl leading-loose tracking-wide font-bold mb-1 mt-6">About The Instructors</h2>
-				<div className="flex flex-row items-center justify-between mt-6">
+				<div className="flex flex-row items-start justify-between mt-6">
 					{mission.instructors.map((instructor, index) => {
 						return (
 							<div
 								key={index}
 								className="flex flex-col"
 							>
-								<div className="flex items-center gap-4">
+								<div className="flex items-center gap-4 flex-1">
 									<div className="relative w-14 h-14 rounded-full overflow-hidden">
 										<Image
 											{...imgConstructor(instructor.avatar, {
