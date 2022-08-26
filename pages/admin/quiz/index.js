@@ -9,7 +9,6 @@ import { Loader } from '@/components/util'
 import { configuredSanityClient as client } from '@/util/img'
 import Papa from 'papaparse'
 import Upload from './Upload'
-import AdminSidebar from '@/components/Nav/AdminSidebar'
 import { nanoid } from 'nanoid'
 import { BsCaretUpFill, BsCheck } from 'react-icons/bs'
 import Link from 'next/link'
@@ -18,12 +17,9 @@ import { notify } from '@/util/notification'
 function Quiz({ quizAttempts, tabIndex }) {
 	return (
 		<section className="flex flex-col md:flex-row gap-5">
-			<AdminSidebar />
 			<section className="w-full my-5">
 				<div className="w-full mx-auto">
-					{tabIndex === 0 && (
-						<AllQuizAttempts quizAttempts={quizAttempts} />
-					)}
+					{tabIndex === 0 && <AllQuizAttempts quizAttempts={quizAttempts} />}
 					{tabIndex === 1 && <UploadQuiz />}
 				</div>
 			</section>
@@ -187,16 +183,8 @@ function UploadQuiz() {
 		try {
 			for (let index = 1; index <= 10; index++) {
 				let schema = {
-					answers:
-						questions[questionID][`option${index}`] === ''
-							? null
-							: questions[questionID][`option${index}`]
-									.toString()
-									.trim(),
-					correct:
-						questions[questionID].correctoption === index
-							? true
-							: false,
+					answers: questions[questionID][`option${index}`] === '' ? null : questions[questionID][`option${index}`].toString().trim(),
+					correct: questions[questionID].correctoption === index ? true : false,
 					_key: nanoid(),
 					_type: 'answer'
 				}
@@ -269,11 +257,7 @@ function UploadQuiz() {
 				order: Number(findCheckpointPosition(selectedStageID)) + 1,
 				slug: {
 					_type: 'slug',
-					current: `${quiz.title
-						.toLowerCase()
-						.replace(/ /g, '-')}-${getCourseName()
-						.toLowerCase()
-						.replace(/ /g, '-')}`
+					current: `${quiz.title.toLowerCase().replace(/ /g, '-')}-${getCourseName().toLowerCase().replace(/ /g, '-')}`
 				},
 				type: {
 					_ref: quizDoc._id,
@@ -308,13 +292,9 @@ function UploadQuiz() {
 				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
 					<div className="flex gap-2 items-center">
 						<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
-							<span className="text-lg text-gray-400 aspect-square">
-								{step}
-							</span>
+							<span className="text-lg text-gray-400 aspect-square">{step}</span>
 						</div>
-						<h1 className="text-2xl font-medium">
-							Upload your CSV file
-						</h1>
+						<h1 className="text-2xl font-medium">Upload your CSV file</h1>
 					</div>
 					{uploading ? (
 						<Loader />
@@ -333,14 +313,9 @@ function UploadQuiz() {
 				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
 					<div className="flex gap-2 items-center">
 						<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
-							<span className="text-lg text-gray-400 aspect-square">
-								{step}
-							</span>
+							<span className="text-lg text-gray-400 aspect-square">{step}</span>
 						</div>
-						<h1 className="text-2xl font-medium">
-							Select the course and chapter you want to add the
-							quiz to
-						</h1>
+						<h1 className="text-2xl font-medium">Select the course and chapter you want to add the quiz to</h1>
 					</div>
 					<section className="flex flex-col gap-1 my-5 w-full px-2 md:px-10 mx-auto">
 						<select
@@ -391,16 +366,10 @@ function UploadQuiz() {
 							</button>
 							<button
 								className={`px-4 py-3 w-1/3 bg-orange-400 uppercase font-bold tracking-wide leading-loose rounded text-white ${
-									!selectedCourseID || !selectedStageID
-										? 'opacity-25 cursor-not-allowed'
-										: 'opacity-100 cursor-pointer hover:bg-orange-600'
+									!selectedCourseID || !selectedStageID ? 'opacity-25 cursor-not-allowed' : 'opacity-100 cursor-pointer hover:bg-orange-600'
 								}`}
 								onClick={() => setStep(3)}
-								disabled={
-									!selectedCourseID || !selectedStageID
-										? true
-										: false
-								}
+								disabled={!selectedCourseID || !selectedStageID ? true : false}
 							>
 								Save Settings
 							</button>
@@ -413,18 +382,11 @@ function UploadQuiz() {
 					<section className="flex flex-col gap-2 w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
 						<div className="flex gap-2 items-center">
 							<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
-								<span className="text-lg text-gray-400 aspect-square">
-									{step}
-								</span>
+								<span className="text-lg text-gray-400 aspect-square">{step}</span>
 							</div>
 							<div className="flex flex-col">
-								<h1 className="text-2xl font-medium">
-									Finalize your quiz and it&apos;s settings
-								</h1>
-								<h2 className="text-sm font-light text-gray-600">
-									You also have the ability to look over all
-									your questions by clicking the button below.
-								</h2>
+								<h1 className="text-2xl font-medium">Finalize your quiz and it&apos;s settings</h1>
+								<h2 className="text-sm font-light text-gray-600">You also have the ability to look over all your questions by clicking the button below.</h2>
 							</div>
 						</div>
 						<div className="flex justify-between">
@@ -457,11 +419,7 @@ function UploadQuiz() {
 									onChange={(e) => {
 										setQuiz((prevState) => {
 											if (e.target.value > 100) {
-												notify(
-													'error',
-													'Minimum score must be less than or equal to 100!',
-													'min-score-error'
-												)
+												notify('error', 'Minimum score must be less than or equal to 100!', 'min-score-error')
 												return {
 													title: prevState.title,
 													minimumScore: 100
@@ -477,14 +435,10 @@ function UploadQuiz() {
 								<a
 									href="#"
 									className="my-2 w-1/3 underline text-sm text-center rounded text-black text-opacity-70 hover:text-opacity-100 hover:border-gray-400"
-									onClick={() =>
-										setShowAllQuestions(!showAllQuestions)
-									}
+									onClick={() => setShowAllQuestions(!showAllQuestions)}
 									type="button"
 								>
-									{showAllQuestions
-										? 'Hide Questions'
-										: 'Show Questions'}
+									{showAllQuestions ? 'Hide Questions' : 'Show Questions'}
 								</a>
 								<div className="flex justify-between w-full">
 									<button
@@ -496,16 +450,10 @@ function UploadQuiz() {
 									</button>
 									<button
 										className={`px-4 py-3 w-1/3 bg-orange-400 uppercase font-bold tracking-wide leading-loose rounded text-white ${
-											!quiz.minimumScore || !quiz.title
-												? 'opacity-25 cursor-not-allowed'
-												: 'opacity-100 cursor-pointer hover:bg-orange-600'
+											!quiz.minimumScore || !quiz.title ? 'opacity-25 cursor-not-allowed' : 'opacity-100 cursor-pointer hover:bg-orange-600'
 										}`}
 										onClick={() => setStep(4)}
-										disabled={
-											!quiz.minimumScore || !quiz.title
-												? true
-												: false
-										}
+										disabled={!quiz.minimumScore || !quiz.title ? true : false}
 									>
 										Save Settings
 									</button>
@@ -523,58 +471,28 @@ function UploadQuiz() {
 										>
 											<div className="flex flex-col gap-2 w-full">
 												<div className="flex justify-between items-center">
-													<span>
-														{question.question}
-													</span>
-													<span>
-														{question.weight} points
-													</span>
+													<span>{question.question}</span>
+													<span>{question.weight} points</span>
 												</div>
 												<button
 													className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-white inline-block w-fit"
-													onClick={() =>
-														setToggleQuestion(
-															!toggleQuestion
-														)
-													}
+													onClick={() => setToggleQuestion(!toggleQuestion)}
 												>
 													Show Questions
 												</button>
 												{toggleQuestion ? (
 													<ul className="list-disc ml-6">
-														{quizOptions.map(
-															(
-																option,
-																questionKey
-															) => {
-																const currentOption =
-																	question[
-																		`option${
-																			questionKey +
-																			1
-																		}`
-																	]
-																return currentOption !==
-																	'' ? (
-																	<li
-																		key={
-																			questionKey
-																		}
-																		className={`${
-																			question.correctoption ===
-																			questionKey +
-																				1
-																				? 'text-red-500'
-																				: ''
-																		}`}
-																	>
-																		{
-																			currentOption
-																		}
-																	</li>
-																) : null
-															}
-														)}
+														{quizOptions.map((option, questionKey) => {
+															const currentOption = question[`option${questionKey + 1}`]
+															return currentOption !== '' ? (
+																<li
+																	key={questionKey}
+																	className={`${question.correctoption === questionKey + 1 ? 'text-red-500' : ''}`}
+																>
+																	{currentOption}
+																</li>
+															) : null
+														})}
 													</ul>
 												) : null}
 											</div>
@@ -599,43 +517,27 @@ function UploadQuiz() {
 				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
 					<div className="flex gap-2 items-center">
 						<div className="rounded-full border-2 border-gray-400 border-opacity-50 h-8 w-8 flex items-center justify-center">
-							<span className="text-lg text-gray-400 aspect-square">
-								{step}
-							</span>
+							<span className="text-lg text-gray-400 aspect-square">{step}</span>
 						</div>
-						<h1 className="text-2xl font-medium">
-							Review your quiz
-						</h1>
+						<h1 className="text-2xl font-medium">Review your quiz</h1>
 					</div>
 					<div className="flex flex-col px-2 mt-5 md:px-10">
 						<p className="font-medium ">
-							<span className="text-gray-400 font-light text-sm">
-								Course:
-							</span>{' '}
-							{getCourseName()}
+							<span className="text-gray-400 font-light text-sm">Course:</span> {getCourseName()}
 						</p>
 						<p className="font-medium ">
-							<span className="text-gray-400 font-light text-sm">
-								Chapter:
-							</span>{' '}
-							{getChapterName()}
+							<span className="text-gray-400 font-light text-sm">Chapter:</span> {getChapterName()}
 						</p>
 						<p className="font-medium ">
-							<span className="text-gray-400 font-light text-sm">
-								Quiz title:{' '}
-							</span>
+							<span className="text-gray-400 font-light text-sm">Quiz title: </span>
 							{quiz.title}
 						</p>
 						<p className="font-medium ">
-							<span className="text-gray-400 font-light text-sm">
-								Minimum score to pass:{' '}
-							</span>
+							<span className="text-gray-400 font-light text-sm">Minimum score to pass: </span>
 							{quiz.minimumScore}
 						</p>
 						<p className="font-medium ">
-							<span className="text-gray-400 font-light text-sm">
-								Number of questions:{' '}
-							</span>
+							<span className="text-gray-400 font-light text-sm">Number of questions: </span>
 							{questions.length}
 						</p>
 					</div>
@@ -650,10 +552,7 @@ function UploadQuiz() {
 											size={32}
 											className="text-green-800 opacity-50"
 										/>
-										<h3 className="font-medium text-green-800">
-											Your quiz questions passed
-											verification!
-										</h3>
+										<h3 className="font-medium text-green-800">Your quiz questions passed verification!</h3>
 									</div>
 								) : (
 									<div className="flex justify-between w-full mt-2 md:px-10">
@@ -690,21 +589,20 @@ function UploadQuiz() {
 			{step === 5 ? (
 				<section className="w-1/2 bg-gray-100 rounded-lg shadow-lg px-4 py-8 mx-auto">
 					<span className="flex items-center justify-center mx-auto bg-green-100 h-44 w-44 rounded-full shadow-lg">
-						<BsCheck size={200} className="text-green-400" />
+						<BsCheck
+							size={200}
+							className="text-green-400"
+						/>
 					</span>
 					<div className="flex flex-col text-center items-center justify-center my-5">
-						<h1 className="text-2xl font-bold">
-							You have successfully uploaded your quiz!
-						</h1>
-						<h2 className="font-light text-sm">
-							Users are now able to take quiz if they are enrolled
-							in the course you assigned it to.
-						</h2>
+						<h1 className="text-2xl font-bold">You have successfully uploaded your quiz!</h1>
+						<h2 className="font-light text-sm">Users are now able to take quiz if they are enrolled in the course you assigned it to.</h2>
 					</div>
-					<Link href="/missions" passHref={false}>
-						<a className="block w-1/3 mx-auto text-center px-4 py-3 bg-ncrma-400 rounded text-white hover:bg-ncrma-600">
-							Go to my courses
-						</a>
+					<Link
+						href="/missions"
+						passHref={false}
+					>
+						<a className="block w-1/3 mx-auto text-center px-4 py-3 bg-ncrma-400 rounded text-white hover:bg-ncrma-600">Go to my courses</a>
 					</Link>
 				</section>
 			) : null}
@@ -720,9 +618,7 @@ function AllQuizAttempts({ quizAttempts }) {
 					<tr className="flex items-center w-full px-4 py-2">
 						<th className="border-r border-gray-500 w-1/4">Quiz</th>
 						<th className="w-1/4">Completed</th>
-						<th className="border-x border-gray-500 w-1/4">
-							Student
-						</th>
+						<th className="border-x border-gray-500 w-1/4">Student</th>
 						<th className="w-1/4">Score</th>
 						{/* <th className="border-l border-gray-500 w-1/5">
 							Action
@@ -737,32 +633,18 @@ function AllQuizAttempts({ quizAttempts }) {
 						>
 							<td className="w-1/4">
 								<div className="flex flex-col gap-0">
-									<span className="font-medium">
-										{attempt.checkpoint?.quiz?.title}
-									</span>
-									<span className="text-sm text-gray-400">
-										{
-											attempt.checkpoint?.stage?.mission
-												?.title
-										}
-									</span>
+									<span className="font-medium">{attempt.checkpoint?.quiz?.title}</span>
+									<span className="text-sm text-gray-400">{attempt.checkpoint?.stage?.mission?.title}</span>
 								</div>
 							</td>
-							<td className="w-1/4">
-								{moment(attempt._createdAt).format(
-									'h:mm:ss A - MM/DD/YYYY'
-								)}
-							</td>
+							<td className="w-1/4">{moment(attempt._createdAt).format('h:mm:ss A - MM/DD/YYYY')}</td>
 							<td className="w-1/4">
 								<div className="flex items-center justify-center">
 									<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
 										<Image
-											{...imgConstructor(
-												attempt.user.avatar.asset,
-												{
-													fit: 'fill'
-												}
-											)}
+											{...imgConstructor(attempt.user.avatar.asset, {
+												fit: 'fill'
+											})}
 											alt="Instructor Avatar"
 											layout="fill"
 											quality={50}
@@ -770,17 +652,9 @@ function AllQuizAttempts({ quizAttempts }) {
 										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 									</div>
 									<div className="flex flex-col items-start">
-										<span className="">
-											{attempt.user.firstName +
-												' ' +
-												attempt.user.lastName}
-										</span>
+										<span className="">{attempt.user.firstName + ' ' + attempt.user.lastName}</span>
 										<span className="text-sm underline text-gray-700">
-											<a
-												href={`mailto:${attempt.user.email}`}
-											>
-												{attempt.user.email}
-											</a>
+											<a href={`mailto:${attempt.user.email}`}>{attempt.user.email}</a>
 										</span>
 									</div>
 								</div>
@@ -788,10 +662,7 @@ function AllQuizAttempts({ quizAttempts }) {
 							<td className="w-1/4">
 								<div className="flex flex-col gap-0">
 									<span>{Math.floor(attempt.score)}%</span>
-									<span className="text-sm text-gray-400">
-										Minimum Score to Pass:{' '}
-										{attempt.checkpoint.quiz.minimumScore}%
-									</span>
+									<span className="text-sm text-gray-400">Minimum Score to Pass: {attempt.checkpoint.quiz.minimumScore}%</span>
 								</div>
 							</td>
 							{/* <td className="w-1/5">

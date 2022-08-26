@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import Loader from 'react-spinners/ClipLoader'
 import { isActive } from '@/util/isActive'
 import { useEffect } from 'react'
+import AdminSidebar from '../Nav/AdminSidebar'
 
 export default function Layout({ children }) {
 	const [session, loading] = useSession()
@@ -15,9 +16,7 @@ export default function Layout({ children }) {
 			isActive(session.user.email)
 				.then((res) => {
 					if (!res) {
-						router.push(
-							`/auth/welcome?email=${session?.user?.email}`
-						)
+						router.push(`/auth/welcome?email=${session?.user?.email}`)
 					} else {
 						return true
 					}
@@ -36,9 +35,7 @@ export default function Layout({ children }) {
 				isActive(session.user.email)
 					.then((res) => {
 						if (!res) {
-							router.push(
-								`/auth/welcome?email=${session?.user?.email}`
-							)
+							router.push(`/auth/welcome?email=${session?.user?.email}`)
 						} else {
 							return true
 						}
@@ -61,11 +58,8 @@ export default function Layout({ children }) {
 	) : (
 		<>
 			{!router?.pathname.includes('login') ? <Navbar /> : null}
-			<main
-				className={`mb-10 px-10 ${
-					router?.pathname.includes('login') ? 'h-screen' : ''
-				}`}
-			>
+			<main className={`mb-10 px-10 ${router?.pathname.includes('login') ? 'h-screen' : ''} ${router.pathname.includes('/admin') ? 'flex lg:flex-row flex-col justify-between gap-3' : ''}`}>
+				{router.pathname.includes('/admin') && <AdminSidebar />}
 				{children}
 			</main>
 			<Footer />
