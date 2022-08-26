@@ -7,6 +7,7 @@ import { BsCaretDownFill, BsCaretUpFill, BsFillPersonFill, BsGearFill } from 're
 import { fetcher } from '@/util/fetcher'
 import { useNextSanityImage } from 'next-sanity-image'
 import Link from 'next/link'
+import getUserFromSession from '@/util/getUserFromSession'
 
 export default function Navbar() {
 	const [session, loading] = useSession()
@@ -15,17 +16,9 @@ export default function Navbar() {
 	const { setUser, user } = useContext(UserContext)
 
 	const getUser = () => {
-		const query = `
-			*[_type == 'user' && email == '${session?.user?.email}']{
-				...,
-				avatar {
-					asset ->
-				}
-			}[0]
-		`
-		fetcher(query)
-			.then(async (usr) => {
-				setUser(await usr)
+		getUserFromSession(session.user.email)
+			.then((usr) => {
+				setUser(usr)
 			})
 			.catch((err) => {
 				throw Error(err)
@@ -33,9 +26,8 @@ export default function Navbar() {
 	}
 
 	useEffect(() => {
-		getUser()
-		return () => {}
-	}, [session])
+		if (session) getUser()
+	}, [])
 
 	let rex = /([A-Z])([A-Z])([a-z])|([a-z])([A-Z])/g
 
