@@ -8,7 +8,6 @@ import { Loader } from '@/components/util'
 import { BsSearch } from 'react-icons/bs'
 import Papa from 'papaparse'
 import { configuredSanityClient as client } from '@/util/img'
-import AdminSidebar from '@/components/Nav/AdminSidebar'
 import { Accordion, Modal } from 'flowbite-react'
 
 function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
@@ -92,7 +91,7 @@ function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 						/>
 					)}
 					{tabIndex === 1 && <LatestEnrollments latestEnrollments={filteredLatestEnrollments} />}
-					{tabIndex === 2 && <EnrollStudents />}
+					{tabIndex === 2 && <EnrollStudents enrollments={enrollments} />}
 				</>
 			)}
 		</section>
@@ -332,7 +331,7 @@ function LatestEnrollments({ latestEnrollments }) {
 	)
 }
 
-function EnrollStudents({}) {
+function EnrollStudents({ enrollments }) {
 	const [uploading, setUploading] = useState(false)
 	const [header, setHeader] = useState(true)
 	const [courses, setCourses] = useState(null)
@@ -376,6 +375,7 @@ function EnrollStudents({}) {
 					})
 					setStudents(file)
 					setUploading(false)
+					handleAlreadyEnrolledInCourse()
 				})
 				.catch((error) => {
 					setUploading(false)
@@ -386,9 +386,33 @@ function EnrollStudents({}) {
 		reader.readAsText(file)
 	}
 
+	const handleAlreadyEnrolledInCourse = () => {
+		// loop over the uploaded students
+		// find the student in the enrollments array
+		// push all course ids in the user enrollment
+		// return the new students array
+
+		setStudents((prev) => {
+			const newStudents = [...prev]
+
+			newStudents.map((user, userIndex) => {
+				let index = enrollments.findIndex((enrollment) => enrollment.email.toLowerCase() === user.email.toLowerCase())
+				if (index !== -1) {
+					let tempCourseEnrollments = []
+					enrollments[index].enrollment.map((enrDoc) => {
+						tempCourseEnrollments.push(enrDoc.course._id)
+					})
+
+					newStudents[userIndex].course = tempCourseEnrollments
+				}
+			})
+			return newStudents
+		})
+	}
+
 	const handleCourseSelection = (event) => {
-		setStudents(() => {
-			const temp = students
+		setStudents((prev) => {
+			const temp = prev
 			if (temp[event.target.name].course.includes(event.target.value)) {
 				return temp
 			} else {
@@ -402,15 +426,24 @@ function EnrollStudents({}) {
 		try {
 			const currentUser = students[event.target.value]
 			const res = await client.fetch(`*[_type == 'user' && email == '${currentUser.email}']{_id}[0]`)
+			//check for duplicate enrollments before processing new enrollment
+			const duplicate = enrollments.find((enrollment) => enrollment._id === res._id)
 			if (res) {
-				//link existing user to new enrollment
-				await currentUser.course.map(async (course) => {
-					return await client.create({
-						_type: 'enrollment',
-						student: { _ref: res._id },
-						course: { _ref: course }
+				if (duplicate.enrollment.length > 0) {
+					let filteredEnrollments
+					duplicate.enrollment.map((doc) => {
+						filteredEnrollments = currentUser.course.filter((course) => course._id === doc.course._id)
 					})
-				})
+					console.log(filteredEnrollments)
+					//link existing user to new enrollment
+					filteredEnrollments.map(async (ID) => {
+						return await client.create({
+							_type: 'enrollment',
+							student: { _ref: res._id },
+							course: { _ref: ID }
+						})
+					})
+				}
 			} else {
 				///create user and then enroll them
 
@@ -436,9 +469,6 @@ function EnrollStudents({}) {
 
 	useEffect(() => {
 		getCourses()
-		return () => {
-			return false
-		}
 	}, [])
 
 	return (
@@ -540,8 +570,13 @@ function EnrollStudents({}) {
 														title={course.title}
 														key={courseIndex}
 														onChange={(e) => handleCourseSelection(e)}
+														checked={student.course.includes(course._id)}
 													/>
-													<div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+													<div
+														className={`w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 ${
+															student.course.includes(course._id) ? 'bg-green-500' : 'peer-checked:bg-blue-600'
+														}`}
+													></div>
 													<span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{course.title}</span>
 												</label>
 											</div>

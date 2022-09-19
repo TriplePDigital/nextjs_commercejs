@@ -16,7 +16,7 @@ import { notify } from '@/util/notification'
 
 function Quiz({ quizAttempts, tabIndex }) {
 	return (
-		<section className="flex flex-col md:flex-row gap-5">
+		<section className="flex flex-col md:flex-row gap-5 w-full">
 			<section className="w-full my-5">
 				<div className="w-full mx-auto">
 					{tabIndex === 0 && <AllQuizAttempts quizAttempts={quizAttempts} />}
@@ -89,7 +89,11 @@ function UploadQuiz() {
 					return h.toLocaleLowerCase().replace(' ', '').trim()
 				},
 				transform: function (v, f) {
-					return f === 'correctoption' ? parseFloat(v) : v.trim()
+					let intValues
+					if (f === 'correctoption') {
+						intValues = v.split(',').map((v) => parseInt(v))
+					}
+					return f === 'correctoption' ? intValues : v.trim()
 				}
 			})
 
@@ -184,7 +188,7 @@ function UploadQuiz() {
 			for (let index = 1; index <= 10; index++) {
 				let schema = {
 					answers: questions[questionID][`option${index}`] === '' ? null : questions[questionID][`option${index}`].toString().trim(),
-					correct: questions[questionID].correctoption === index ? true : false,
+					correct: questions[questionID].correctoption.includes(index) ? true : false,
 					_key: nanoid(),
 					_type: 'answer'
 				}
@@ -478,7 +482,7 @@ function UploadQuiz() {
 													className="bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-white inline-block w-fit"
 													onClick={() => setToggleQuestion(!toggleQuestion)}
 												>
-													Show Questions
+													Show Answers
 												</button>
 												{toggleQuestion ? (
 													<ul className="list-disc ml-6">
@@ -487,7 +491,7 @@ function UploadQuiz() {
 															return currentOption !== '' ? (
 																<li
 																	key={questionKey}
-																	className={`${question.correctoption === questionKey + 1 ? 'text-red-500' : ''}`}
+																	className={`${question.correctoption.includes(questionKey + 1) ? 'text-red-500' : ''}`}
 																>
 																	{currentOption}
 																</li>

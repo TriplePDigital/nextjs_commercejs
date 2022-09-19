@@ -1,13 +1,7 @@
 import { Loader } from '@/components/util'
 import React from 'react'
 
-const Upload = ({
-	uploading,
-	inputRef,
-	handleUploadCSV,
-	header,
-	setHeader
-}) => {
+const Upload = ({ uploading, inputRef, handleUploadCSV, header, setHeader }) => {
 	return (
 		<section className="flex flex-col gap-5 items-center my-3">
 			<div className="text-sm font-light w-full">
@@ -29,13 +23,10 @@ const Upload = ({
 					className="mt-1 text-sm text-gray-500 dark:text-gray-300"
 					id="csv_upload_help"
 				>
-					Upload a CSV file with your desired questions. After, you
-					will have the ability to select which course and chapter to
-					attach the quiz to as well as assign the quiz&apos;s title
-					and the minimum score to pass.
+					Upload a CSV file with your desired questions. After, you will have the ability to select which course and chapter to attach the quiz to as well as assign the quiz&apos;s title and the minimum score to pass.
 				</div>
 			</div>
-			<label
+			{/* <label
 				htmlFor=""
 				className="flex items-center gap-2 text-sm text-gray-500"
 			>
@@ -45,7 +36,7 @@ const Upload = ({
 					checked={header}
 				/>
 				Include headers?
-			</label>
+			</label> */}
 			<button
 				onClick={handleUploadCSV}
 				disabled={uploading}
@@ -54,7 +45,10 @@ const Upload = ({
 			>
 				{uploading ? (
 					<span className="relative max-h-14 flex gap-2 items-center text-white">
-						<Loader size={16} color={'#eee'} />
+						<Loader
+							size={16}
+							color={'#eee'}
+						/>
 						Loading...
 					</span>
 				) : (
