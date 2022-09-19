@@ -64,11 +64,7 @@ export async function getLatestEnrollments() {
 
 export async function getEnrollmentsPerUser(term, input = false) {
 	const query = groq`
-        *[_type == 'user'] ${
-			input
-				? `| score(firstName match '*${term}*' || lastName match '*${term}*' || email match '*${term}*', boost(email match '*${term}*', 4)) | order(_score desc)`
-				: ''
-		}
+        *[_type == 'user'] ${input ? `| score(firstName match '*${term}*' || lastName match '*${term}*' || email match '*${term}*', boost(email match '*${term}*', 4)) | order(_score desc)` : ''}
 			{
 				_id,
 				_score,
@@ -82,6 +78,7 @@ export async function getEnrollmentsPerUser(term, input = false) {
 				"enrollment": *[_type == 'enrollment' && references(^._id)]{
 					_id,
 					course->{
+						_id,
 						title,
 						"stages": *[_type =='stage' && references(^._id)]
 					},

@@ -39,3 +39,5 @@ README.code-workspace
 .sentryclirc
 
 .idea/
+cypress/videos
+cypress/screenshots
