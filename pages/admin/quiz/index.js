@@ -85,7 +85,7 @@ function UploadQuiz() {
 			const csv = Papa.parse(target.result, {
 				header: true,
 				transformHeader: function (h) {
-					return h.toLocaleLowerCase().trim()
+					return h.toLocaleLowerCase().replace(' ', '').trim()
 				},
 				transform: function (v, f) {
 					let intValues
