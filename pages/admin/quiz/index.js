@@ -29,7 +29,6 @@ function Quiz({ quizAttempts, tabIndex }) {
 
 function UploadQuiz() {
 	const [uploading, setUploading] = useState(false)
-	const [header, setHeader] = useState(true)
 	const [questions, setQuestions] = useState(null)
 	const [loading, setLoading] = useState(false)
 	const [quizSchemaQuestions, setQuizSchemaQuestions] = useState([])
@@ -84,9 +83,9 @@ function UploadQuiz() {
 
 		reader.onloadend = ({ target }) => {
 			const csv = Papa.parse(target.result, {
-				header,
+				header: true,
 				transformHeader: function (h) {
-					return h.toLocaleLowerCase().replace(' ', '').trim()
+					return h.toLocaleLowerCase().trim()
 				},
 				transform: function (v, f) {
 					let intValues
@@ -97,13 +96,13 @@ function UploadQuiz() {
 				}
 			})
 
-			fetch('/api/admin', {
+			fetch('/api/admin/upload', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					csv: csv?.data
+					file: csv?.data
 				})
 			})
 				.then((res) => {
@@ -187,7 +186,7 @@ function UploadQuiz() {
 		try {
 			for (let index = 1; index <= 10; index++) {
 				let schema = {
-					answers: questions[questionID][`option${index}`] === '' ? null : questions[questionID][`option${index}`].toString().trim(),
+					answers: questions[questionID][`option${index}`] === '' || questions[questionID][`option${index}`] === undefined ? null : questions[questionID][`option${index}`].toString().trim(),
 					correct: questions[questionID].correctoption.includes(index) ? true : false,
 					_key: nanoid(),
 					_type: 'answer'
@@ -306,9 +305,12 @@ function UploadQuiz() {
 						<Upload
 							uploading={uploading}
 							inputRef={inputRef}
-							handleUploadCSV={handleUploadCSV}
-							header={header}
-							setHeader={setHeader}
+							handleUpload={handleUploadCSV}
+							htmlFor="csv-upload"
+							helpID="csv-upload-help"
+							help="Upload a CSV file with your desired questions. After, you will have the ability to select which course and chapter to attach the quiz to as well as assign the quiz's title and the minimum score to pass."
+							label="Upload CSV file"
+							_type="csv"
 						/>
 					)}
 				</section>
