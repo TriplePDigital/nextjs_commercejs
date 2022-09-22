@@ -5,6 +5,7 @@ import { GrUserAdmin } from 'react-icons/gr'
 import { MdOutlineDashboard, MdQuiz } from 'react-icons/md'
 import { useRouter } from 'next/router'
 import { RiTimerFlashFill } from 'react-icons/ri'
+import { FaCanadianMapleLeaf } from 'react-icons/fa'
 
 const AdminSidebar = () => {
 	const [showQuizChildren, setShowQuizChildren] = useState(false)
@@ -122,6 +123,16 @@ const AdminSidebar = () => {
 						className="opacity-30"
 					/>
 					Progress
+				</a>
+			</Link>
+
+			<Link href="/admin/crpp">
+				<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer">
+					<FaCanadianMapleLeaf
+						size={20}
+						className="opacity-30"
+					/>
+					CRP²
 				</a>
 			</Link>
 		</aside>
