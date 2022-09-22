@@ -12,10 +12,7 @@ function Quiz({ quizID, session, content }) {
 	const quiz = content.type
 	const [quizResponse, setQuizResponse] = useState([])
 	const [currentQuestion, setCurrentQuestion] = useState(0)
-	const [attempt, setAttempt] = useState(null)
 	const [enrollment, setEnrollment] = useState(null)
-	const [score, setScore] = useState(0)
-	const [showScore, setShowScore] = useState(false)
 	const [loading, setLoading] = useState(true)
 
 	const LENGTH = quiz.questions.length - 1
@@ -62,10 +59,23 @@ function Quiz({ quizID, session, content }) {
 	const handleSubmit = () => {
 		let newScore = 0
 		for (let i = 0; i < quiz.questions.length; i++) {
-			quiz.questions[i].answers.map((answer) => answer.correct && answer.answers === quizResponse[i]?.answerByUser && (newScore += 1))
+			const correctAnswers = quiz.questions[i].answers.filter((answer) => answer.correct)
+			const numberOfCorrectAnswers = correctAnswers.length
+			if (numberOfCorrectAnswers === 1) {
+				correctAnswers[0].answers === quizResponse[i][0] ? newScore++ : null
+			} else {
+				//TODO: Figure out a way to handle selecting the correct choices but also the incorrect ones. Currently we are giving 100% if the student selects all options and not all of them are correct.
+				let partialScore = 0
+				for (let j = 0; j < quizResponse[i].length; j++) {
+					if (correctAnswers.find((answer) => answer.answers === quizResponse[i][j])) {
+						partialScore++
+					} else {
+						partialScore--
+					}
+				}
+				newScore += partialScore / numberOfCorrectAnswers
+			}
 		}
-		setScore(newScore)
-		setShowScore(true)
 		return newScore
 	}
 
@@ -98,7 +108,6 @@ function Quiz({ quizID, session, content }) {
 					_type: 'reference'
 				}
 			})
-			// setAttempt(quizAttempt)
 			router.push(`/quiz/result/[quizResult]`, `/quiz/result/${quizAttempt._id}`)
 		}
 	}
@@ -146,7 +155,6 @@ function Quiz({ quizID, session, content }) {
 											type="checkbox"
 											name={currentQuestion}
 											value={answer.answers}
-											// onChange={(e) => handleAnswerOption(e.target.value)}
 											checked={quizResponse[currentQuestion]?.includes(answer.answers)}
 										/>
 										{answer.answers}
