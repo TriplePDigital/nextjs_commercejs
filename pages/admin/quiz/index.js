@@ -305,12 +305,31 @@ function UploadQuiz() {
 						<Upload
 							uploading={uploading}
 							inputRef={inputRef}
-							handleUpload={handleUploadCSV}
 							htmlFor="csv-upload"
 							helpID="csv-upload-help"
 							help="Upload a CSV file with your desired questions. After, you will have the ability to select which course and chapter to attach the quiz to as well as assign the quiz's title and the minimum score to pass."
-							label="Upload CSV file"
 							_type="csv"
+							// parseJsonFile={handleUploadCSV}
+							processButton={
+								<button
+									onClick={handleUploadCSV}
+									disabled={uploading}
+									className="w-1/2 bg-ncrma-300 hover:bg-ncrma-500 focus:bg-ncrma-500 focus:ring-2 rounded px-5 py-2 text-white"
+									type="button"
+								>
+									{uploading ? (
+										<span className="relative max-h-14 flex gap-2 items-center text-white">
+											<Loader
+												size={16}
+												color={'#eee'}
+											/>
+											Loading...
+										</span>
+									) : (
+										'Upload CSV file'
+									)}
+								</button>
+							}
 						/>
 					)}
 				</section>

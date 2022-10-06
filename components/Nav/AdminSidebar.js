@@ -117,7 +117,7 @@ const AdminSidebar = () => {
 			) : null}
 
 			<Link href="/admin/reports">
-				<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer">
+				<a className={`flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer ${router.pathname.includes('/reports') ? 'font-bold bg-gray-200' : 'hover:bg-gray-200'}`}>
 					<BsGraphUp
 						size={20}
 						className="opacity-30"
@@ -127,7 +127,7 @@ const AdminSidebar = () => {
 			</Link>
 
 			<Link href="/admin/crpp">
-				<a className="flex items-center gap-3 hover:bg-gray-200 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer">
+				<a className={`flex items-center gap-3 px-5 py-5 border-t border-gray-300 font-semibold cursor-pointer ${router.pathname.includes('/crpp') ? 'font-bold bg-gray-200' : 'hover:bg-gray-200'}`}>
 					<FaCanadianMapleLeaf
 						size={20}
 						className="opacity-30"
