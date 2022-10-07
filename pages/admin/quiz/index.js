@@ -102,7 +102,7 @@ function UploadQuiz() {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					file: csv?.data
+					csv: csv?.data
 				})
 			})
 				.then((res) => {
