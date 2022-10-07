@@ -6,6 +6,6 @@ export default async function (req, res) {
 			error: 'There was an error processing your CSV file.'
 		})
 	} else {
-		res.json(fileUpload).status(200)
+		res.status(200).json(fileUpload)
 	}
 }
