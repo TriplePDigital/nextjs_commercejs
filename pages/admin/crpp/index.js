@@ -533,19 +533,8 @@ Verify.propTypes = {
 			email: PropTypes.string,
 			phoneNumber: PropTypes.string
 		})
-	}),
-	data: PropTypes.shape({
-		entry: PropTypes.shape({
-			courses: PropTypes.arrayOf(
-				PropTypes.arrayOf(
-					PropTypes.shape({
-						name: PropTypes.string,
-						price: PropTypes.string | PropTypes.number
-					})
-				)
-			)
-		})
-	})
+	}).isRequired,
+	data: PropTypes.object.isRequired
 }
 
 export default CrppPage
