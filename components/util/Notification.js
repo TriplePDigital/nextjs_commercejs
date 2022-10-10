@@ -1,13 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { toast } from 'react-toastify'
-import {
-	FaInfo,
-	FaCheck,
-	FaExclamationTriangle,
-	FaBug,
-	FaExclamationCircle
-} from 'react-icons/fa'
+import { FaInfo, FaCheck, FaExclamationTriangle, FaBug, FaExclamationCircle } from 'react-icons/fa'
 
 export const displayIcon = (type) => {
 	switch (type) {
@@ -27,9 +21,7 @@ export const displayIcon = (type) => {
 const ToastMessage = ({ type, message, ID }) =>
 	toast[type](
 		<div style={{ display: 'flex' }}>
-			<div style={{ flexGrow: 1, fontSize: 15, padding: '8px 12px' }}>
-				{message}
-			</div>
+			<div style={{ flexGrow: 1, fontSize: 15, padding: '8px 12px' }}>{message}</div>
 		</div>,
 		{
 			toastId: ID
