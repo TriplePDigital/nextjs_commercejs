@@ -71,14 +71,7 @@ export default function Stages({ enrollment, setStageContext, setCheckpointConte
 														{checkpoint.title}
 													</a>
 												</Link>
-												<span className="text-sm text-gray-500 w-1/6">
-													{`${getProgressForCheckpoint(stage._id, checkpoint._id, enrollment)}%`}
-													{/* {findQuizResult(
-															enrollment.student
-																.quizAttempts,
-															checkpoint._id
-														)} */}
-												</span>
+												<span className="text-sm text-gray-500 w-1/6">{`${getProgressForCheckpoint(stage._id, checkpoint._id, enrollment)}%`}</span>
 												<span className="text-sm text-gray-500 w-1/6">{isVideo(checkpoint.type) ? `${moment.utc(checkpoint.type?.duration * 1000).format('HH:mm:ss')}` : null}</span>
 											</div>
 										</>
