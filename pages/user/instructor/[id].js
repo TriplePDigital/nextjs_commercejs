@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 function Profile({ profile }) {
 	return (
-		<section className="mx-auto w-1/2 flex flex-col mt-5">
+		<section className="mx-auto w-2/3 flex flex-col mt-5">
 			<div className="flex items-center gap-4 mb-5">
 				<div className="w-20 h-20 rounded-full overflow-hidden relative">
 					<Image
@@ -19,36 +19,35 @@ function Profile({ profile }) {
 				<div className="flex flex-col">
 					<h1 className="text-lg font-medium mb-2">{profile.name}</h1>
 					<p className="text-md">{profile.company}</p>
-					<p className="text-md text-gray-500 underline">
-						{profile.email}
-					</p>
+					<p className="text-md text-gray-500 underline">{profile.email}</p>
 				</div>
 			</div>
 			<div className="">{profile.bio}</div>
 			<div className="flex flex-col my-5">
-				<h1 className="font-medium text-xl">
-					Course(s) by {profile.name}
-				</h1>
-				<table className="">
+				<h1 className="font-medium text-xl">Course(s) by {profile.name}</h1>
+				<table className="container w-full flex flex-col rounded shadow-md">
 					<thead className="border-b-2 border-gray-500">
-						<tr>
-							<th></th>
-							<th>Course</th>
-							<th>Description</th>
-							<th>Track Name</th>
-							<th>Number of Enrollments</th>
+						<tr className="w-full bg-gray-200 flex items-center px-5 py-2 items-center">
+							<th className="" />
+							<th className="flex-[2]">Course</th>
+							<th className="border-l border-gray-500 flex-[3]">Description</th>
+							<th className="border-l border-gray-500 flex-[2]">Track Name</th>
+							<th className="border-gray-500 border-l flex-1">Number of Enrollments</th>
 						</tr>
 					</thead>
-					<tbody className="text-center">
+					<tbody className="text-center flex flex-col w-full">
 						{profile.missions.map((mission, count) => (
-							<tr key={count} className="border-b">
+							<tr
+								key={count}
+								className="border-b border-r flex relative items-center justify-between w-full py-5"
+							>
 								<span
-									className="w-1 h-auto"
+									className="block w-2 h-full absolute left-0 top-0"
 									style={{
 										backgroundColor: `${mission.colorCode}`
 									}}
-								></span>
-								<td>
+								/>
+								<td className="ml-4 flex-[2]">
 									<Link
 										href={`/mission/${mission.slug}`}
 										passHref
@@ -57,9 +56,9 @@ function Profile({ profile }) {
 										<a>{mission.title}</a>
 									</Link>
 								</td>
-								<td>{mission.description}</td>
-								<td>{mission.track.name}</td>
-								<td>{mission.enrollmentCount}</td>
+								<td className="flex-[3]">{mission.description.length > 100 ? `${mission.description.slice(0, 90)}...` : mission.description}</td>
+								<td className="flex-[2]">{mission.track.name}</td>
+								<td className="flex-1">{mission.enrollmentCount}</td>
 							</tr>
 						))}
 					</tbody>
