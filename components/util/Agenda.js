@@ -104,7 +104,11 @@ const Blob = () => {
 					height="1000"
 					fill="transparent"
 				></rect>
-				<g id="group" fill="#5FBBBE" filter="url(#goo)">
+				<g
+					id="group"
+					fill="#5FBBBE"
+					filter="url(#goo)"
+				>
 					{Array.from(Array(100)).map((_, i) => (
 						<Particle key={i} />
 					))}
