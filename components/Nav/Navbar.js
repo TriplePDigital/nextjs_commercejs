@@ -1,17 +1,14 @@
 import { useSession, signIn, signOut } from 'next-auth/client'
 import ActiveLink from './ActiveLink'
 import { RiShutDownLine } from 'react-icons/ri'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../pages/_app'
 import { BsCaretDownFill, BsCaretUpFill, BsFillPersonFill, BsGearFill } from 'react-icons/bs'
-import { fetcher } from '@/util/fetcher'
-import { useNextSanityImage } from 'next-sanity-image'
 import Link from 'next/link'
 import getUserFromSession from '@/util/getUserFromSession'
 
 export default function Navbar() {
 	const [session, loading] = useSession()
-	const [avatar, setAvatar] = useState(null)
 	const [toggleDropdown, setToggleDropdown] = useState(false)
 	const { setUser, user } = useContext(UserContext)
 
@@ -27,7 +24,7 @@ export default function Navbar() {
 
 	useEffect(() => {
 		if (session) getUser()
-	}, [])
+	}, [session])
 
 	let rex = /([A-Z])([A-Z])([a-z])|([a-z])([A-Z])/g
 
@@ -72,7 +69,7 @@ export default function Navbar() {
 							className="bg-ncrma-400 font-bold text-white uppercase px-6 py-2 rounded leading-loose tracking-wide"
 							onClick={() =>
 								signIn(null, {
-									callbackUrl: `http://localhost:3000/auth/welcome`
+									callbackUrl: `${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`
 								})
 							}
 						>

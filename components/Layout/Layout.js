@@ -11,22 +11,6 @@ export default function Layout({ children }) {
 	const [session, loading] = useSession()
 	const router = useRouter()
 
-	const checkForActive = () => {
-		if (session && !loading && !router?.pathname.includes('login')) {
-			isActive(session.user.email)
-				.then((res) => {
-					if (!res) {
-						router.push(`/auth/welcome?email=${session?.user?.email}`)
-					} else {
-						return true
-					}
-				})
-				.catch((err) => {
-					throw new Error(err)
-				})
-		}
-	}
-
 	useEffect(() => {
 		let mounted = true
 
@@ -36,8 +20,6 @@ export default function Layout({ children }) {
 					.then((res) => {
 						if (!res) {
 							router.push(`/auth/welcome?email=${session?.user?.email}`)
-						} else {
-							return true
 						}
 					})
 					.catch((err) => {

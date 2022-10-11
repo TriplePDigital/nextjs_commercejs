@@ -6,7 +6,7 @@ export const configuredSanityClient = sanityClient({
 	dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
 	token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
 	useCdn: process.env.NODE_ENV === 'production',
-	apiVersion: 'vX'
+	apiVersion: 'v1'
 })
 
 export default function imgConstructor(

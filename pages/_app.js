@@ -2,9 +2,7 @@ import 'tailwindcss/tailwind.css'
 import 'react-toastify/dist/ReactToastify.css'
 import { Provider } from 'next-auth/client'
 import { Layout } from '../components/Layout'
-import { SWRConfig } from 'swr'
 import { createContext, useState } from 'react'
-import { fetcher } from '../util/fetcher'
 import { ToastContainer } from 'react-toastify'
 
 export const UserContext = createContext({
@@ -18,8 +16,7 @@ function MyApp({ Component, pageProps }) {
 	return (
 		<Provider session={pageProps.session}>
 			<UserContext.Provider value={{ user, setUser }}>
-				<SWRConfig value={{ fetcher }}>
-					<Layout session={pageProps.session}>
+					<Layout>
 						<Component {...pageProps} />
 						<ToastContainer
 							position="top-right"
@@ -32,7 +29,6 @@ function MyApp({ Component, pageProps }) {
 							pauseOnHover
 						/>
 					</Layout>
-				</SWRConfig>
 			</UserContext.Provider>
 		</Provider>
 	)
