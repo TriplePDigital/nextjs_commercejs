@@ -64,10 +64,8 @@ export default function Questions({ data }) {
 								setQuestions([...questions, response])
 							} else {
 								//find the entry in questions that matches our questionID and update it
-								const matchingQuestion = (q) =>
-									q.questionID === questionID
-								const idx =
-									questions.findIndex(matchingQuestion)
+								const matchingQuestion = (q) => q.questionID === questionID
+								const idx = questions.findIndex(matchingQuestion)
 
 								questions[idx].answer = answer
 							}
@@ -93,15 +91,7 @@ export default function Questions({ data }) {
 							</label>
 						</div>
 					))}
-					<button
-						className={`${
-							currentQuestionIndex === data?.length - 1
-								? 'block'
-								: 'hidden'
-						}`}
-					>
-						Submit
-					</button>
+					<button className={`${currentQuestionIndex === data?.length - 1 ? 'block' : 'hidden'}`}>Submit</button>
 				</form>
 				<button
 					disabled={currentQuestionIndex === 0}
@@ -126,10 +116,7 @@ export default function Questions({ data }) {
 							// 2. update the answer
 							if (questions.has(response)) {
 								questions.forEach((question) => {
-									if (
-										question.questionID ===
-										response.questionID
-									) {
+									if (question.questionID === response.questionID) {
 										question.answer = response.answer
 									} else {
 										return
