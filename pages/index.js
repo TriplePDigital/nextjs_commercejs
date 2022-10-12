@@ -19,7 +19,11 @@ export default function Home({}) {
 			) : (
 				<button
 					className="bg-ncrma-400 hover:bg-ncrma-700 text-white rounded py-2 px-4 block mx-auto"
-					onClick={() => signIn()}
+					onClick={() =>
+						signIn(null, {
+							callbackUrl: `${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`
+						})
+					}
 				>
 					Sign in to gain access to your courses
 				</button>
