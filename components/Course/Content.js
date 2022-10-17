@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from 'react'
 import ReactPlayer from 'react-player/vimeo'
 import Image from 'next/image'
@@ -31,11 +30,11 @@ const getCheckpointProgress = async (checkpointID, enrollmentID) => {
 export default function Content({ currentCheckpoint, enrollment, setCheckpointContext, setStageContext }) {
 	const videoRef = useRef(null)
 	const [videoEnded, setVideoEnded] = useState(false)
-	const [loading, setLoading] = useState(false)
+	const [loading, setLoading] = useState(true)
 	const router = useRouter()
 
 	const getCurrentProgress = async () => {
-		return Math.floor(((await videoRef.current.getCurrentTime()) / (await videoRef.current.getDuration())) * 100)
+		return Math.floor(((await videoRef.current.getCurrentTime()) / videoRef.current.getDuration()) * 100)
 	}
 
 	const createProgress = async (checkpoint) => {
@@ -109,10 +108,13 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 		return obj
 	}
 
-	if (currentCheckpoint.instance === 'quiz') {
-		router.push(`/quiz/${currentCheckpoint._id}`)
-	}
-	useEffect(() => {}, [])
+	useEffect(() => {
+		if (currentCheckpoint.instance === 'quiz') {
+			router.push(`/quiz/${currentCheckpoint._id}`, undefined, { shallow: true }).then(() => {
+				setLoading(false)
+			})
+		}
+	}, [currentCheckpoint, router])
 
 	return loading ? (
 		<Loader />
