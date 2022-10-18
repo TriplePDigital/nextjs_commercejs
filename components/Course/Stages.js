@@ -15,7 +15,7 @@ const getProgressForCheckpoint = (stageID, checkpointID, enrollment) => {
 		if (!res?.status) {
 			return '0'
 		} else {
-			return res?.status
+			return Number.parseFloat(res.status).toFixed(2)
 		}
 	}
 }

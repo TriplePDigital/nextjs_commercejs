@@ -16,6 +16,7 @@ import ReactMarkdown from 'react-markdown'
 import mdConfig from '@/util/md'
 import Content from '@/components/Course/Content'
 import moment from 'moment'
+import { TakeQuiz } from '@/components/Course/TakeQuiz'
 
 // const getLatestProgress = (stages) => {
 // 	let progress = []
@@ -110,12 +111,15 @@ function MissionSlug({ session, mission, user, enrollment }) {
 		<Loader />
 	) : enrollment ? (
 		<div className="flex flex-row">
-			<Content
-				currentCheckpoint={currentCheckpoint}
-				enrollment={enrollment}
-				setCheckpointContext={setCheckpointContext}
-				setStageContext={setStageContext}
-			/>
+			{currentCheckpoint.instance === 'video' && (
+				<Content
+					currentCheckpoint={currentCheckpoint}
+					enrollment={enrollment}
+					setCheckpointContext={setCheckpointContext}
+					setStageContext={setStageContext}
+				/>
+			)}
+			{currentCheckpoint.instance === 'quiz' && <TakeQuiz />}
 			<Stages
 				enrollment={enrollment}
 				setCheckpointContext={setCheckpointContext}
