@@ -1,4 +1,4 @@
 import { signUpHandler } from 'next-auth-sanity'
-import { configuredSanityClient } from '../../../util/img'
+import { client } from '@/util/config'
 
-export default signUpHandler(configuredSanityClient)
+export default signUpHandler(client)
