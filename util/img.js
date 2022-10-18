@@ -1,13 +1,5 @@
 import { useNextSanityImage } from 'next-sanity-image'
-import sanityClient from '@sanity/client'
-
-export const configuredSanityClient = sanityClient({
-	projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-	dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-	token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,
-	useCdn: process.env.NODE_ENV === 'production',
-	apiVersion: 'v1'
-})
+import configuredSanityClient from '@/util/config'
 
 export default function imgConstructor(
 	asset,
@@ -16,7 +8,7 @@ export default function imgConstructor(
 	}
 ) {
 	try {
-		const img = useNextSanityImage(configuredSanityClient, asset)
+		const img = useNextSanityImage(configuredSanityClient(), asset)
 		if (options.fit === 'fill') {
 			delete img['width']
 			delete img['height']

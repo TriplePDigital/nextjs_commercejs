@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import ReactPlayer from 'react-player/vimeo'
 import Image from 'next/image'
-import { Question, Bio } from '../Lesson'
 import Link from 'next/link'
-import imgConstructor, { configuredSanityClient as client } from '@/util/img'
+import { configuredSanityClient as client } from '@/util/img'
 import { MdReplay } from 'react-icons/md'
 import { AiFillCaretRight } from 'react-icons/ai'
 import ReactMarkdown from 'react-markdown'
@@ -15,9 +14,9 @@ import { Loader } from '../util'
 
 /**
  * Gets a single progress document that references a specific checkpoint and user
- * @param object the checkpoint ID that we want to get the reference to
- * @param object the user's ID that we want to get the reference to
  * @returns an progress document if one exists, otherwise null
+ * @param checkpointID
+ * @param enrollmentID
  */
 const getCheckpointProgress = async (checkpointID, enrollmentID) => {
 	try {
@@ -114,6 +113,9 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 				setLoading(false)
 			})
 		}
+		if(currentCheckpoint.instance === 'video' && currentCheckpoint.type?.vimeoVideo){
+			setLoading(false)
+		}
 	}, [currentCheckpoint, router])
 
 	return loading ? (
@@ -192,19 +194,21 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 						<a>
 							<div className="flex items-center mx-4 first:ml-0 cursor-pointer">
 								<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-									{currentCheckpoint.type?.instructor ? (
+									{currentCheckpoint.type?.instructor && (
 										<>
-											<Image
-												{...imgConstructor(currentCheckpoint.type?.instructor.avatar, {
-													fit: 'fill'
-												})}
-												alt="Instructor Avatar"
-												layout="fill"
-												quality={50}
-											/>
+											{/*TODO: If uncommented -> Error: Rendered more hooks than during
+											 previous render*/}
+											{/*<Image*/}
+											{/*	{...useImageConstructor(currentCheckpoint.type?.instructor.avatar, {*/}
+											{/*		fit: 'fill'*/}
+											{/*	})}*/}
+											{/*	alt="Instructor Avatar"*/}
+											{/*	layout="fill"*/}
+											{/*	quality={50}*/}
+											{/*/>*/}
 											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 										</>
-									) : null}
+									)}
 								</div>
 								<div className="flex-col flex gap-0 justify-center">
 									<span className="font-semibold tracking-wide text-lg underline cursor-pointer hover:text-gray-600">{currentCheckpoint.type?.instructor.name}</span>
