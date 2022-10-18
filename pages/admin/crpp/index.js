@@ -6,7 +6,7 @@ import { MdOutlineUploadFile } from 'react-icons/md'
 import Upload from '../quiz/Upload'
 import PropTypes from 'prop-types'
 import { Accordion } from 'flowbite-react'
-import { configuredSanityClient } from '@/util/img'
+import { client } from '@/util/config'
 import { nanoid } from 'nanoid'
 
 const CrppPage = () => {
@@ -562,10 +562,10 @@ const CoursePurchase = ({ courseData }) => {
  */
 const processJSONFile = async (data) => {
 	const companyObject = {}
-	const rm = await configuredSanityClient.fetch(`*[_type == "user" && email == "${data.metadata.riskManagerData.email}"][0]`)
+	const rm = await client.fetch(`*[_type == "user" && email == "${data.metadata.riskManagerData.email}"][0]`)
 	const rmID = rm
 		? rm._id
-		: await configuredSanityClient
+		: await client
 				.create({
 					_type: 'user',
 					firstName: data.metadata.riskManagerData.firstName,
@@ -592,7 +592,7 @@ const processJSONFile = async (data) => {
 		}
 	]
 	companyObject.primaryContact = data.metadata.companyData.primaryContactData
-	const res = await configuredSanityClient.create(companyObject)
+	const res = await client.create(companyObject)
 	console.log(res)
 }
 

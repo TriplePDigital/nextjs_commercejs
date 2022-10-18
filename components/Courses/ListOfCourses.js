@@ -1,11 +1,9 @@
 /* eslint-disable no-unused-vars */
-import imgConstructor from '../../util/img'
+import imgConstructor from '@/util/img'
 import Image from 'next/image'
 import Link from 'next/link'
 import Loader from '../util/Loader'
 import { FaUserGraduate } from 'react-icons/fa'
-import { useEffect, useState } from 'react'
-import { nanoid } from 'nanoid'
 
 export default function ListOfCourses({ course, index, progress }) {
 	return !course ? (

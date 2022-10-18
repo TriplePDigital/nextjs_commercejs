@@ -7,7 +7,7 @@ import { getEnrollmentsPerUser, getLatestEnrollments } from '@/util/getEnrollmen
 import { Loader } from '@/components/util'
 import { BsSearch } from 'react-icons/bs'
 import Papa from 'papaparse'
-import { configuredSanityClient as client } from '@/util/img'
+import { client } from '@/util/config'
 import { Accordion, Modal } from 'flowbite-react'
 
 function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {

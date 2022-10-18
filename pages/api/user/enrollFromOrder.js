@@ -1,6 +1,6 @@
 import { post } from 'axios'
 import xml2js from 'xml2js'
-import { configuredSanityClient as client } from '@/util/img'
+import { client } from '@/util/config'
 import { nanoid } from 'nanoid'
 
 export default async function (req, res) {

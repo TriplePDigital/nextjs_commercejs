@@ -5,7 +5,7 @@ import { getSession } from 'next-auth/client'
 import { useEffect, useState } from 'react'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/router'
-import { configuredSanityClient as client } from '@/util/img'
+import { client } from '@/util/config'
 import { Loader } from '@/components/util'
 
 function Quiz({ quizID, session, content }) {

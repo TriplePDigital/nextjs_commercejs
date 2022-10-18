@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState, useMemo } from 'react'
-import { configuredSanityClient as client } from '@/util/img'
+import { client } from '@/util/config'
 import { useRouter } from 'next/router'
 import { Loader } from '@/components/util'
 import axios from 'axios'

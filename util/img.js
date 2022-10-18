@@ -1,5 +1,5 @@
 import { useNextSanityImage } from 'next-sanity-image'
-import configuredSanityClient from '@/util/config'
+import {client} from '@/util/config'
 
 export default function imgConstructor(
 	asset,
@@ -8,7 +8,7 @@ export default function imgConstructor(
 	}
 ) {
 	try {
-		const img = useNextSanityImage(configuredSanityClient(), asset)
+		const img = useNextSanityImage(client, asset)
 		if (options.fit === 'fill') {
 			delete img['width']
 			delete img['height']
