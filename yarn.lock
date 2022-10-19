@@ -898,6 +898,18 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.3.tgz#1185726610acc37317ddab11c3c7f9066966bd20"
   integrity sha512-O3uyB/JbkAEMZaP3YqyHH7TMnex7tWyCbCI4EfJdOCoN6HIhqdJBWTM6aCCiWQ/5f5wxjgU735QAIpJbjDvmzg==
 
+"@tanstack/react-table@^8.5.15":
+  version "8.5.15"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.5.15.tgz#8179d24d7fdf909799a517e8897501c44e51284d"
+  integrity sha512-9rSvhIFeMpfXksFgQNTWnVoJbkae/U8CkHnHYGWAIB/O0Ca51IKap0Rjp5WkIUVBWxJ7Wfl2y13oY+aWcyM6Rg==
+  dependencies:
+    "@tanstack/table-core" "8.5.15"
+
+"@tanstack/table-core@8.5.15":
+  version "8.5.15"
+  resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.5.15.tgz#e1e674135cd6c36f29a1562a2b846f824861149b"
+  integrity sha512-k+BcCOAYD610Cij6p1BPyEqjMQjZIdAnVDoIUKVnA/tfHbF4JlDP7pKAftXPBxyyX5Z1yQPurPnOdEY007Snyg==
+
 "@types/axios@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@types/axios/-/axios-0.14.0.tgz#ec2300fbe7d7dddd7eb9d3abf87999964cafce46"
