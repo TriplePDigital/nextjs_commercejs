@@ -19,9 +19,9 @@ export default function Course({ webinar, tracks, enrollment }) {
 	const [session, loading] = useSession()
 	const router = useRouter()
 
-	if (!session) {
-		return router.push('/auth/login')
-	}
+	// if (!session) {
+	// 	return router.push('/auth/login')
+	// }
 
 	return loading ? (
 		<Loader />
@@ -29,40 +29,40 @@ export default function Course({ webinar, tracks, enrollment }) {
 		<div className="flex flex-row w-full mt-5">
 			<section className="w-full">
 				{/* <Streak user={user} /> */}
-				<h1 className="text-4xl font-semibold mt-5">My Courses</h1>
-				<div className="flex overflow-x-scroll pb-10">
-					<div className="flex flex-nowrap mt-2">
-						{enrollment?.length > 0
-							? enrollment.map((item, enrollmentIndex) => (
-									<ListOfCourses
-										key={enrollmentIndex}
-										index={enrollmentIndex}
-										course={item.course}
-										progress={false}
-									/>
-							  ))
-							: null}
-					</div>
-				</div>
+				{session && (
+					<>
+						<h1 className="text-4xl font-semibold mt-5">My Courses</h1>
+						<div className="flex overflow-x-scroll pb-10">
+							<div className="flex flex-nowrap mt-2">
+								{enrollment?.length > 0
+									? enrollment.map((item, enrollmentIndex) => (
+											<ListOfCourses
+												key={enrollmentIndex}
+												index={enrollmentIndex}
+												course={item.course}
+												progress={false}
+											/>
+									  ))
+									: null}
+							</div>
+						</div>
+					</>
+				)}
 				{tracks.map((track, i) => {
 					return track.numCourses !== 0 ? (
 						<div key={i}>
-							<h1 className="text-4xl font-semibold mt-5">
-								{track.name}
-							</h1>
+							<h1 className="text-4xl font-semibold mt-5">{track.name}</h1>
 							<div className="flex overflow-x-scroll pb-10">
 								<div className="flex flex-nowrap mt-2">
 									{track.missions
-										? track.missions.map(
-												(course, courseIndex) => (
-													<ListOfCourses
-														key={courseIndex}
-														index={courseIndex}
-														course={course}
-														progress={false}
-													/>
-												)
-										  )
+										? track.missions.map((course, courseIndex) => (
+												<ListOfCourses
+													key={courseIndex}
+													index={courseIndex}
+													course={course}
+													progress={false}
+												/>
+										  ))
 										: null}
 								</div>
 							</div>
@@ -77,21 +77,7 @@ export default function Course({ webinar, tracks, enrollment }) {
 
 export async function getServerSideProps(ctx) {
 	const session = await getSession(ctx)
-	if (!session) {
-		return {
-			redirect: {
-				destination: `/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`,
-				permanent: false
-			}
-		}
-	} else {
-		const usr = await getUserFromSession(session?.user?.email)
-
-		const tracks = await getTracks()
-
-		const enrollment = await getEnrollmentByStudentID(usr?._id)
-
-		const webinar = await fetcher(`
+	const webinar = await fetcher(`
 			*[_type == 'webinar' ] | order(releaseDateDesc){
 				...,
 				presenters[]->{
@@ -102,12 +88,25 @@ export async function getServerSideProps(ctx) {
 					}
 				},
 			}[0]`)
+	const tracks = await getTracks()
+	if (session) {
+		const usr = await getUserFromSession(session?.user?.email)
+
+		const enrollment = await getEnrollmentByStudentID(usr?._id)
 
 		return {
 			props: {
 				tracks,
 				webinar,
 				enrollment: enrollment?.length > 0 ? enrollment : []
+			}
+		}
+	} else {
+		return {
+			props: {
+				tracks,
+				webinar,
+				enrollment: []
 			}
 		}
 	}
