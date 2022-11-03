@@ -2,15 +2,18 @@ import { useSession, signIn, signOut } from 'next-auth/client'
 import ActiveLink from './ActiveLink'
 import { RiShutDownLine } from 'react-icons/ri'
 import { useContext, useEffect, useState } from 'react'
-import { UserContext } from '../../pages/_app'
+import { cartContextObject, UserContext } from '../../pages/_app'
 import { BsCaretDownFill, BsCaretUpFill, BsFillPersonFill, BsGearFill } from 'react-icons/bs'
 import Link from 'next/link'
 import getUserFromSession from '@/util/getUserFromSession'
+import { BiCart } from 'react-icons/bi'
 
 export default function Navbar() {
 	const [session, loading] = useSession()
 	const [toggleDropdown, setToggleDropdown] = useState(false)
 	const { setUser, user } = useContext(UserContext)
+
+	const ctx = useContext(cartContextObject)
 
 	const getUser = () => {
 		getUserFromSession(session.user.email)
@@ -65,16 +68,27 @@ export default function Navbar() {
 				</div>
 				<div className="lg:w-2/3 w-1/2 flex justify-end">
 					{!session ? (
-						<button
-							className="bg-ncrma-400 font-bold text-white uppercase px-6 py-2 rounded leading-loose tracking-wide"
-							onClick={() =>
-								signIn(null, {
-									callbackUrl: `${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`
-								})
-							}
-						>
-							Sign in
-						</button>
+						<>
+							<Link
+								href={`/cart`}
+								passHref={true}
+							>
+								<a className="flex items-center gap-3 bg-ncrma-400 hover:bg-ncrma-600 font-bold text-white uppercase xl:px-6 px-3 py-2 rounded leading-loose tracking-wide xl:mr-3 mr-1">
+									<BiCart size={30} />
+									{ctx.cart.length > 0 ? ctx.cart.length : null}
+								</a>
+							</Link>
+							<button
+								className="bg-ncrma-400 font-bold text-white uppercase px-6 py-2 rounded leading-loose tracking-wide"
+								onClick={() =>
+									signIn(null, {
+										callbackUrl: `${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`
+									})
+								}
+							>
+								Sign in
+							</button>
+						</>
 					) : (
 						<>
 							{user?.role === 'admin' || user?.role === 'riskManager' ? (
@@ -88,6 +102,15 @@ export default function Navbar() {
 							>
 								{user?.membership ? user?.membership.replace(rex, '$1$4 $2$3$5') : 'Become a Member'}
 							</button>
+							<Link
+								href={`/cart`}
+								passHref={true}
+							>
+								<a className="flex items-center gap-3 bg-ncrma-400 hover:bg-ncrma-600 font-bold text-white uppercase xl:px-6 px-3 py-2 rounded leading-loose tracking-wide xl:mr-12 mr-1">
+									<BiCart size={30} />
+									{ctx.cart.length > 0 ? ctx.cart.length : null}
+								</a>
+							</Link>
 							<button
 								className="relative bg-ncrma-100 hover:bg-ncrma-300 rounded-lg xl:px-5 px-3 py-2 flex flex-row items-center"
 								onClick={() => setToggleDropdown(!toggleDropdown)}
