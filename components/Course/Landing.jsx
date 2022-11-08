@@ -8,6 +8,7 @@ import imgConstructor from '@/util/img'
 import ReactMarkdown from 'react-markdown'
 import mdConfig from '@/util/md'
 import { cartContextObject } from '../../pages/_app'
+import checkout	from '@/util/checkout'
 
 const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 	const ctx = useContext(cartContextObject)
@@ -123,26 +124,10 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 					className="bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3"
 					onClick={() => {
 						// eslint-disable-next-line no-undef
-						CollectCheckout.redirectToCheckout({
-							lineItems: [
-								{
-									sku: '002',
-									quantity: 1
-								}
-							],
-							successUrl: 'https://dev-ncrma-lms.triplep-digital.com/success',
-							cancelUrl: `https://dev-ncrma-lms.triplep-digital.com/cancel`,
-							receipt: {
-								showReceipt: true,
-								redirectToSuccessUrl: true,
-								sendToCustomer: true
-							},
-							customerVault: {
-								addCustomer: true
-							}
-						}).then((error) => {
-							console.log(error)
-						})
+						checkout([{
+							sku: mission.sku || '002',
+							quantity: 1
+						}])
 					}}
 				>
 					One Click Checkout
