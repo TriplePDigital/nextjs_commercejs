@@ -7,6 +7,7 @@ import getter from '@/util/getter'
 import { FaTrash } from 'react-icons/fa'
 import { Loader } from '@/components/util'
 import Script from 'next/script'
+import checkout from "@/util/checkout";
 
 const Cart = () => {
 	const ctx = useContext(cartContextObject)
@@ -16,7 +17,11 @@ const Cart = () => {
 	const getCourseDataFromCart = () => {
 		let filtered = []
 		ctx.cart.forEach((item) => {
-			let course = data.result.find((course) => course._id === item.item)
+			let course = data.result.find((course) => {
+				if (course._id === item.item) {
+					return course
+				}
+			})
 			course['quantity'] = item.quantity
 			filtered.push(course)
 		})
@@ -28,11 +33,21 @@ const Cart = () => {
 	}, [data, ctx.cart])
 
 	if (!data) {
-		return <Loader />
+		return <Loader/>
 	}
 	if (error) {
 		notify('error', 'Error', 'There was an error loading your cart')
 		return <div></div>
+	}
+	const convertCourseOjbectToCheckoutItem = (courses) => {
+		let items = []
+		courses.forEach((course) => {
+			items.push({
+				quantity: course.quantity,
+				sku: course.sku,
+			})
+		})
+		return items
 	}
 	return (
 		<section className="w-2/3 mx-auto my-10">
@@ -72,26 +87,13 @@ const Cart = () => {
 					<p>Your cart is empty</p>
 				</div>
 			)}
-			<div className="border-b px-4 py-4 flex justify-between items-center">
-				<span className="text-gray-400">Subtotal</span>
-				<span className="text-gray-400">${courses.reduce((acc, item) => acc + item.price * item.quantity, 0)}</span>
-			</div>
-			<div className="border-b px-4 py-4 flex justify-between items-center">
-				<span className="text-gray-400">Tax</span>
-				<span className="text-gray-400">$0.00</span>
-			</div>
-			<div className="border-b px-4 py-4 flex justify-between items-center">
-				<span className="text-gray-400">Shipping</span>
-				<span className="text-gray-400">$0.00</span>
-			</div>
-			<div className="border-b px-4 py-4 flex justify-between items-center">
-				<span className="text-gray-400">Total</span>
-				<span className="text-gray-400">${courses.reduce((acc, item) => acc + item.price * item.quantity, 0)}</span>
+			<div className="border-b px-4 py-4 w-full">
+				<span className="text-gray-400 text-right text-sm w-full inline-block">The total price for your order will be shown after you click checkout</span>
 			</div>
 			<div className="px-4 py-4 flex justify-end items-center">
 				<button
 					className="bg-blue-500 text-white px-4 py-2 rounded-md"
-					onClick={() => null}
+					onClick={() => checkout(convertCourseOjbectToCheckoutItem(courses))}
 				>
 					Checkout
 				</button>

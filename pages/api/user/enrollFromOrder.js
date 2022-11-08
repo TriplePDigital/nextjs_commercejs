@@ -1,84 +1,175 @@
-import { post } from 'axios'
+import axios from 'axios'
 import xml2js from 'xml2js'
-import { client } from '@/util/config'
-import { nanoid } from 'nanoid'
+import {client} from '@/util/config'
 
 export default async function (req, res) {
-	try {
-		if (req.method === 'GET') {
-			res.status(405)
-		}
-		if (req.method === 'POST') {
-			const { first_name, last_name, email } = await req.body.event_body
-				.billing_address
-			const { transaction_id } = await req.body.event_body
+    if (req.method !== 'POST') {
+        res.status(405).json({message: 'Method Not Allowed'})
+    } else {
+        const {billing_address: {first_name, last_name, email}, transaction_id} = await req.body.event_body
 
-			const payment = await post(
-				`https://paybotic.transactiongateway.com/api/query.php?security_key=${process.env.NEXT_PUBLIC_PAYBOTIC_KEY}&transaction_id=${transaction_id}`
-			)
+        const payment = await axios.post(
+            `https://sweetblinginc.transactiongateway.com/api/query.php?security_key=${process.env.NMI_SECRET_KEY}&transaction_id=${transaction_id}`
+        )
 
-			const parser = new xml2js.Parser()
+        const parser = new xml2js.Parser()
 
-			const response = await parser.parseStringPromise(payment.data)
+        const response = await parser.parseStringPromise(payment.data)
 
-			const { transaction } = response.nm_response
+        const {transaction} = response.nm_response
 
-			const data = transaction[0]
+        if (!transaction) {
+            res.status(400)
+            res.json({message: 'Transaction not found'})
+        } else {
+            const data = transaction[0]
 
-			const courseName = data?.product[0]?.description[0]
+            //TODO: handle the purchase of multiple products
+            if (data.product.length > 1) {
+                console.log(data.product);
 
-			const courses = await client.fetch(
-				`*[_type == 'mission' && title == '${courseName}']`, // query
-				{} // params
-			)
+                const products = data.product
 
-			const userCheck = await client.fetch(
-				`*[_type == 'user' && email == '${email}']`, // query
-				{} // params
-			)
+                const userCheck = await client.fetch(
+                    `*[_type == 'user' && email == '${email.toLowerCase().trim()}'][0]`
+                )
 
-			if (userCheck.length > 0) {
-				res.status(400).send('User already exists')
-			} else {
-				const doc = {
-					_type: 'user',
-					email,
-					name: `${first_name} ${last_name}`,
-					image: 'https://via.placeholder.com/150'
-				}
+                let user
 
-				const basicAccount = await client.create(doc)
+                if (!userCheck) {
+                    //create user object
+                    let userObj = {
+                        _type: 'user',
+                        email: email.toLowerCase().trim(),
+                        firstName: first_name,
+                        lastName: last_name,
+                        active: false,
+                        role: "student",
+                        avatar: {
+                            _type: "image",
+                            asset: {
+                                _ref: "image-9dcb9bb1b32805305dedaf9f0a2161930f585190-500x500-png",
+                                _type: "reference"
+                            }
+                        },
+                    }
 
-				const user = await client
-					.patch(basicAccount._id)
-					.setIfMissing({ missions: [] })
-					.insert('after', 'missions[0]', [
-						{
-							_type: 'mission',
-							_ref: courses[0]._id,
-							_key: nanoid()
-						}
-					])
-					.commit({ autoGenerateArrayKeys: true })
+                    user = await client.create(userObj)
+                } else {
+                    //link enrollment to existing user
+                    user = userCheck
+                }
 
-				res.status(200).send(user)
-			}
-		}
-	} catch (error) {
-		res.status(500)
-		res.json({ message: error.message })
-	}
+                //for each product in the array, create an enrollment object and link it to the user
+
+                const enrollments = products.map(async (product) => {
+                    const docs = await client.fetch(
+                        `*[_type == 'mission' && sku == '${product.sku[0]}'][0]`
+                    )
+                    if (docs) {
+                        return {sku: docs.sku, mission: docs._id}
+                    }
+                })
+
+                Promise.all(enrollments).then((enrollments) => {
+                    let enrollmentDoc = []
+                    enrollments.forEach((enrollment) => {
+                        if (enrollment) {
+                            enrollmentDoc.push({
+                                _type: 'enrollment',
+                                student: {
+                                    _type: 'reference',
+                                    _ref: user._id
+                                },
+                                course: {
+                                    _type: 'reference',
+                                    _ref: enrollment.mission
+                                }
+                            })
+                        }
+                    })
+                    console.log(enrollmentDoc)
+                    enrollmentDoc.forEach(async (enrollment) => {
+                        const doc = await client.create(enrollment)
+                        res.status(200).json({message: 'Enrollment successful', enrollment: doc})
+                    })
+                }).catch((err) => {
+                    res.status(400).json({message: 'Error creating enrollment', error: err})
+                })
+
+
+                res.status(200).json({message: 'Multiple products purchased', products})
+            } else {
+                const product = data.product[0]
+                const sku = product.sku[0]
+
+                const course = await client.fetch(
+                    `*[_type == 'mission' && sku == '${sku}'][0]`
+                )
+
+                const userCheck = await client.fetch(
+                    `*[_type == 'user' && email == '${email.toLowerCase().trim()}']`
+                )
+
+                if (userCheck.length > 0) {
+                    const existingUser = userCheck[0]
+                    const existingEnrollments = await client.fetch(`*[_type == 'enrollment' && student._ref == '${existingUser._id}']{..., course->{...}}`)
+
+
+                    for (const enrollment of existingEnrollments) {
+                        if (enrollment.course.sku === sku) {
+                            //TODO: handle the refund of the purchase if the user already has the course
+                            res.status(400).json({message: 'User already enrolled in the purchased course'})
+                        }
+                    }
+
+                    const enrollment = await client.create({
+                        _type: 'enrollment',
+                        student: {_type: 'reference', _ref: existingUser._id},
+                        course: {_type: 'reference', _ref: course._id},
+                    })
+                    res.status(200).json({message: 'User enrolled in course', enrollment})
+
+                } else {
+                    const doc = {
+                        _type: 'user',
+                        email,
+                        firstName: first_name,
+                        lastName: last_name,
+                        avatar: {
+                            _type: "image",
+                            asset: {
+                                _ref: "image-9dcb9bb1b32805305dedaf9f0a2161930f585190-500x500-png",
+                                _type: "reference"
+                            }
+                        },
+                        role: "student",
+                        active: false
+                    }
+
+                    const basicAccount = await client.create(doc)
+
+                    const enrollment = {
+                        _type: 'enrollment',
+                        course: {
+                            _type: 'reference',
+                            _ref: course._id
+                        },
+                        student: {
+                            _ref: basicAccount._id,
+                            _type: 'reference'
+                        }
+                    }
+
+                    const enrollmentCreate = await client.create(enrollment)
+
+                    res.status(200).json({message: 'User created', user: basicAccount, enrollment: enrollmentCreate})
+                }
+            }
+        }
+    }
 }
 
-// const doc = {
-// 	_type: 'bike',
-// 	name: 'Sanity Tandem Extraordinaire',
-// 	seats: 2
-// }
-
-// client.create(doc).then((res) => {
-// 	console.log(`Bike was created, document ID is ${res._id}`)
-// })
 
 /***************************************************************************************************/
 
