@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import {useRouter} from 'next/router'
 import commerceGetter from "@/util/commerceGetter";
+import {Loader} from "@/components/util";
 
 export default function Success() {
 	const {
@@ -10,8 +11,8 @@ export default function Success() {
 
 	const {data, error} = useSWR(() => `/api/user/getReceipt?transid=${transid}`, commerceGetter)
 
-	if (!data) {
-		return <div>Loading...</div>
+	if (!data?.transaction) {
+		return <Loader/>
 	}
 	if (error) {
 		return <div>Error</div>
