@@ -22,8 +22,9 @@ export default function ListOfCourses({ course, index, progress }) {
 									fit: 'fill'
 								})}
 								layout="fill"
-								quality={50}
+								quality={20}
 								alt={course.blurb}
+								loading={'lazy'}
 							/>
 							<div
 								className="opacity-75 absolute left-0 top-0 h-full w-full"

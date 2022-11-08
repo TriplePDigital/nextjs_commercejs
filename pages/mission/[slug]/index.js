@@ -138,14 +138,6 @@ export default MissionSlug
 
 export async function getServerSideProps(ctx) {
 	const session = await getSession(ctx)
-	// if (!session) {
-	// 	return {
-	// 		redirect: {
-	// 			destination: `/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`,
-	// 			permanent: false
-	// 		}
-	// 	}
-	// }
 	const user = await getUserFromSession(session?.user?.email)
 	const mission = await getMissionBySlug(ctx.params.slug)
 	try {
