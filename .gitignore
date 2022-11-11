@@ -41,3 +41,4 @@ README.code-workspace
 .idea/
 cypress/videos
 cypress/screenshots
+next.lock/
