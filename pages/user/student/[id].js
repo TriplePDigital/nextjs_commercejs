@@ -10,12 +10,23 @@ import { getSession, signOut } from 'next-auth/client'
 import moment from 'moment'
 import ProficiencyMatrix from '@/components/util/ProficiencyMatrix'
 import getQuizAttemptsByStudent from '@/util/getQuizAttemptsByStudent'
+import commerceGetter from '@/util/commerceGetter'
+import useSWR from 'swr'
+import { useNextSanityImage } from 'next-sanity-image'
 
 function Profile({ profile, account, quizAttempts }) {
 	const [user, setUser] = useState({ ...profile })
 	useEffect(() => {}, [])
 	const RMProfile = profile.riskManagerProfile || null
 	const [tabIndex, setTabIndex] = useState(0)
+
+	const { data, error } = useSWR(`/api/user/getOrders?email=${user?.email}`, commerceGetter)
+
+	const imageProps = useNextSanityImage(client, profile?.avatar.asset)
+
+	if (error) {
+		return <div className="text-center text-2xl font-bold">Error</div>
+	}
 
 	const syncEdgeInstance = async () => {
 		try {
@@ -57,7 +68,7 @@ function Profile({ profile, account, quizAttempts }) {
 			})
 	}
 
-	return !profile ? (
+	return !profile || !data ? (
 		<Loader />
 	) : (
 		<div className="flex flex-col items-center w-full mt-5">
@@ -68,7 +79,9 @@ function Profile({ profile, account, quizAttempts }) {
 				{profile.avatar ? (
 					<div className="mx-auto rounded-full h-48 w-48 aspect-square relative overflow-hidden shadow border border-gray-100">
 						<Image
-							{...imgConstructor(profile.avatar.asset)}
+							src={imageProps.src}
+							loader={imageProps.loader}
+							blurDataURL={imageProps.blurDataURL}
 							layout="fill"
 							objectFit="cover"
 							objectPosition="center"

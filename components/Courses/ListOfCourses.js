@@ -4,8 +4,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Loader from '../util/Loader'
 import { FaUserGraduate } from 'react-icons/fa'
+import { useNextSanityImage } from 'next-sanity-image'
+import { client } from '@/util/config'
 
 export default function ListOfCourses({ course, index, progress }) {
+	const imageProps = useNextSanityImage(client, course?.coverImage)
+
 	return !course ? (
 		<Loader />
 	) : (
@@ -18,10 +22,13 @@ export default function ListOfCourses({ course, index, progress }) {
 					<span className="text-black font-bold text-xl">
 						<div className="relative h-44 w-full">
 							<Image
-								{...imgConstructor(course.coverImage, {
-									fit: 'fill'
-								})}
+								src={imageProps.src}
+								loader={imageProps.loader}
+								blurDataURL={imageProps.blurDataURL}
+								placeholder="blur"
 								layout="fill"
+								objectFit="cover"
+								objectPosition="center"
 								quality={20}
 								alt={course.blurb}
 								loading={'lazy'}

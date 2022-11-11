@@ -4,14 +4,21 @@ import Image from 'next/image'
 import Link from 'next/link'
 import mdConfig from '@/util/md'
 import ReactMarkdown from 'react-markdown'
+import { useNextSanityImage } from 'next-sanity-image'
+import { client } from '@/util/config'
 
 function Profile({ profile }) {
+	const imageProps = useNextSanityImage(client, profile?.avatar)
 	return (
 		<section className="mx-auto w-2/3 flex flex-col mt-5">
 			<div className="flex items-center gap-4 mb-5">
 				<div className="w-20 h-20 rounded-full overflow-hidden relative">
 					<Image
-						{...imgConstructor(profile.avatar)}
+						src={imageProps.src}
+						loader={imageProps.loader}
+						blurDataURL={imageProps.blurDataURL}
+						width={imageProps.width}
+						height={imageProps.height}
 						layout="intrinsic"
 						quality={50}
 						alt={profile.name}
