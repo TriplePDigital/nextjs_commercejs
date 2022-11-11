@@ -3,7 +3,7 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const moduleExports = {
 	reactStrictMode: true,
 	images: {
-		domains: ['cdn.sanity.io', 'lh3.googleusercontent.com', 'images.unsplash.com', 'localhost', 'via.placeholder.com', 'i.vimeocdn.com']
+		domains: ['cdn.sanity.io', 'lh3.googleusercontent.com', 'images.unsplash.com', 'localhost', 'via.placeholder.com', 'i.vimeocdn.com', 'ncrma.net']
 	},
 	env: { VERSION: process.env.npm_package_version }
 }

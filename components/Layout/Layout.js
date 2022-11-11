@@ -39,8 +39,8 @@ export default function Layout({ children }) {
 		</div>
 	) : (
 		<>
-			{!router?.pathname.includes('login') ? <Navbar /> : null}
-			<main className={`mb-10 px-10 ${router?.pathname.includes('login') ? 'h-screen' : ''} ${router.pathname.includes('/admin') ? 'flex lg:flex-row flex-col justify-between gap-3' : ''}`}>
+			{!router?.pathname.includes('login') && !router?.pathname.includes('promo') ? <Navbar /> : null}
+			<main className={`mb-10 ${router?.pathname.includes('promo') ? 'px-0' : 'px-10'} ${router?.pathname.includes('login') ? 'h-screen' : ''} ${router.pathname.includes('/admin') ? 'flex lg:flex-row flex-col justify-between gap-3' : ''}`}>
 				{router.pathname.includes('/admin') && <AdminSidebar />}
 				{children}
 			</main>

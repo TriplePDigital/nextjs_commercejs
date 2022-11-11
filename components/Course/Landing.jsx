@@ -123,9 +123,8 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 				<button
 					className="bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3"
 					onClick={() => {
-						// eslint-disable-next-line no-undef
 						checkout([{
-							sku: mission.sku || '002',
+							sku: mission.sku || '003',
 							quantity: 1
 						}])
 					}}
