@@ -82,14 +82,14 @@ function Mjbiz2022({ products }) {
 				</ul>
 			</section>
 			<div className="w-full my-10">
-				{/* <button
+				<button
 					className="block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/3 mx-auto px-4 py-3"
 					onClick={() => {
 						checkout(products.courses)
 					}}
 				>
 					Purchase PCRM Bundle
-				</button> */}
+				</button>
 			</div>
 			<div className="relative w-1/4 h-32 mx-auto">
 				<Image
@@ -103,13 +103,13 @@ function Mjbiz2022({ products }) {
 	)
 }
 
-// export async function getStaticProps() {
-// 	const products = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/promo/getAllCourses`)
-// 	return {
-// 		props: {
-// 			products: products.data
-// 		}
-// 	}
-// }
+export async function getStaticProps() {
+	const products = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/promo/getAllCourses`)
+	return {
+		props: {
+			products: products.data
+		}
+	}
+}
 
 export default Mjbiz2022
