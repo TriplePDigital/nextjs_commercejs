@@ -104,7 +104,7 @@ function Mjbiz2022({ products }) {
 }
 
 export async function getStaticProps() {
-	const products = await axios.get('http://localhost:3000/api/promo/getAllCourses')
+	const products = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/promo/getAllCourses`)
 	return {
 		props: {
 			products: products.data
