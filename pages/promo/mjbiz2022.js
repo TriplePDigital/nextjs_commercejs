@@ -1,16 +1,40 @@
-import React from 'react'
+/* eslint-disable no-undef */
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-import checkout from '@/util/checkout'
-import Script from 'next/script'
 import axios from 'axios'
+import collect from '@/util/collect'
 
 function Mjbiz2022({ products }) {
+	const [user, setUser] = useState({
+		fname: '',
+		lname: '',
+		email: ''
+	})
+
+	useEffect(() => {
+		if (window?.CollectJS) {
+			window.CollectJS.configure({
+				variant: 'inline',
+				paymentType: 'cc',
+				price: '19.95',
+				currency: 'USD',
+				country: 'US',
+				callback: function (response) {
+					console.log(response.token)
+					const input = document.createElement('input')
+					input.type = 'hidden'
+					input.name = 'payment_token'
+					input.value = response.token
+					const form = document.getElementsByTagName('form')[0]
+					form.appendChild(input)
+					form.submit()
+				}
+			})
+		}
+	}, [])
+
 	return (
 		<div>
-			<Script
-				src="https://secure.nmi.com/token/CollectCheckout.js"
-				data-checkout-key="checkout_public_Du2E7M5C7spt3N8Vs9Su2tuFs9UgM25W"
-			/>
 			<div className="w-full h-96 relative">
 				<Image
 					src="https://ncrma.net/wp-content/uploads/2022/09/MJBizCon-Logo.png"
@@ -81,12 +105,72 @@ function Mjbiz2022({ products }) {
 					</li>
 				</ul>
 			</section>
+			<form onSubmit={(event) => collect(event)}>
+				<table>
+					<tr>
+						<td>First Name</td>
+						<td>
+							<input
+								required={true}
+								size="30"
+								type="text"
+								name="fname"
+								defaultValue={user.fname}
+								onChange={(event) => setUser({ ...user, fname: event.target.value })}
+							/>
+						</td>
+					</tr>
+					<tr>
+						<td>Last Name</td>
+						<td>
+							<input
+								required={true}
+								size="30"
+								type="text"
+								name="lname"
+								defaultValue={user.lname}
+								onChange={(event) => setUser({ ...user, lname: event.target.value })}
+							/>
+						</td>
+					</tr>
+					<tr>
+						<td>email</td>
+						<td>
+							<input
+								required={true}
+								size="30"
+								type="email"
+								name="email"
+								defaultValue={user.email}
+								onChange={(event) => setUser({ ...user, email: event.target.value })}
+							/>
+						</td>
+					</tr>
+					<tr>
+						<td>CC</td>
+						<div id="ccnumber" />
+					</tr>
+					<tr>
+						<td>Expiration</td>
+						<div id="ccexp" />
+					</tr>
+					<tr>
+						<td>CVV</td>
+						<div id="cvv" />
+					</tr>
+				</table>
+				<br />
+				<button
+					id="payButton"
+					type="submit"
+				>
+					Submit Payment
+				</button>
+			</form>
 			<div className="w-full my-10">
 				<button
 					className="block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/3 mx-auto px-4 py-3"
-					onClick={() => {
-						checkout(products.courses)
-					}}
+					// onClick={(event) => collect(event)}
 				>
 					Purchase PCRM Bundle
 				</button>
