@@ -13,6 +13,7 @@ import getQuizAttemptsByStudent from '@/util/getQuizAttemptsByStudent'
 import commerceGetter from '@/util/commerceGetter'
 import useSWR from 'swr'
 import { useNextSanityImage } from 'next-sanity-image'
+import { notify } from '@/util/notification'
 
 function Profile({ profile, account, quizAttempts }) {
 	const [user, setUser] = useState({ ...profile })
@@ -42,6 +43,9 @@ function Profile({ profile, account, quizAttempts }) {
 					}
 				}
 			)
+			if (res.status === 200) {
+				notify('success', 'User profile updated successfully')
+			}
 			return res
 		} catch (error) {
 			throw Error(error)

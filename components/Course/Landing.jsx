@@ -8,7 +8,7 @@ import imgConstructor from '@/util/img'
 import ReactMarkdown from 'react-markdown'
 import mdConfig from '@/util/md'
 import { cartContextObject } from '../../pages/_app'
-import checkout	from '@/util/checkout'
+import checkout from '@/util/checkout'
 
 const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 	const ctx = useContext(cartContextObject)
@@ -123,10 +123,12 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 				<button
 					className="bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3"
 					onClick={() => {
-						checkout([{
-							sku: mission.sku || '003',
-							quantity: 1
-						}])
+						checkout([
+							{
+								sku: mission.sku,
+								quantity: 1
+							}
+						])
 					}}
 				>
 					One Click Checkout
