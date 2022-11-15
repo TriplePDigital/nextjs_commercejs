@@ -3,35 +3,72 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import axios from 'axios'
 import collect from '@/util/collect'
+import { client } from '@/util/config'
+import { FaEnvelope } from 'react-icons/fa'
+import { nanoid } from 'nanoid'
+import { notify } from '@/util/notification'
+import { Loader } from '@/components/util'
 
 function Mjbiz2022({ products }) {
 	const [user, setUser] = useState({
-		fname: '',
-		lname: '',
+		firstName: '',
+		lastName: '',
 		email: ''
 	})
+	const [loading, setLoading] = useState(false)
 
 	useEffect(() => {
-		if (window?.CollectJS) {
-			window.CollectJS.configure({
-				variant: 'inline',
-				paymentType: 'cc',
-				price: '19.95',
-				currency: 'USD',
-				country: 'US',
-				callback: function (response) {
-					console.log(response.token)
-					const input = document.createElement('input')
-					input.type = 'hidden'
-					input.name = 'payment_token'
-					input.value = response.token
-					const form = document.getElementsByTagName('form')[0]
-					form.appendChild(input)
-					form.submit()
-				}
-			})
-		}
+		// if (window?.CollectJS) {
+		// 	window.CollectJS.configure({
+		// 		variant: 'inline',
+		// 		paymentType: 'cc',
+		// 		price: '19.95',
+		// 		currency: 'USD',
+		// 		country: 'US',
+		// 		callback: function (response) {
+		// 			console.log(response.token)
+		// 			const input = document.createElement('input')
+		// 			input.type = 'hidden'
+		// 			input.name = 'payment_token'
+		// 			input.value = response.token
+		// 			const form = document.getElementsByTagName('form')[0]
+		// 			form.appendChild(input)
+		// 			form.submit()
+		// 		}
+		// 	})
+		// }
 	}, [])
+
+	function signup(event) {
+		event.preventDefault()
+		setLoading(true)
+		const { firstName, lastName, email } = user
+		const userDoc = {
+			_key: nanoid(16),
+			_type: 'person',
+			firstName,
+			lastName,
+			email
+		}
+		client
+			.patch('ea7cda0e-0259-4515-8949-2a3e339f5a9c')
+			.setIfMissing({ list: [] })
+			.append('list', [userDoc])
+			.commit()
+			.then(() => {
+				setUser({
+					firstName: '',
+					lastName: '',
+					email: ''
+				})
+				setLoading(false)
+				notify('success', 'Thank you for signing up!')
+			})
+			.catch((err) => {
+				setLoading(false)
+				notify('error', 'Error', err.message)
+			})
+	}
 
 	return (
 		<div>
@@ -50,7 +87,7 @@ function Mjbiz2022({ products }) {
 					objectFit={'cover'}
 					objectPosition={'center'}
 				/>
-				<div className="bg-ncrma-500 opacity-75 absolute top-0 left-0 w-full h-full"></div>
+				<div className="bg-ncrma-700 opacity-90 absolute top-0 left-0 w-full h-full"></div>
 			</div>
 			<section className="mx-auto w-2/3 my-10 flex flex-col text-justify">
 				<h1 className="text-4xl text-center font-semibold mb-3">Professional Cannabis Risk Manager Certification</h1>
@@ -105,77 +142,176 @@ function Mjbiz2022({ products }) {
 					</li>
 				</ul>
 			</section>
-			<form onSubmit={(event) => collect(event)}>
-				<table>
-					<tr>
-						<td>First Name</td>
-						<td>
-							<input
-								required={true}
-								size="30"
-								type="text"
-								name="fname"
-								defaultValue={user.fname}
-								onChange={(event) => setUser({ ...user, fname: event.target.value })}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td>Last Name</td>
-						<td>
-							<input
-								required={true}
-								size="30"
-								type="text"
-								name="lname"
-								defaultValue={user.lname}
-								onChange={(event) => setUser({ ...user, lname: event.target.value })}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td>email</td>
-						<td>
-							<input
-								required={true}
-								size="30"
-								type="email"
-								name="email"
-								defaultValue={user.email}
-								onChange={(event) => setUser({ ...user, email: event.target.value })}
-							/>
-						</td>
-					</tr>
-					<tr>
-						<td>CC</td>
-						<div id="ccnumber" />
-					</tr>
-					<tr>
-						<td>Expiration</td>
-						<div id="ccexp" />
-					</tr>
-					<tr>
-						<td>CVV</td>
-						<div id="cvv" />
-					</tr>
-				</table>
-				<br />
-				<button
-					id="payButton"
-					type="submit"
+			{/*<form onSubmit={(event) => collect(event)}>*/}
+			{/*	<table>*/}
+			{/*		<tr>*/}
+			{/*			<td>First Name</td>*/}
+			{/*			<td>*/}
+			{/*				<input*/}
+			{/*// 					required={true}*/}
+			{/*// 					size="30"*/}
+			{/*// 					type="text"*/}
+			{/*// 					name="fname"*/}
+			{/*// 					defaultValue={user.fname}*/}
+			{/*// 					onChange={(event) => setUser({ ...user, fname: event.target.value })}*/}
+			{/*// 				/>*/}
+			{/*// 			</td>*/}
+			{/*// 		</tr>*/}
+			{/*// 		<tr>*/}
+			{/*// 			<td>Last Name</td>*/}
+			{/*// 			<td>*/}
+			{/*// 				<input*/}
+			{/*// 					required={true}*/}
+			{/*					size="30"*/}
+			{/*					type="text"*/}
+			{/*					name="lname"*/}
+			{/*					defaultValue={user.lname}*/}
+			{/*					onChange={(event) => setUser({ ...user, lname: event.target.value })}*/}
+			{/*				/>*/}
+			{/*			</td>*/}
+			{/*		</tr>*/}
+			{/*		<tr>*/}
+			{/*			<td>email</td>*/}
+			{/*			<td>*/}
+			{/*				<input*/}
+			{/*					required={true}*/}
+			{/*					size="30"*/}
+			{/*					type="email"*/}
+			{/*					name="email"*/}
+			{/*					defaultValue={user.email}*/}
+			{/*					onChange={(event) => setUser({ ...user, email: event.target.value })}*/}
+			{/*				/>*/}
+			{/*			</td>*/}
+			{/*		</tr>*/}
+			{/*		<tr>*/}
+			{/*			<td>CC</td>*/}
+			{/*			<div id="ccnumber" />*/}
+			{/*		</tr>*/}
+			{/*// 		<tr>*/}
+			{/*// 			<td>Expiration</td>*/}
+			{/*// 			<div id="ccexp" />*/}
+			{/*// 		</tr>*/}
+			{/*		<tr>*/}
+			{/*			<td>CVV</td>*/}
+			{/*			<div id="cvv" />*/}
+			{/*		</tr>*/}
+			{/*	</table>*/}
+			{/*// 	<br />*/}
+			{/*// 	<button*/}
+			{/*// 		id="payButton"*/}
+			{/*// 		type="submit"*/}
+			{/*	>*/}
+			{/*		Submit Payment*/}
+			{/*	</button>*/}
+			{/*</form>*/}
+			<div className="md:w-1/2 w-full my-10 flex gap-0 mx-auto items-center justify-center">
+				<form
+					className="flex flex-col"
+					onSubmit={(event) => signup(event)}
 				>
-					Submit Payment
-				</button>
-			</form>
-			<div className="w-full my-10">
-				<button
-					className="block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/3 mx-auto px-4 py-3"
-					// onClick={(event) => collect(event)}
-				>
-					Purchase PCRM Bundle
-				</button>
+					<div className="flex flex-col items-center gap-2 justify-center w-full">
+						<div className="w-3/4">
+							<label
+								htmlFor="firstName"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+							>
+								First Name
+							</label>
+							<input
+								type="text"
+								id="firstName"
+								className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500"
+								placeholder="John"
+								onChange={(event) => setUser({ ...user, firstName: event.target.value })}
+								value={user.firstName}
+							/>
+						</div>
+						<div className="w-3/4">
+							<label
+								htmlFor="lastName"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+							>
+								Last Name
+							</label>
+							<input
+								type="text"
+								id="lastName"
+								className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500"
+								placeholder="Doe"
+								onChange={(event) => setUser({ ...user, lastName: event.target.value })}
+								value={user.lastName}
+							/>
+						</div>
+						<div className="w-3/4">
+							<label
+								htmlFor="input-group-1"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+							>
+								Your Email
+							</label>
+							<div className="relative">
+								<div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+									<FaEnvelope className="w-5 h-5 text-gray-400 dark:text-gray-400" />
+								</div>
+								<input
+									type="email"
+									id="input-group-1"
+									className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500"
+									placeholder="name@ncrma.com"
+									required={true}
+									aria-describedby="marketing-email-explanation"
+									onChange={(event) => setUser({ ...user, email: event.target.value })}
+									value={user.email}
+								/>
+							</div>
+						</div>
+						<button
+							className="w-1/4 block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white font-medium rounded px-2 py-1 text-sm"
+							type="submit"
+						>
+							{loading ? (
+								<span className="relative max-h-14 flex items-center justify-center black">
+									<Loader size={16} />
+								</span>
+							) : (
+								'Sign up'
+							)}
+						</button>
+					</div>
+					<p
+						id="marketing-email-explanation"
+						className="mt-2 text-sm text-gray-500 dark:text-gray-400 md:px-0 px-5"
+					>
+						Sign up for more information about our Professional Cannabis Risk Manager course bundle and other National Cannabis Risk Management Academy courses. To find more information about the PCRM curriculum, please visit our{' '}
+						<a
+							href="https://ncrma.net/ncrmacademy/"
+							target="_blank"
+							className="font-medium text-ncrma-800 hover:underline dark:text-ncrma-600"
+							rel="noreferrer"
+						>
+							website
+						</a>
+						.
+					</p>
+				</form>
+				{/*<label htmlFor="marketing-email-list">*/}
+				{/*	Email Address*/}
+				{/*	<input*/}
+				{/*		id="marketing-email-list"*/}
+				{/*		type="email"*/}
+				{/*		defaultValue={user.email}*/}
+				{/*		onChange={(event) => setUser({ ...user, email: event.target.value })}*/}
+				{/*		placeholder="Sign up for more information"*/}
+				{/*	/>*/}
+				{/*</label>*/}
+				{/*<button*/}
+				{/*	className="block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded px-4 py-3"*/}
+				{/*	onClick={(event) => signup(event)}*/}
+				{/*>*/}
+				{/*	Purchase PCRM Bundle*/}
+				{/*</button>*/}
 			</div>
-			<div className="relative w-1/4 h-32 mx-auto">
+			<div className="relative md:w-1/4 w-3/4 h-32 mx-auto">
 				<Image
 					src="https://ncrma.net/wp-content/uploads/2020/11/NCRMA-LOGO-10-2020-1-1.png"
 					alt="NCRM Academy Logo"
@@ -187,13 +323,13 @@ function Mjbiz2022({ products }) {
 	)
 }
 
-export async function getStaticProps() {
-	const products = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/promo/getAllCourses`)
-	return {
-		props: {
-			products: products.data
-		}
-	}
-}
+// export async function getStaticProps() {
+// 	const products = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/promo/getAllCourses`)
+// 	return {
+// 		props: {
+// 			products: products.data
+// 		}
+// 	}
+// }
 
 export default Mjbiz2022
