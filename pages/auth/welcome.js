@@ -105,12 +105,8 @@ export default function Welcome({ error }) {
 		return <Loader />
 	}
 	if (edgeError || accountError) {
-		console.log(edgeError)
-		console.log(accountError)
 		return <div>There was an error</div>
 	}
-
-	console.log(accountData.result)
 
 	if (accountData?.result?.active) {
 		router.push('/missions')
