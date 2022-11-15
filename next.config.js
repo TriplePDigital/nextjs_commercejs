@@ -5,7 +5,16 @@ const moduleExports = {
 	images: {
 		domains: ['cdn.sanity.io', 'lh3.googleusercontent.com', 'images.unsplash.com', 'localhost', 'via.placeholder.com', 'i.vimeocdn.com', 'ncrma.net']
 	},
-	env: { VERSION: process.env.npm_package_version }
+	env: { VERSION: process.env.npm_package_version },
+	sentry: {
+		// Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
+		// for client-side builds. (This will be the default starting in
+		// `@sentry/nextjs` version 8.0.0.) See
+		// https://webpack.js.org/configuration/devtool/ and
+		// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#use-hidden-source-map
+		// for more information.
+		hideSourceMaps: true
+	}
 }
 
 const sentryWebpackPluginOptions = {

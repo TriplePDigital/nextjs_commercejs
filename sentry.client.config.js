@@ -8,7 +8,7 @@ const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 
 if (process.env.NODE_ENV === 'production') {
 	Sentry.init({
-		dsn: SENTRY_DSN,
+		dsn: SENTRY_DSN || 'https://ade5e333b8ed4c75b27bb7f6788e80be@o1189320.ingest.sentry.io/6309666',
 		// Adjust this value in production, or use tracesSampler for greater control
 		tracesSampleRate: 1.0,
 		release: `ncrma-lms-ui@${process.env.VERSION}`
