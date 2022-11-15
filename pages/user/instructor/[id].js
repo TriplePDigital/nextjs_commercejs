@@ -73,7 +73,7 @@ function Profile({ profile }) {
 									</Link>
 								</td>
 								<td className="flex-[3]">{mission.description.length > 100 ? `${mission.description.slice(0, 90)}...` : mission.description}</td>
-								<td className="flex-[2]">{mission.track.name}</td>
+								<td className="flex-[2]">{mission?.track?.name || ''}</td>
 								<td className="flex-1">{mission.enrollmentCount}</td>
 							</tr>
 						))}
