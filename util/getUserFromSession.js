@@ -6,3 +6,5 @@ export default async function getUserFromSession(email) {
 
 	return await fetcher(query, false)
 }
+
+export const userSessionQuery = (email) => groq`*[_type=="user" && email=="${email}"]{_id, role, active, membership, firstName}[0]`
