@@ -10,9 +10,6 @@ const checkout = (items) => {
 			showReceipt: true,
 			redirectToSuccessUrl: true,
 			sendToCustomer: true
-		},
-		customerVault: {
-			addCustomer: true
 		}
 	})
 }
