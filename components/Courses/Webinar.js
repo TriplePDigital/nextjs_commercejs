@@ -12,13 +12,9 @@ export default function Webinar({ webinar }) {
 		let minutes = temp.getMinutes().toString()
 		let timeZone = temp.getTimezoneOffset() / 60
 		if (hour >= 12) {
-			return `${hour > 12 ? hour - 12 : hour}:${
-				minutes === '0' ? '00' : minutes
-			} PM (GMT${timeZone > 0 ? `-${timeZone}` : timeZone})`
+			return `${hour > 12 ? hour - 12 : hour}:${minutes === '0' ? '00' : minutes} PM (GMT${timeZone > 0 ? `-${timeZone}` : timeZone})`
 		} else {
-			return `${hour}:${minutes === '0' ? '00' : minutes} AM GMT${
-				timeZone > 0 ? `-${timeZone}` : timeZone
-			}`
+			return `${hour}:${minutes === '0' ? '00' : minutes} AM GMT${timeZone > 0 ? `-${timeZone}` : timeZone}`
 		}
 	}
 	function getDate(datetime) {
@@ -26,17 +22,13 @@ export default function Webinar({ webinar }) {
 		let day = temp.getDate().toString()
 		let month = (temp.getMonth() + 1).toString()
 		let year = temp.getFullYear().toString()
-		return `${month?.length === 1 ? `0${month}` : month}/${
-			day?.length === 1 ? `0${day}` : day
-		}/${year}`
+		return `${month?.length === 1 ? `0${month}` : month}/${day?.length === 1 ? `0${day}` : day}/${year}`
 	}
 	return (
 		<>
 			<aside className="w-1/4 bg-gray-100 px-4 py-6 ml-4 shadow-md border rounded h-full">
 				<h1 className="text-2xl mb-4 font-semibold">{webinar.title}</h1>
-				<p className="text-gray-600 tracking-wide mb-2">
-					{webinar.description}
-				</p>
+				<p className="text-gray-600 tracking-wide mb-2">{webinar.description}</p>
 				<div className="flex flex-row justify-between items-center">
 					<div className="flex flex-row items-center">
 						<AiOutlineCalendar
@@ -63,9 +55,7 @@ export default function Webinar({ webinar }) {
 						</div>
 					</div>
 				</div>
-				<h2 className="text-xl mt-5 mb-2 font-semibold">
-					Presenters & Instructors
-				</h2>
+				<h2 className="text-xl mt-5 mb-2 font-semibold">Presenters & Instructors</h2>
 				<div className="py-4 flex flex-row relative mb-5">
 					{webinar.presenters.map((presenter, i) => (
 						<div
@@ -94,15 +84,16 @@ export default function Webinar({ webinar }) {
 				{webinar.agenda.map((agendaEntry, j) => (
 					<Agenda
 						key={j}
-						time={agendaEntry.startTime
-							.slice(11, 16)
-							.replaceAll('-', ' ')}
+						time={agendaEntry.startTime.slice(11, 16).replaceAll('-', ' ')}
 						title={agendaEntry.title}
 					/>
 				))}
 
 				<div className="flex xl:flex-row flex-col w-full justify-between mt-5">
-					<Link passHref href={webinar.joinLink}>
+					<Link
+						passHref
+						href={webinar.joinLink}
+					>
 						<a
 							target="_blank"
 							className="border-2 border-transparent bg-ncrma-500 text-white px-8 py-3 rounded xl:mr-2 mx-0 my-1  uppercase leading-loose tracking-wide font-semibold text-center"
@@ -111,7 +102,10 @@ export default function Webinar({ webinar }) {
 							Attend
 						</a>
 					</Link>
-					<Link passHref href={webinar.purchaseLink}>
+					<Link
+						passHref
+						href={webinar.purchaseLink}
+					>
 						<a
 							target="_blank"
 							className="border-2 border-ncrma-500 text-black px-8 py-3 rounded xl:ml-2 mx-0 my-1 uppercase leading-loose tracking-wide font-semibold text-center"

@@ -6,36 +6,47 @@ import { Loader } from '@/components/util'
 import axios from 'axios'
 import { fetcher } from '@/util/fetcher'
 import Image from 'next/image'
+import useSWR from 'swr'
+import commerceGetter from '@/util/commerceGetter'
+import { userSessionQuery } from '@/util/getUserFromSession'
+import getter from '@/util/getter'
 
-export default function Welcome({ error, email, userID }) {
+export default function Welcome({ error }) {
 	const router = useRouter()
 
 	const [firstName, setFirstName] = useState('')
 	// const [userID, setUserID] = useState('')
 	const [lastName, setLastName] = useState('')
-	const [asset, setAsset] = useState(null)
-	const [createObjectURL, setCreateObjectURL] = useState(null)
+	// const [asset, setAsset] = useState(null)
+	// const [createObjectURL, setCreateObjectURL] = useState(null)
 	const [em, setEmail] = useState('')
 	const [loading, setLoading] = useState(false)
 
-	const uploadToClient = (event) => {
-		if (event.target.files && event.target.files[0]) {
-			const i = event.target.files[0]
+	const { email } = router.query
 
-			const file = new File([i], i.name, { type: i.type })
+	// const uploadToClient = (event) => {
+	// 	if (event.target.files && event.target.files[0]) {
+	// 		const i = event.target.files[0]
+	//
+	// 		const file = new File([i], i.name, { type: i.type })
+	//
+	// 		setAsset(file)
+	// 		setCreateObjectURL(URL.createObjectURL(i))
+	// 	}
+	// }
 
-			setAsset(file)
-			setCreateObjectURL(URL.createObjectURL(i))
-		}
-	}
+	const { data: edgeData, error: edgeError } = useSWR(`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser?email=${email}`, commerceGetter)
+
+	const { data: accountData, error: accountError } = useSWR(userSessionQuery(email), getter)
 
 	const updateUser = async () => {
+		const mongoUser = JSON.parse(edgeData)
 		const { data } = await axios.post(
 			`${process.env.NEXT_PUBLIC_EDGE_URL}/updateUser`,
 			{},
 			{
 				params: {
-					id: userID,
+					id: mongoUser?._id,
 					email,
 					firstName,
 					lastName
@@ -51,17 +62,16 @@ export default function Welcome({ error, email, userID }) {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
+		const mongoUser = JSON.parse(edgeData)
 		try {
 			setLoading(true)
 
-			let usr = await client.fetch(
-				`*[_type == 'user' && email == '${email}'][0]`
-			)
+			let usr = await client.fetch(`*[_type == 'user' && email == '${email}'][0]`)
 
 			if (!usr) {
 				await client.create({
 					_type: 'user',
-					account_id: userID,
+					account_id: mongoUser?._id,
 					active: true,
 					firstName,
 					lastName,
@@ -70,7 +80,7 @@ export default function Welcome({ error, email, userID }) {
 			} else {
 				await client
 					.patch(usr._id) // Document ID to patch
-					.set({ active: true, account_id: userID }) // Shallow merge
+					.set({ active: true, account_id: mongoUser?._id }) // Shallow merge
 					.commit() // Perform the patch and return a promise
 			}
 
@@ -91,41 +101,42 @@ export default function Welcome({ error, email, userID }) {
 		}
 	}
 
+	if (!edgeData || !accountData) {
+		return <Loader />
+	}
+	if (edgeError || accountError) {
+		return <div>There was an error</div>
+	}
+
+	if (accountData?.result?.active) {
+		router.push('/missions')
+	}
+
 	return loading ? (
 		<Loader size={96} />
 	) : (
 		<section className="text-center">
-			{error ? (
-				<p className="rounded bg-red-200 text-red-500 w-1/2 mx-auto my-3 px-3 py-1.5">
-					{error}
-				</p>
-			) : null}
+			{error ? <p className="rounded bg-red-200 text-red-500 w-1/2 mx-auto my-3 px-3 py-1.5">{error}</p> : null}
 			<form
 				className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-1/2 flex flex-col border border-gray-100 mx-auto"
-				onSubmit={handleSubmit}
+				onSubmit={(e) => handleSubmit(e)}
 			>
 				<div className="mb-3">
-					<h1 className="text-3xl font-semibold">
-						Welcome to the NCRMA Learning Management System
-					</h1>
-					<p className="">
-						Please finish setting up your profile in order to gain
-						access to your courses. You can always edit your profile
-						later on.
-					</p>
+					<h1 className="text-3xl font-semibold">Welcome to the NCRMA Learning Management System</h1>
+					<p className="">Please finish setting up your profile in order to gain access to your courses. You can always edit your profile later on.</p>
 				</div>
-				{createObjectURL ? (
-					<div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden">
-						<Image
-							src={createObjectURL}
-							alt="avatar"
-							layout="fill"
-							objectFit="cover"
-							objectPosition="center"
-							quality={50}
-						/>
-					</div>
-				) : null}
+				{/*{createObjectURL ? (*/}
+				{/*	<div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden">*/}
+				{/*		<Image*/}
+				{/*			src={createObjectURL}*/}
+				{/*			alt="avatar"*/}
+				{/*			layout="fill"*/}
+				{/*			objectFit="cover"*/}
+				{/*			objectPosition="center"*/}
+				{/*			quality={50}*/}
+				{/*		/>*/}
+				{/*	</div>*/}
+				{/*) : null}*/}
 				{/* <input
 					className="my-1 px-3 py-1.5 border rounded mx-auto w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white"
 					type="file"
@@ -193,18 +204,15 @@ export async function getServerSideProps(ctx) {
 		//If user check is true, that means a profile in the CMS exists for the user
 		const userCheck = await fetcher(query, true)
 
-		let res = await axios.get(
-			`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`,
-			{
-				params: { email }
-			}
-		)
+		let res = await axios.get(`https://us-east-1.aws.data.mongodb-api.com/app/ncrma_lms_edge-hfcpq/endpoint/getUser`, {
+			params: { email }
+		})
 
 		const edgeProfile = JSON.parse(res.data)
 
-		if(userCheck){
+		if (userCheck) {
 			// user has a profile already
-			if(userCheck.active){
+			if (userCheck.active) {
 				// user has logged in before
 				return {
 					redirect: {
@@ -212,21 +220,19 @@ export async function getServerSideProps(ctx) {
 						permanent: true
 					}
 				}
-			}
-			else{
+			} else {
 				// we set up a profile for the user
-				if(edgeProfile){
+				if (edgeProfile) {
 					// they have logged in before
 					return {
-							props: {
-								error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
-								userID: userCheck.account_id,
-								active: userCheck.active,
-								email: userCheck.email
-							}
+						props: {
+							error: 'It looks like one of our associates already created an account for you. Please proceed by setting up your profile.',
+							userID: userCheck.account_id,
+							active: userCheck.active,
+							email: userCheck.email
 						}
-				}
-				else{
+					}
+				} else {
 					// they have not logged in before
 					return {
 						props: {
@@ -238,12 +244,11 @@ export async function getServerSideProps(ctx) {
 					}
 				}
 			}
-		}
-		else{
+		} else {
 			// user has no profile in the CMS
 			return {
 				redirect: {
-					destination: `/auth/login?error=${encodeURI('We do not have an account with your email address. Please confirm that your email address is correct, and that your team has created an account for you.')}&email=${email}`,
+					destination: `/auth/login?error=${encodeURI('We do not have an account with your email address. Please confirm that your email address is correct, and that your team has created an account for you.')}&email=${email}`
 				}
 			}
 		}

@@ -23,3 +23,24 @@ export default async function getEnrollmentByStudentID(studentID) {
     `
 	return await fetcher(query)
 }
+
+export const enrollmentQuery = (ID) => groq`
+        *[_type == 'enrollment' && references('${ID}')]{
+          ...,
+          course -> {
+            _id,
+            title,
+            instructors[] ->{name, _id},
+            slug,
+            "coverImage": coverImage.asset->,
+            "enrollCount": count(*[_type == 'enrollment' && references(^._id)]),
+            "numberOfStages": count(*[_type == 'stage' && references(^._id)]),
+            colorCode
+          },
+          student,
+          "progress": *[_type == 'progress' && references(^._id)]{
+            status,
+            "title": content -> {title}
+          }
+        }
+    `

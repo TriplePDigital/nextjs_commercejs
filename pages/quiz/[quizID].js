@@ -7,6 +7,8 @@ import { nanoid } from 'nanoid'
 import { useRouter } from 'next/router'
 import { client } from '@/util/config'
 import { Loader } from '@/components/util'
+import mdConfig from '@/util/md'
+import ReactMarkdown from 'react-markdown'
 
 function Quiz({ quizID, session, content }) {
 	const quiz = content.type
@@ -143,9 +145,16 @@ function Quiz({ quizID, session, content }) {
 								<p className="text-gray-500">
 									Question {currentQuestion + 1} of {quiz.questions.length}
 								</p>
-								<p className="font-semibold">{quiz.questions[currentQuestion].title}</p>
+								<p className="font-semibold">
+									<ReactMarkdown
+										components={mdConfig}
+										className="my-2"
+									>
+										{quiz.questions[currentQuestion].title}
+									</ReactMarkdown>
+								</p>
 							</div>
-							<p className="text-gray-500">Point: {100 / quiz.questions.length}</p>
+							<p className="text-gray-500 self-start mt-5">Point: {100 / quiz.questions.length}</p>
 						</div>
 						<div className="flex flex-col">
 							{quiz.questions[currentQuestion].answers.map((answer, i) => {

@@ -17,7 +17,9 @@ const mdConfig = {
 			/>
 			<blockquote {...props} />
 		</div>
-	)
+	),
+	ol: ({ node, ...props }) => <ol className="list-decimal ml-4" {...props} />,
+	ul: ({ node, ...props }) => <ul className="list-disc ml-4" {...props} />,
 }
 
 export default mdConfig

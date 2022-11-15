@@ -4,23 +4,34 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Loader from '../util/Loader'
 import { FaUserGraduate } from 'react-icons/fa'
+import { useNextSanityImage } from 'next-sanity-image'
+import { client } from '@/util/config'
 
 export default function ListOfCourses({ course, index, progress }) {
+	const imageProps = useNextSanityImage(client, course?.coverImage)
+
 	return !course ? (
 		<Loader />
 	) : (
 		<div className="inline-block px-3">
-			<Link href={course.fallbackURL ? course.fallbackURL : `/mission/${course.slug.current}`} passHref={false}>
+			<Link
+				href={course.fallbackURL ? course.fallbackURL : `/mission/${course.slug.current}`}
+				passHref={false}
+			>
 				<a className="w-72 h-fit xl:max-w-xl lg:max-w-lg md:max-w-md max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out block">
 					<span className="text-black font-bold text-xl">
 						<div className="relative h-44 w-full">
 							<Image
-								{...imgConstructor(course.coverImage, {
-									fit: 'fill'
-								})}
+								src={imageProps.src}
+								loader={imageProps.loader}
+								blurDataURL={imageProps.blurDataURL}
+								placeholder="blur"
 								layout="fill"
-								quality={50}
+								objectFit="cover"
+								objectPosition="center"
+								quality={20}
 								alt={course.blurb}
+								loading={'lazy'}
 							/>
 							<div
 								className="opacity-75 absolute left-0 top-0 h-full w-full"
@@ -33,9 +44,7 @@ export default function ListOfCourses({ course, index, progress }) {
 					<div className="p-3">
 						{/* course title */}
 						<h1 className="font-semibold text-xl">
-							<span className="text-black font-bold text-xl">
-								{course?.title}
-							</span>
+							<span className="text-black font-bold text-xl">{course?.title}</span>
 						</h1>
 
 						{/* enrollment line */}
@@ -44,23 +53,19 @@ export default function ListOfCourses({ course, index, progress }) {
 								<FaUserGraduate className="mr-2 text-gray-300" />
 								<p className="text-gray-600">Enrolled:</p>
 							</div>
-							<span className="font-semibold ml-2">
-								{course?.enrollCount}
-							</span>
+							<span className="font-semibold ml-2">{course?.enrollCount}</span>
 						</div>
 
 						{/* instructors being mapped out */}
 						<ul>
-							{course?.instructors.map(
-								(instructor, instructorIndex) => (
-									<li
-										key={instructorIndex}
-										className="relative"
-									>
-										{instructor.name}
-									</li>
-								)
-							)}
+							{course?.instructors.map((instructor, instructorIndex) => (
+								<li
+									key={instructorIndex}
+									className="relative"
+								>
+									{instructor.name}
+								</li>
+							))}
 						</ul>
 					</div>
 				</a>

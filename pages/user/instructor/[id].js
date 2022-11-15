@@ -2,14 +2,23 @@ import { fetcher } from '@/util/fetcher'
 import imgConstructor from '@/util/img'
 import Image from 'next/image'
 import Link from 'next/link'
+import mdConfig from '@/util/md'
+import ReactMarkdown from 'react-markdown'
+import { useNextSanityImage } from 'next-sanity-image'
+import { client } from '@/util/config'
 
 function Profile({ profile }) {
+	const imageProps = useNextSanityImage(client, profile?.avatar)
 	return (
 		<section className="mx-auto w-2/3 flex flex-col mt-5">
 			<div className="flex items-center gap-4 mb-5">
 				<div className="w-20 h-20 rounded-full overflow-hidden relative">
 					<Image
-						{...imgConstructor(profile.avatar)}
+						src={imageProps.src}
+						loader={imageProps.loader}
+						blurDataURL={imageProps.blurDataURL}
+						width={imageProps.width}
+						height={imageProps.height}
 						layout="intrinsic"
 						quality={50}
 						alt={profile.name}
@@ -22,7 +31,14 @@ function Profile({ profile }) {
 					<p className="text-md text-gray-500 underline">{profile.email}</p>
 				</div>
 			</div>
-			<div className="">{profile.bio}</div>
+			<div className="">
+				<ReactMarkdown
+					components={mdConfig}
+					className="my-2"
+				>
+					{profile.bio}
+				</ReactMarkdown>
+			</div>
 			<div className="flex flex-col my-5">
 				<h1 className="font-medium text-xl">Course(s) by {profile.name}</h1>
 				<table className="container w-full flex flex-col rounded shadow-md">

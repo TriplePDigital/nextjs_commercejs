@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown'
 import mdConfig from '@/util/md'
 import { useRouter } from 'next/router'
 import { Loader } from '../util'
+import { useNextSanityImage } from 'next-sanity-image'
 
 // TODO: https://cdn.dribbble.com/users/1008889/screenshots/17247195/media/e8e6ae59a1569f0b3370c1c2d4a29ba0.png
 
@@ -31,6 +32,7 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 	const [videoEnded, setVideoEnded] = useState(false)
 	const [loading, setLoading] = useState(true)
 	const router = useRouter()
+	const imageProps = useNextSanityImage(client, currentCheckpoint.type?.instructor.avatar)
 
 	const getCurrentProgress = async () => {
 		return Math.floor(((await videoRef.current.getCurrentTime()) / videoRef.current.getDuration()) * 100)
@@ -94,10 +96,9 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 		}
 		//TODO: This might break if the quiz is not the last checkpoint in the stage
 		if (
-			enrollment.course.stages[stageIndex]?.checkpoints.length > 1 && enrollment.course.stages[stageIndex]?.checkpoints[checkpointIndex + 1].instance === 'quiz' 
-			|| 
-			enrollment.course.stages[stageIndex + 1]?.checkpoints.length === 1 && enrollment.course.stages[stageIndex + 1]?.checkpoints[0].instance === 'quiz'
-			) {
+			(enrollment.course.stages[stageIndex]?.checkpoints.length > 1 && enrollment.course.stages[stageIndex]?.checkpoints[checkpointIndex + 1].instance === 'quiz') ||
+			(enrollment.course.stages[stageIndex + 1]?.checkpoints.length === 1 && enrollment.course.stages[stageIndex + 1]?.checkpoints[0].instance === 'quiz')
+		) {
 			obj = {
 				stageIndex: 'quiz',
 				checkpointIndex: 'quiz',
@@ -113,7 +114,7 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 				setLoading(false)
 			})
 		}
-		if(currentCheckpoint.instance === 'video' && currentCheckpoint.type?.vimeoVideo){
+		if (currentCheckpoint.instance === 'video' && currentCheckpoint.type?.vimeoVideo) {
 			setLoading(false)
 		}
 	}, [currentCheckpoint, router])
@@ -133,7 +134,10 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 										setVideoEnded(false)
 									}}
 								>
-									<MdReplay className="opacity-50" size={28} />
+									<MdReplay
+										className="opacity-50"
+										size={28}
+									/>
 									Replay Video
 								</button>
 
@@ -155,12 +159,19 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 										}}
 									>
 										Next Lesson
-										<AiFillCaretRight className="opacity-50" size={28} />
+										<AiFillCaretRight
+											className="opacity-50"
+											size={28}
+										/>
 									</button>
 								)}
 							</div>
 							<div className="-z-[1]">
-								<Image src={currentCheckpoint.type?.vimeoVideo.oEmbedData.thumbnail_url} alt="Video has ended and the thumbnail of the video is shown" layout="fill" />
+								<Image
+									src={currentCheckpoint.type?.vimeoVideo.oEmbedData.thumbnail_url}
+									alt="Video has ended and the thumbnail of the video is shown"
+									layout="fill"
+								/>
 							</div>
 							<div className="bg-ncrma-400 opacity-75 absolute top-0 left-0 w-full h-full -z-0"></div>
 						</div>
@@ -190,22 +201,25 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 					)}
 				</div>
 				<div className="flex items-center my-6">
-					<Link href={`/user/instructor/${currentCheckpoint.type?.instructor._id}`} passHref={false}>
+					<Link
+						href={`/user/instructor/${currentCheckpoint.type?.instructor._id}`}
+						passHref={false}
+					>
 						<a>
 							<div className="flex items-center mx-4 first:ml-0 cursor-pointer">
 								<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
 									{currentCheckpoint.type?.instructor && (
 										<>
-											{/*TODO: If uncommented -> Error: Rendered more hooks than during
-											 previous render*/}
-											{/*<Image*/}
-											{/*	{...useImageConstructor(currentCheckpoint.type?.instructor.avatar, {*/}
-											{/*		fit: 'fill'*/}
-											{/*	})}*/}
-											{/*	alt="Instructor Avatar"*/}
-											{/*	layout="fill"*/}
-											{/*	quality={50}*/}
-											{/*/>*/}
+											<Image
+												src={imageProps.src}
+												loader={imageProps.loader}
+												blurDataURL={imageProps.blurDataURL}
+												layout="fill"
+												objectFit="cover"
+												objectPosition="center"
+												alt="Instructor Avatar"
+												quality={50}
+											/>
 											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 										</>
 									)}
@@ -220,7 +234,10 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 				</div>
 				<div>
 					<div className="font-light text-gray-500">
-						<ReactMarkdown components={mdConfig} className="my-2">
+						<ReactMarkdown
+							components={mdConfig}
+							className="my-2"
+						>
 							{currentCheckpoint.type?.body}
 						</ReactMarkdown>
 					</div>

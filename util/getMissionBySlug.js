@@ -10,6 +10,7 @@ export default async function getMissionBySlug(slug) {
           description,
           categories,
           colorCode,
+          sku,
           "instructors": *[_type == 'instructor' && references(^._id)]{
             ...,
             "avatar": avatar.asset->
