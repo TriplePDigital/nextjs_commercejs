@@ -21,7 +21,7 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 		<div className="flex mx-auto w-full my-3">
 			<Script
 				src="https://secure.nmi.com/token/CollectCheckout.js"
-				data-checkout-key="checkout_public_Du2E7M5C7spt3N8Vs9Su2tuFs9UgM25W"
+				data-checkout-key="checkout_public_pP7wBv6nWYqF275UnGzRV77k9H8KwacA"
 			/>
 			<div className="w-8/12 mr-8">
 				<h1 className="text-4xl tracking-wide font-bold">{mission.title}</h1>
