@@ -53,7 +53,7 @@ const Cart = () => {
 		<section className="w-2/3 mx-auto my-10">
 			<Script
 				src="https://secure.nmi.com/token/CollectCheckout.js"
-				data-checkout-key="checkout_public_Du2E7M5C7spt3N8Vs9Su2tuFs9UgM25W"
+				data-checkout-key={process.env.NEXT_PUBLIC_NMI_PUB_KEY}
 			/>
 			{courses.length > 0 ? (
 				courses.map((item, index) => (
