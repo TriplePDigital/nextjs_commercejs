@@ -1,16 +1,16 @@
 /* eslint-disable no-undef */
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import axios from 'axios'
 import collect from '@/util/collect'
-import {client} from '@/util/config'
-import {FaEnvelope} from 'react-icons/fa'
-import {nanoid} from 'nanoid'
-import {notify} from '@/util/notification'
-import {Loader} from '@/components/util'
-import {useRouter} from 'next/router'
+import { client } from '@/util/config'
+import { FaEnvelope } from 'react-icons/fa'
+import { nanoid } from 'nanoid'
+import { notify } from '@/util/notification'
+import { Loader } from '@/components/util'
+import { useRouter } from 'next/router'
 
-function Mjbiz2022({products}) {
+function Mjbiz2022({ products }) {
 	const [user, setUser] = useState({
 		firstName: '',
 		lastName: '',
@@ -87,7 +87,8 @@ function Mjbiz2022({products}) {
 	}, [])
 
 	const finishSubmit = (token, account) => {
-		const {firstName, lastName, email} = account
+		setLoading(true)
+		const { firstName, lastName, email } = account
 		axios
 			.post(
 				'/api/promo/purchase',
@@ -97,7 +98,9 @@ function Mjbiz2022({products}) {
 						first_name: firstName,
 						last_name: lastName,
 						email,
-						payment_token: token
+						payment_token: token,
+						amount: '995.00',
+						sku: '003'
 					}
 				}
 			)
@@ -105,6 +108,11 @@ function Mjbiz2022({products}) {
 				console.log(res)
 				setLoading(false)
 				notify('success', 'Order successfully placed!')
+				setUser({
+					firstName: '',
+					lastName: '',
+					email: ''
+				})
 				// router.push(`/success?transid=${res.data.payload.transactionID}`).then(() => notify('success', 'Order created'))
 			})
 			.catch((err) => {
@@ -116,7 +124,7 @@ function Mjbiz2022({products}) {
 	function signup(event) {
 		event.preventDefault()
 		setLoading(true)
-		const {firstName, lastName, email} = user
+		const { firstName, lastName, email } = user
 		const userDoc = {
 			_key: nanoid(16),
 			_type: 'person',
@@ -274,13 +282,12 @@ function Mjbiz2022({products}) {
 									placeholder="name@ncrma.com"
 									required={true}
 									aria-describedby="marketing-email-explanation"
-									onChange={(event) => setUser({...user, email: event.target.value})}
+									onChange={(event) => setUser({ ...user, email: event.target.value })}
 									value={user.email}
 								/>
 							</div>
 						</div>
-						<div
-							className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
+						<div className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
 							<label
 								htmlFor="ccnumber"
 								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -289,8 +296,7 @@ function Mjbiz2022({products}) {
 							</label>
 							<div id="ccnumber"></div>
 						</div>
-						<div
-							className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
+						<div className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
 							<label
 								htmlFor="ccexp"
 								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -299,8 +305,7 @@ function Mjbiz2022({products}) {
 							</label>
 							<div id="ccexp"></div>
 						</div>
-						<div
-							className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
+						<div className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
 							<label
 								htmlFor="cvv"
 								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -315,7 +320,7 @@ function Mjbiz2022({products}) {
 						>
 							{loading ? (
 								<span className="relative max-h-14 flex items-center justify-center black">
-									<Loader size={16}/>
+									<Loader size={16} />
 								</span>
 							) : (
 								'Purchase PCRM Bundle'
@@ -338,22 +343,6 @@ function Mjbiz2022({products}) {
 						.
 					</p>
 				</form>
-				{/*<label htmlFor="marketing-email-list">*/}
-				{/*	Email Address*/}
-				{/*	<input*/}
-				{/*		id="marketing-email-list"*/}
-				{/*		type="email"*/}
-				{/*		defaultValue={user.email}*/}
-				{/*		onChange={(event) => setUser({ ...user, email: event.target.value })}*/}
-				{/*		placeholder="Sign up for more information"*/}
-				{/*	/>*/}
-				{/*</label>*/}
-				{/*<button*/}
-				{/*	className="block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded px-4 py-3"*/}
-				{/*	onClick={(event) => signup(event)}*/}
-				{/*>*/}
-				{/*	Purchase PCRM Bundle*/}
-				{/*</button>*/}
 			</div>
 			<div className="relative md:w-1/4 w-3/4 h-32 mx-auto">
 				<Image
