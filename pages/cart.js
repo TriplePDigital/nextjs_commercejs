@@ -7,7 +7,7 @@ import getter from '@/util/getter'
 import { FaTrash } from 'react-icons/fa'
 import { Loader } from '@/components/util'
 import Script from 'next/script'
-import checkout from "@/util/checkout";
+import checkout from '@/util/checkout'
 
 const Cart = () => {
 	const ctx = useContext(cartContextObject)
@@ -33,7 +33,7 @@ const Cart = () => {
 	}, [data, ctx.cart])
 
 	if (!data) {
-		return <Loader/>
+		return <Loader />
 	}
 	if (error) {
 		notify('error', 'Error', 'There was an error loading your cart')
@@ -44,7 +44,7 @@ const Cart = () => {
 		courses.forEach((course) => {
 			items.push({
 				quantity: course.quantity,
-				sku: course.sku,
+				sku: course.sku
 			})
 		})
 		return items
@@ -65,17 +65,22 @@ const Cart = () => {
 							<span className="">{item.title}</span>
 							<span className="text-gray-400 text-sm">SKU: {item.sku || '000'}</span>
 						</div>
-						<span className="w-1/5 text-right">{item.quantity}</span>
-						<button
-							className="w-1/5"
-							onClick={() => ctx.removeProductFromCart(item._id)}
-							title="Remove from cart"
-						>
-							<FaTrash
-								size={20}
-								className="text-red-500 ml-auto mr-0"
-							/>
-						</button>
+						<span className="w-1/5 flex gap-2">
+							<span className="text-gray-400 text-sm">Qty: </span>
+							<span>{item.quantity}</span>
+						</span>
+						<span className="w-1/5 flex justify-end items-center">
+							<button
+								onClick={() => ctx.removeProductFromCart(item._id)}
+								title="Remove from cart"
+								className="hover:bg-slate-400 p-3 transition-all rounded"
+							>
+								<FaTrash
+									size={20}
+									className="text-red-500 ml-auto mr-0"
+								/>
+							</button>
+						</span>
 					</div>
 				))
 			) : (
@@ -92,7 +97,7 @@ const Cart = () => {
 			</div>
 			<div className="px-4 py-4 flex justify-end items-center">
 				<button
-					className="bg-blue-500 text-white px-4 py-2 rounded-md"
+					className={`bg-blue-500 text-white px-4 py-2 rounded-md ${courses.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
 					onClick={() => checkout(convertCourseOjbectToCheckoutItem(courses))}
 				>
 					Checkout
