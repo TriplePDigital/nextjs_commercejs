@@ -68,7 +68,20 @@ export default async function (req, res) {
 						count: filteredCourses.length
 					}
 
-					let enrollmentDoc = []
+					// default document of enrollments with PCRM enrollment preset
+					let enrollmentDoc = [
+						{
+							_type: 'enrollment',
+							student: {
+								_type: 'reference',
+								_ref: user._id
+							},
+							course: {
+								_type: 'reference',
+								_ref: 'c0631150-7b17-40c8-b756-8fa25a139e58'
+							}
+						}
+					]
 
 					for (const item of filteredCourses) {
 						enrollmentDoc.push({
