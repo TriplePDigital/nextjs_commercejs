@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 			//add quantity of 1 to each course
 			const data = courses.data.result.map((course) => {
 				const { _id, sku } = course
-				return { sku, quantity: 1 }
+				return { sku, quantity: 1, _id }
 			})
 			res.status(200).json({ message: 'Courses found', courses: data })
 		}

@@ -8,36 +8,118 @@ import { FaEnvelope } from 'react-icons/fa'
 import { nanoid } from 'nanoid'
 import { notify } from '@/util/notification'
 import { Loader } from '@/components/util'
+import { useRouter } from 'next/router'
 
 function Mjbiz2022({ products }) {
 	const [user, setUser] = useState({
 		firstName: '',
 		lastName: '',
-		email: ''
+		email: '',
+		payment_token: ''
 	})
 	const [loading, setLoading] = useState(false)
+	const router = useRouter()
 
 	useEffect(() => {
-		// if (window?.CollectJS) {
-		// 	window.CollectJS.configure({
-		// 		variant: 'inline',
-		// 		paymentType: 'cc',
-		// 		price: '19.95',
-		// 		currency: 'USD',
-		// 		country: 'US',
-		// 		callback: function (response) {
-		// 			console.log(response.token)
-		// 			const input = document.createElement('input')
-		// 			input.type = 'hidden'
-		// 			input.name = 'payment_token'
-		// 			input.value = response.token
-		// 			const form = document.getElementsByTagName('form')[0]
-		// 			form.appendChild(input)
-		// 			form.submit()
-		// 		}
-		// 	})
-		// }
+		if (typeof window !== 'undefined') {
+			window.CollectJS.configure({
+				variant: 'inline',
+				paymentType: 'cc',
+				price: '995.00',
+				currency: 'USD',
+				country: 'US',
+				styleSniffer: 'true',
+				fields: {
+					ccnumber: {
+						selector: '#ccnumber',
+						title: 'Card Number',
+						placeholder: '0000 0000 0000 0000'
+					},
+					ccexp: {
+						selector: '#ccexp',
+						title: 'Card Expiration',
+						placeholder: '00 / 00'
+					},
+					cvv: {
+						display: 'show',
+						selector: '#cvv',
+						title: 'CVV Code',
+						placeholder: '***'
+					}
+				},
+				customCss: {
+					border: '0px',
+					'background-color': 'rgb(250 250 250)'
+				},
+				invalidCss: {
+					color: 'red',
+					'background-color': '#f78e83'
+				},
+				validCss: {
+					color: 'green',
+					'background-color': '#d0ffd0'
+				},
+				focusCss: {
+					color: 'black',
+					'background-color': 'rgb(220 220 220)'
+				},
+				placeholderCss: {
+					color: 'black',
+					'background-color': 'rgb(220 220 220)'
+				},
+				validationCallback: function (field, status, message) {
+					if (status) {
+						notify('success', message, field)
+					} else {
+						notify('warning', message, field)
+					}
+				},
+				callback: function (response) {
+					const form = document.getElementsByTagName('form')[0].elements
+					finishSubmit(response.token, {
+						firstName: form['first_name'].value,
+						lastName: form['last_name'].value,
+						email: form['email'].value
+					})
+				}
+			})
+		}
 	}, [])
+
+	const finishSubmit = (token, account) => {
+		setLoading(true)
+		const { firstName, lastName, email } = account
+		axios
+			.post(
+				'/api/promo/purchase',
+				{},
+				{
+					params: {
+						first_name: firstName,
+						last_name: lastName,
+						email,
+						payment_token: token,
+						amount: '995.00',
+						sku: '003'
+					}
+				}
+			)
+			.then((res) => {
+				console.log(res)
+				setLoading(false)
+				notify('success', 'Order successfully placed!')
+				setUser({
+					firstName: '',
+					lastName: '',
+					email: ''
+				})
+				// router.push(`/success?transid=${res.data.payload.transactionID}`).then(() => notify('success', 'Order created'))
+			})
+			.catch((err) => {
+				setLoading(false)
+				notify('error', err?.message, 'There was an error processing your order')
+			})
+	}
 
 	function signup(event) {
 		event.preventDefault()
@@ -142,73 +224,8 @@ function Mjbiz2022({ products }) {
 					</li>
 				</ul>
 			</section>
-			{/*<form onSubmit={(event) => collect(event)}>*/}
-			{/*	<table>*/}
-			{/*		<tr>*/}
-			{/*			<td>First Name</td>*/}
-			{/*			<td>*/}
-			{/*				<input*/}
-			{/*// 					required={true}*/}
-			{/*// 					size="30"*/}
-			{/*// 					type="text"*/}
-			{/*// 					name="fname"*/}
-			{/*// 					defaultValue={user.fname}*/}
-			{/*// 					onChange={(event) => setUser({ ...user, fname: event.target.value })}*/}
-			{/*// 				/>*/}
-			{/*// 			</td>*/}
-			{/*// 		</tr>*/}
-			{/*// 		<tr>*/}
-			{/*// 			<td>Last Name</td>*/}
-			{/*// 			<td>*/}
-			{/*// 				<input*/}
-			{/*// 					required={true}*/}
-			{/*					size="30"*/}
-			{/*					type="text"*/}
-			{/*					name="lname"*/}
-			{/*					defaultValue={user.lname}*/}
-			{/*					onChange={(event) => setUser({ ...user, lname: event.target.value })}*/}
-			{/*				/>*/}
-			{/*			</td>*/}
-			{/*		</tr>*/}
-			{/*		<tr>*/}
-			{/*			<td>email</td>*/}
-			{/*			<td>*/}
-			{/*				<input*/}
-			{/*					required={true}*/}
-			{/*					size="30"*/}
-			{/*					type="email"*/}
-			{/*					name="email"*/}
-			{/*					defaultValue={user.email}*/}
-			{/*					onChange={(event) => setUser({ ...user, email: event.target.value })}*/}
-			{/*				/>*/}
-			{/*			</td>*/}
-			{/*		</tr>*/}
-			{/*		<tr>*/}
-			{/*			<td>CC</td>*/}
-			{/*			<div id="ccnumber" />*/}
-			{/*		</tr>*/}
-			{/*// 		<tr>*/}
-			{/*// 			<td>Expiration</td>*/}
-			{/*// 			<div id="ccexp" />*/}
-			{/*// 		</tr>*/}
-			{/*		<tr>*/}
-			{/*			<td>CVV</td>*/}
-			{/*			<div id="cvv" />*/}
-			{/*		</tr>*/}
-			{/*	</table>*/}
-			{/*// 	<br />*/}
-			{/*// 	<button*/}
-			{/*// 		id="payButton"*/}
-			{/*// 		type="submit"*/}
-			{/*	>*/}
-			{/*		Submit Payment*/}
-			{/*	</button>*/}
-			{/*</form>*/}
 			<div className="md:w-1/2 w-full my-10 flex gap-0 mx-auto items-center justify-center">
-				<form
-					className="flex flex-col"
-					onSubmit={(event) => signup(event)}
-				>
+				<form className="flex flex-col">
 					<div className="flex flex-col items-center gap-2 justify-center w-full">
 						<div className="w-3/4">
 							<label
@@ -220,10 +237,12 @@ function Mjbiz2022({ products }) {
 							<input
 								type="text"
 								id="firstName"
+								name="first_name"
 								className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500"
 								placeholder="John"
 								onChange={(event) => setUser({ ...user, firstName: event.target.value })}
 								value={user.firstName}
+								required={true}
 							/>
 						</div>
 						<div className="w-3/4">
@@ -236,10 +255,12 @@ function Mjbiz2022({ products }) {
 							<input
 								type="text"
 								id="lastName"
+								name="last_name"
 								className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500"
 								placeholder="Doe"
 								onChange={(event) => setUser({ ...user, lastName: event.target.value })}
 								value={user.lastName}
+								required={true}
 							/>
 						</div>
 						<div className="w-3/4">
@@ -256,6 +277,7 @@ function Mjbiz2022({ products }) {
 								<input
 									type="email"
 									id="input-group-1"
+									name="email"
 									className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500"
 									placeholder="name@ncrma.com"
 									required={true}
@@ -265,16 +287,43 @@ function Mjbiz2022({ products }) {
 								/>
 							</div>
 						</div>
+						<div className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
+							<label
+								htmlFor="ccnumber"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+							>
+								Credit Card Number
+							</label>
+							<div id="ccnumber"></div>
+						</div>
+						<div className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
+							<label
+								htmlFor="ccexp"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+							>
+								Credit Card Expiration
+							</label>
+							<div id="ccexp"></div>
+						</div>
+						<div className="w-3/4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-ncrma-500 focus:border-ncrma-500 block w-full pl-2.5 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-ncrma-500 dark:focus:border-ncrma-500">
+							<label
+								htmlFor="cvv"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+							>
+								CVV
+							</label>
+							<div id="cvv"></div>
+						</div>
 						<button
 							className="w-1/4 block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white font-medium rounded px-2 py-1 text-sm"
-							type="submit"
+							id="payButton"
 						>
 							{loading ? (
 								<span className="relative max-h-14 flex items-center justify-center black">
 									<Loader size={16} />
 								</span>
 							) : (
-								'Sign up'
+								'Purchase PCRM Bundle'
 							)}
 						</button>
 					</div>
@@ -294,22 +343,6 @@ function Mjbiz2022({ products }) {
 						.
 					</p>
 				</form>
-				{/*<label htmlFor="marketing-email-list">*/}
-				{/*	Email Address*/}
-				{/*	<input*/}
-				{/*		id="marketing-email-list"*/}
-				{/*		type="email"*/}
-				{/*		defaultValue={user.email}*/}
-				{/*		onChange={(event) => setUser({ ...user, email: event.target.value })}*/}
-				{/*		placeholder="Sign up for more information"*/}
-				{/*	/>*/}
-				{/*</label>*/}
-				{/*<button*/}
-				{/*	className="block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded px-4 py-3"*/}
-				{/*	onClick={(event) => signup(event)}*/}
-				{/*>*/}
-				{/*	Purchase PCRM Bundle*/}
-				{/*</button>*/}
 			</div>
 			<div className="relative md:w-1/4 w-3/4 h-32 mx-auto">
 				<Image

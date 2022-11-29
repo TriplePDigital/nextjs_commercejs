@@ -34,6 +34,8 @@ function MyApp({ Component, pageProps }) {
 					<Script
 						src="https://secure.nmi.com/token/Collect.js"
 						data-tokenization-key={process.env.NEXT_PUBLIC_NMI_COLLECT_KEY}
+						strategy="beforeInteractive"
+						data-theme="material"
 					/>
 					<Layout>
 						<Component {...pageProps} />
