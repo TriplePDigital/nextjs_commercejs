@@ -4,13 +4,13 @@ import Image from 'next/image'
 import axios from 'axios'
 import collect from '@/util/collect'
 import { client } from '@/util/config'
-import { FaEnvelope } from 'react-icons/fa'
+import { FaCheck, FaEnvelope } from 'react-icons/fa'
 import { nanoid } from 'nanoid'
 import { notify } from '@/util/notification'
 import { Loader } from '@/components/util'
 import { useRouter } from 'next/router'
 
-function Mjbiz2022({ products }) {
+function Intro_offer({ products }) {
 	const [user, setUser] = useState({
 		firstName: '',
 		lastName: '',
@@ -154,26 +154,64 @@ function Mjbiz2022({ products }) {
 
 	return (
 		<div>
-			<div className="w-full h-96 relative">
-				<Image
-					src="https://ncrma.net/wp-content/uploads/2022/09/MJBizCon-Logo.png"
-					layout="fill"
-					objectFit="contain"
-					className="z-20"
-					alt="MJBizCon 2022 Logo"
-				/>
+			<div className="w-full h-96 relative flex items-center justify-center">
+				<h2 className="text-5xl text-center font-semibold z-30 relative text-white uppercase">Professional Cannabis Risk Manager Certification</h2>
 				<Image
 					src="https://ncrma.net/wp-content/uploads/2022/09/MJBizCon-BG.jpeg"
 					alt="MJBizCon 2022 background image"
 					layout={'fill'}
 					objectFit={'cover'}
 					objectPosition={'center'}
+					className="z-10"
 				/>
-				<div className="bg-ncrma-700 opacity-90 absolute top-0 left-0 w-full h-full"></div>
+				<div className="bg-ncrma-700 opacity-90 absolute top-0 left-0 w-full h-full z-20"></div>
 			</div>
 			<section className="mx-auto w-2/3 my-10 flex flex-col text-justify">
-				<h1 className="text-4xl text-center font-semibold mb-3">Professional Cannabis Risk Manager Certification</h1>
-				<p>
+				<div className="flex flex-col p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white">
+					<h3 className="mb-4 text-2xl font-semibold">PCRM Bundle</h3>
+					<p className="font-light text-gray-500 sm:text-lg dark:text-gray-400">
+						Introductory offer until <span className="text-gray-900 dark:text-gray-400 font-medium">1/1/2023</span>
+					</p>
+					<div className="flex justify-center items-baseline my-8">
+						<span className="mr-2 text-5xl font-extrabold">
+							<span className="line-through mr-2 opacity-25 text-3xl">$1995</span>$995
+						</span>
+					</div>
+					<ul
+						role="list"
+						className="mb-8 space-y-4 text-left"
+					>
+						<li className="flex items-center space-x-3">
+							<FaCheck className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
+							<span>
+								Includes <span className="font-semibold">33</span> courses
+							</span>
+						</li>
+						<li className="flex items-center space-x-3">
+							<FaCheck className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
+							<span>
+								<span className="font-semibold">6</span> areas of focus
+							</span>
+						</li>
+						<li className="flex items-center space-x-3">
+							<FaCheck className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
+							<span>PCRM Online Exam</span>
+						</li>
+						<li className="flex items-center space-x-3">
+							<FaCheck className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
+							<span>
+								<span className="font-semibold">Certificate</span> of completion
+							</span>
+						</li>
+					</ul>
+					<a
+						href="#form"
+						className="text-white bg-ncrma-600 hover:bg-ncrma-700 focus:ring-4 focus:ring-ncrma-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white  dark:focus:ring-ncrma-900"
+					>
+						Purchase
+					</a>
+				</div>
+				<p className="mt-5">
 					NCRM Academy offers the Professional Cannabis Risk Manager Certification online. Covering a range of subjects such as occupational safety & health, compliance, medical cannabis, and talent optimization, our certification prepares students
 					for the many risk of cannabis operations. Instructed by subject matter experts that are recognized and respected in their particular fields and the cannabis industry. If you are a cannabis professional, or an aspiring professional,
 					navigating your way into or through the industry adding this designation can significantly boost your career prospects. Becoming a Professional Cannabis Risk Manager - commonly known as a <strong>PCRM</strong> - is a worthwhile goal as you
@@ -225,7 +263,10 @@ function Mjbiz2022({ products }) {
 				</ul>
 			</section>
 			<div className="md:w-1/2 w-full my-10 flex gap-0 mx-auto items-center justify-center">
-				<form className="flex flex-col">
+				<form
+					className="flex flex-col w-full"
+					id="form"
+				>
 					<div className="flex flex-col items-center gap-2 justify-center w-full">
 						<div className="w-3/4">
 							<label
@@ -314,8 +355,11 @@ function Mjbiz2022({ products }) {
 							</label>
 							<div id="cvv"></div>
 						</div>
+						<p className="mt-2 text-lg text-center text-gray-800 dark:text-gray-400 md:px-0 px-5">
+							Until 1/1/2023 save over 50% and pay the introductory offer of <span className="font-bold">$995</span>!
+						</p>
 						<button
-							className="w-1/4 block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white font-medium rounded px-2 py-1 text-sm"
+							className="w-1/4 block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white font-medium rounded px-2 py-3 text-base"
 							id="payButton"
 						>
 							{loading ? (
@@ -327,21 +371,6 @@ function Mjbiz2022({ products }) {
 							)}
 						</button>
 					</div>
-					<p
-						id="marketing-email-explanation"
-						className="mt-2 text-sm text-gray-500 dark:text-gray-400 md:px-0 px-5"
-					>
-						Sign up for more information about our Professional Cannabis Risk Manager course bundle and other National Cannabis Risk Management Academy courses. To find more information about the PCRM curriculum, please visit our{' '}
-						<a
-							href="https://ncrma.net/ncrmacademy/"
-							target="_blank"
-							className="font-medium text-ncrma-800 hover:underline dark:text-ncrma-600"
-							rel="noreferrer"
-						>
-							website
-						</a>
-						.
-					</p>
 				</form>
 			</div>
 			<div className="relative md:w-1/4 w-3/4 h-32 mx-auto">
@@ -365,4 +394,4 @@ function Mjbiz2022({ products }) {
 // 	}
 // }
 
-export default Mjbiz2022
+export default Intro_offer

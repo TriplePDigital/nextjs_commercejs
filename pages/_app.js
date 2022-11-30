@@ -6,6 +6,7 @@ import React, { createContext, useState } from 'react'
 import { ToastContainer } from 'react-toastify'
 import { CartContextProvider } from '../context/cartProvider'
 import Script from 'next/script'
+import Head from 'next/head'
 
 export const UserContext = createContext({
 	user: {},
@@ -31,6 +32,13 @@ function MyApp({ Component, pageProps }) {
 		<Provider session={pageProps.session}>
 			<UserContext.Provider value={{ user, setUser }}>
 				<CartContextProvider context={cartContextObject}>
+					<Head>
+						<title>NCRM Academy</title>
+						<html
+							lang="en"
+							className="scroll-smooth"
+						/>
+					</Head>
 					<Script
 						src="https://secure.nmi.com/token/Collect.js"
 						data-tokenization-key={process.env.NEXT_PUBLIC_NMI_COLLECT_KEY}
