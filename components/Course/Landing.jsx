@@ -22,6 +22,8 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 
 	const imageProps = useNextSanityImage(client, mission?.coverImage)
 
+	const CreateImage = (image) => useNextSanityImage(client, image)
+
 	return (
 		<div className="flex mx-auto w-full my-3">
 			<Script
@@ -69,7 +71,7 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 				<h2 className="text-xl leading-loose tracking-wide font-bold mb-1 mt-6">About The Instructors</h2>
 				<div className="flex flex-row items-start justify-between mt-6">
 					{mission.instructors.map((instructor, index) => {
-						const instructorAvatar = useNextSanityImage(client, instructor?.avatar)
+						const instructorAvatar = CreateImage(instructor.avatar)
 						return (
 							<div
 								key={index}
