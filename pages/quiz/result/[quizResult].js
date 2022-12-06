@@ -1,31 +1,39 @@
-import { getSession } from 'next-auth/client'
-import getQuizResultByID from '@/util/getQuizResultByID'
+import { useSession } from 'next-auth/client'
+import { getQuizResultByIDQuery } from '@/util/getQuizResultByID'
 import Link from 'next/link'
 import { MdCheck, MdClose } from 'react-icons/md'
 import { useState } from 'react'
+import { useRouter } from 'next/router'
+import getter from '@/util/getter'
+import useSWR from 'swr'
+import { Loader } from '@/components/util'
 
-const QuizResult = ({ result }) => {
+const QuizResult = () => {
 	const [showAlert, setShowAlert] = useState(true)
 
+	const router = useRouter()
+
+	const [session, loading] = useSession()
+
+	const { data: quizAttempt, error: quizAttemptError } = useSWR(getQuizResultByIDQuery(router.query.quizResult), getter)
+
+	if (!quizAttempt || loading) return <Loader />
+
+	if (quizAttemptError) return <div>Something went wrong</div>
+
+	const { result } = quizAttempt
+
 	const getNextStage = (stageObj) => {
-		try {
-			const nextStage = stageObj.find((stage) => stage.order === result.checkpoint.stage.order + 1)
-			return nextStage._id
-		} catch (error) {
-			throw new Error(error)
-		}
+		const nextStage = stageObj.find((stage) => stage.order === result.checkpoint.stage.order + 1)
+		return nextStage?._id || ''
 	}
 
 	const getNextCheckpoint = (checkpointObj) => {
-		try {
-			const nextCheckpoint = checkpointObj.find((checkpoint) => checkpoint.order === result.checkpoint.order + 1)
-			return nextCheckpoint._id
-		} catch (error) {
-			throw new Error(error)
-		}
+		const nextCheckpoint = checkpointObj.find((checkpoint) => checkpoint.order === result.checkpoint.order + 1)
+		return nextCheckpoint?._id || ''
 	}
 
-	return (
+	return session ? (
 		<div className="flex flex-col w-2/3 mx-auto mt-5 shadow-md rounded p-8 bg-gray-50 border">
 			<div className="mb-3">
 				<h1 className="text-3xl font-medium">{result.checkpoint.title}</h1>
@@ -100,7 +108,7 @@ const QuizResult = ({ result }) => {
 					<a className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg px-6 py-4 w-fit">Back to Courses</a>
 				</Link>
 				{result.checkpoint.stage.checkpoints?.length !== result.checkpoint.order ? (
-					<Link href={`/mission/${result.checkpoint.stage.mission.slug}?checkpointID=${getNextCheckpoint(result.checkpoint.stage.checkpoints)}`}>
+					<Link href={`/mission/${result.checkpoint.stage.mission.slug}?checkpointID=${getNextCheckpoint(result.checkpoint.stage?.checkpoints)}`}>
 						<a className="bg-ncrma-400 hover:bg-ncrma-600 text-white px-6 py-4 rounded-lg">Proceed to next Checkpoint</a>
 					</Link>
 				) : (
@@ -110,27 +118,29 @@ const QuizResult = ({ result }) => {
 				)}
 			</div>
 		</div>
+	) : (
+		router.push(`/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`)
 	)
 }
 
 export default QuizResult
 
-export async function getServerSideProps(ctx) {
-	const session = await getSession(ctx)
-	if (!session) {
-		return {
-			redirect: {
-				destination: `/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`,
-				permanent: false
-			}
-		}
-	} else {
-		const quizResultID = ctx.query.quizResult
-		const result = await getQuizResultByID(quizResultID)
-		return {
-			props: {
-				result
-			}
-		}
-	}
-}
+// export async function getServerSideProps(ctx) {
+// 	const session = await getSession(ctx)
+// 	if (!session) {
+// 		return {
+// 			redirect: {
+// 				destination: `/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`,
+// 				permanent: false
+// 			}
+// 		}
+// 	} else {
+// 		const quizResultID = ctx.query.quizResult
+// 		const result = await getQuizResultByID(quizResultID)
+// 		return {
+// 			props: {
+// 				result
+// 			}
+// 		}
+// 	}
+// }
