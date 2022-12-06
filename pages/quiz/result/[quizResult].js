@@ -33,7 +33,9 @@ const QuizResult = () => {
 		return nextCheckpoint?._id || ''
 	}
 
-	return session ? (
+	if (!session) router.push(`/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`)
+
+	return (
 		<div className="flex flex-col w-2/3 mx-auto mt-5 shadow-md rounded p-8 bg-gray-50 border">
 			<div className="mb-3">
 				<h1 className="text-3xl font-medium">{result.checkpoint.title}</h1>
@@ -118,8 +120,6 @@ const QuizResult = () => {
 				)}
 			</div>
 		</div>
-	) : (
-		router.push(`/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`)
 	)
 }
 
