@@ -1,6 +1,5 @@
 import { fetcher } from '@/util/fetcher'
 import Loader from '@/components/util/Loader'
-import imgConstructor from '@/util/img'
 import Image from 'next/image'
 import { FaTrophy } from 'react-icons/fa'
 import { client } from '@/util/config'
@@ -8,12 +7,12 @@ import { useEffect, useState } from 'react'
 import { post, get } from 'axios'
 import { getSession, signOut } from 'next-auth/client'
 import moment from 'moment'
-import ProficiencyMatrix from '@/components/util/ProficiencyMatrix'
 import getQuizAttemptsByStudent from '@/util/getQuizAttemptsByStudent'
 import commerceGetter from '@/util/commerceGetter'
 import useSWR from 'swr'
 import { useNextSanityImage } from 'next-sanity-image'
 import { notify } from '@/util/notification'
+import { RiskManagerMatrixReport } from '@/components/RM/RiskManagerMatrix'
 
 function Profile({ profile, account, quizAttempts }) {
 	const [user, setUser] = useState({ ...profile })
@@ -215,109 +214,10 @@ const QuizAttempts = ({ quizAttempts }) => {
 const RiskManagementProfile = ({ RMProfile }) => {
 	return !RMProfile ? null : (
 		<section className="my-5">
-			<div className="flex flex-col items-center">
-				<h2 className="font-medium text-lg">CRP2 Video Training</h2>
-				<div className="flex gap-3">
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Video 1</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.crpVideoTraining.videoNumberOne.updatedAt}
-							status={RMProfile.crpVideoTraining.videoNumberOne.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Video 2</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.crpVideoTraining.videoNumberTwo.updatedAt}
-							status={RMProfile.crpVideoTraining.videoNumberTwo.status}
-						/>
-					</div>
-				</div>
-			</div>
-			<div className="flex flex-col items-center mt-3">
-				<h2 className="font-medium text-lg">Training Assessments</h2>
-				<div className="flex gap-3">
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Dispensary</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.trainingAssessments.dispensary.updatedAt}
-							status={RMProfile.trainingAssessments.dispensary.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Express Assessment</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.trainingAssessments.expressAssess.updatedAt}
-							status={RMProfile.trainingAssessments.expressAssess.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Property Premises</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.trainingAssessments.propertyPremises.updatedAt}
-							status={RMProfile.trainingAssessments.propertyPremises.status}
-						/>
-					</div>
-				</div>
-			</div>
-			<div className="flex flex-col items-center mt-3">
-				<h2 className="font-medium text-lg">Shadow Assessment</h2>
-				<div className="flex gap-3">
-					<div className="flex flex-col gap-1 items-center">
-						<ProficiencyMatrix
-							timestamp={RMProfile.shadowAssessment.updatedAt}
-							status={RMProfile.shadowAssessment.status}
-						/>
-					</div>
-				</div>
-			</div>
-			<div className="flex flex-col items-center mt-3">
-				<h2 className="font-medium text-lg">Assessment Proficiency</h2>
-				<div className="flex gap-3">
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Health and Safety (OSHA)</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.assessmentProficiency.healthAndSafety.updatedAt}
-							status={RMProfile.assessmentProficiency.healthAndSafety.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Risk Management</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.assessmentProficiency.riskManagement.updatedAt}
-							status={RMProfile.assessmentProficiency.riskManagement.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Insurance</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.assessmentProficiency.insurance.updatedAt}
-							status={RMProfile.assessmentProficiency.insurance.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Quality Assurance (ISO)</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.assessmentProficiency.qualityAssurance.updatedAt}
-							status={RMProfile.assessmentProficiency.qualityAssurance.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Product and Process (Cannabis)</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.assessmentProficiency.productProcess.updatedAt}
-							status={RMProfile.assessmentProficiency.productProcess.status}
-						/>
-					</div>
-					<div className="flex flex-col gap-1 items-center">
-						<h3 className="">Property and Premises</h3>
-						<ProficiencyMatrix
-							timestamp={RMProfile.assessmentProficiency.propertyAndPremises.updatedAt}
-							status={RMProfile.assessmentProficiency.propertyAndPremises.status}
-						/>
-					</div>
-				</div>
-			</div>
+			<RiskManagerMatrixReport
+				profile={RMProfile}
+				fallbackDate={RMProfile._createdAt}
+			/>
 		</section>
 	)
 }
