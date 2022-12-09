@@ -80,7 +80,10 @@ export async function getEnrollmentsPerUser(term, input = false) {
 					course->{
 						_id,
 						title,
-						"stages": *[_type =='stage' && references(^._id)]
+						"stages": *[_type =='stage' && references(^._id)]{
+							...,
+							"checkpointCount": count(*[_type == 'checkpoint' && references(^._id)]),
+						},
 					},
 					"progress": *[_type == 'progress' && references(^._id)] | order(status desc){
 						content ->{
