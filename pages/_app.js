@@ -40,6 +40,10 @@ function MyApp({ Component, pageProps }) {
 								lang="en"
 								className="scroll-smooth"
 							/>
+							<link
+								rel="shortcut icon"
+								href="/favicon.ico"
+							/>
 						</Head>
 						<Script
 							src="https://secure.nmi.com/token/Collect.js"
