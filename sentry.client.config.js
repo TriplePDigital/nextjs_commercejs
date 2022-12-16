@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
+import { Replay } from '@sentry/replay'
 
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 
@@ -11,10 +12,19 @@ if (process.env.NODE_ENV === 'production') {
 		dsn: SENTRY_DSN || 'https://ade5e333b8ed4c75b27bb7f6788e80be@o1189320.ingest.sentry.io/6309666',
 		// Adjust this value in production, or use tracesSampler for greater control
 		tracesSampleRate: 1.0,
-		release: `ncrma-lms-ui@${process.env.VERSION}`
+		release: `ncrma-lms-ui@${process.env.VERSION}`,
 		// ...
 		// Note: if you want to override the automatic release value, do not set a
 		// `release` value here - use the environment variable `SENTRY_RELEASE`, so
 		// that it will also get attached to your source maps
+
+		// This sets the sample rate to be 10%. You may want this to be 100% while
+		// in development and sample at a lower rate in production
+		replaysSessionSampleRate: 0.1,
+		// If the entire session is not sampled, use the below sample rate to sample
+		// sessions when an error occurs.
+		replaysOnErrorSampleRate: 1.0,
+
+		integrations: [new Replay()]
 	})
 }
