@@ -35,12 +35,22 @@ export const enrollmentQuery = (ID) => groq`
             "coverImage": coverImage.asset->,
             "enrollCount": count(*[_type == 'enrollment' && references(^._id)]),
             "numberOfStages": count(*[_type == 'stage' && references(^._id)]),
-            colorCode
+            colorCode,
+            "stages": *[_type =='stage' && references(^._id)]{
+				...,
+				"checkpointCount": count(*[_type == 'checkpoint' && references(^._id)]),
+			},
           },
           student,
           "progress": *[_type == 'progress' && references(^._id)]{
             status,
-            "title": content -> {title}
+            "title": content -> {title},
+            content ->{
+				_id,
+				"slug": slug.current,
+				"parentStage": stage->_id,
+			},
+			_id
           }
         }
     `

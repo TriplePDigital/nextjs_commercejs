@@ -38,6 +38,17 @@ export async function getMostPopularCourses() {
 	return await fetcher(query)
 }
 
+export const getMostPopularCoursesQuery = groq`
+		*[_type == 'mission']{
+			_id,
+			title,
+			"slug": slug.current,
+			colorCode,
+			instructors[] ->{name,"avatar":avatar.asset->,email},
+			"memberCount": count(*[_type == 'enrollment' && references(^._id)])
+		} | order(memberCount desc)
+	`
+
 export async function getLatestEnrollments() {
 	const query = groq`
 		*[_type == 'enrollment']{

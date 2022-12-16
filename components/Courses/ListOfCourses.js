@@ -1,14 +1,33 @@
 /* eslint-disable no-unused-vars */
-import imgConstructor from '@/util/img'
 import Image from 'next/image'
 import Link from 'next/link'
 import Loader from '../util/Loader'
 import { FaUserGraduate } from 'react-icons/fa'
 import { useNextSanityImage } from 'next-sanity-image'
 import { client } from '@/util/config'
+import { calculateCourseProgress, filterEnrollment } from '@/util/progress'
 
-export default function ListOfCourses({ course, index, progress }) {
+export default function ListOfCourses({ course, index, progress, enrollment }) {
 	const imageProps = useNextSanityImage(client, course?.coverImage)
+
+	// console.log(
+	// 	enrollment
+	// 		? filterEnrollment({
+	// 				user: {
+	// 					enrollment
+	// 				}
+	// 		  })
+	// 		: null
+	// )
+	// console.log(
+	// 	enrollment
+	// 		? {
+	// 				percentage: calculateCourseProgress(enrollment),
+	// 				name: course.title,
+	// 				enrollment
+	// 		  }
+	// 		: null
+	// )
 
 	return !course ? (
 		<Loader />

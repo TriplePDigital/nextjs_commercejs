@@ -72,6 +72,7 @@ export default function Course({}) {
 												index={enrollmentIndex}
 												course={item.course}
 												progress={false}
+												enrollment={item}
 											/>
 									  ))
 									: null}
