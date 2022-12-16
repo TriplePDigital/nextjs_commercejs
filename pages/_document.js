@@ -5,7 +5,6 @@ export default function Document() {
 	return (
 		<Html>
 			<Head>
-				<title>NCRM Academy</title>
 				<html
 					lang="en"
 					className="scroll-smooth"

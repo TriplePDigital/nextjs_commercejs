@@ -4,8 +4,9 @@ import { useSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import Loader from 'react-spinners/ClipLoader'
 import { isActive } from '@/util/isActive'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import AdminSidebar from '../Nav/AdminSidebar'
+import Head from 'next/head'
 
 export default function Layout({ children }) {
 	const [session, loading] = useSession()
@@ -39,6 +40,9 @@ export default function Layout({ children }) {
 		</div>
 	) : (
 		<>
+			<Head>
+				<title>NCRM Academy</title>
+			</Head>
 			{!router?.pathname.includes('login') && !router?.pathname.includes('promo') ? <Navbar /> : null}
 			<main className={`mb-10 ${router?.pathname.includes('promo') ? 'px-0' : 'px-10'} ${router?.pathname.includes('login') ? 'h-screen' : ''} ${router.pathname.includes('/admin') ? 'flex lg:flex-row flex-col justify-between gap-3' : ''}`}>
 				{router.pathname.includes('/admin') && <AdminSidebar />}
