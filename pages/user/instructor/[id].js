@@ -1,5 +1,4 @@
 import { fetcher } from '@/util/fetcher'
-import imgConstructor from '@/util/img'
 import Image from 'next/image'
 import Link from 'next/link'
 import mdConfig from '@/util/md'

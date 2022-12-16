@@ -1,6 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-import imgConstructor from '@/util/img'
+import { useEffect, useRef, useState } from 'react'
 import { getSession } from 'next-auth/client'
 import getUserFromSession from '@/util/getUserFromSession'
 import { getEnrollmentsPerUser, getLatestEnrollments } from '@/util/getEnrollments'
@@ -9,8 +7,8 @@ import { BsSearch } from 'react-icons/bs'
 import Papa from 'papaparse'
 import { client } from '@/util/config'
 import { Accordion, Modal } from 'flowbite-react'
-import { useNextSanityImage } from 'next-sanity-image'
 import { calculateCourseProgress, filterEnrollment } from '@/util/progress'
+import Picture from '@/components/util/Picture'
 
 function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 	const [filteredEnrollment, setFilteredEnrollment] = useState(enrollments)
@@ -164,8 +162,6 @@ function AllEnrollments({ enrollments, loading, setEnrollments }) {
 				<tbody className="flex flex-col">
 					{enrollments &&
 						enrollments.map((user, userIndex) => {
-							// eslint-disable-next-line react-hooks/rules-of-hooks
-							const imageProps = useNextSanityImage(client, user.avatar.asset)
 							const { enrollment } = filterEnrollment(user)
 							return (
 								<tr
@@ -174,19 +170,11 @@ function AllEnrollments({ enrollments, loading, setEnrollments }) {
 								>
 									<td className="basis-1/4 items-center flex">
 										<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-											<Image
-												src={imageProps.src}
-												loader={imageProps.loader}
-												blurDataURL={imageProps.blurDataURL}
-												placeholder="blur"
-												layout="fill"
-												objectFit="cover"
-												objectPosition="center"
+											<Picture
+												avatar={user.avatar.asset}
 												quality={20}
-												alt="Instructor Avatar"
-												loading={'lazy'}
+												alt={'Instructor Avatar'}
 											/>
-
 											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 										</div>
 										<div className="flex flex-col items-start">
@@ -318,13 +306,10 @@ function LatestEnrollments({ latestEnrollments }) {
 								<td className="w-1/3 px-4 py-2">
 									<div className="flex gap-2 items-center justify-center">
 										<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-											<Image
-												{...imgConstructor(enrollment?.student?.avatar, {
-													fit: 'fill'
-												})}
-												alt="Instructor Avatar"
-												layout="fill"
+											<Picture
+												avatar={enrollment?.student?.avatar}
 												quality={50}
+												alt={'Instructor avatar'}
 											/>
 											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 										</div>
