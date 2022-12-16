@@ -60,7 +60,7 @@ export default function Navbar() {
 						<a>Courses</a>
 					</ActiveLink>
 					<ActiveLink
-						href={`/membership`}
+						href={`/memberships`}
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
 						<a>Memberships</a>
