@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify'
 import { CartContextProvider } from '../context/cartProvider'
 import Script from 'next/script'
 import { SWRConfig } from 'swr'
+import * as Sentry from '@sentry/browser'
 
 export const UserContext = createContext({
 	user: {},
@@ -27,7 +28,7 @@ export const cartContextObject = CreateCartContext()
 
 function MyApp({ Component, pageProps }) {
 	const [user, setUser] = useState(null)
-
+	Sentry.setUser({ email: user?.email || '' })
 	return (
 		<SWRConfig refetchInterval={10000}>
 			<Provider session={pageProps.session}>
