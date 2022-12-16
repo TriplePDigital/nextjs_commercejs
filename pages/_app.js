@@ -6,7 +6,6 @@ import React, { createContext, useState } from 'react'
 import { ToastContainer } from 'react-toastify'
 import { CartContextProvider } from '../context/cartProvider'
 import Script from 'next/script'
-import Head from 'next/head'
 import { SWRConfig } from 'swr'
 
 export const UserContext = createContext({
@@ -34,22 +33,16 @@ function MyApp({ Component, pageProps }) {
 			<Provider session={pageProps.session}>
 				<UserContext.Provider value={{ user, setUser }}>
 					<CartContextProvider context={cartContextObject}>
-						<Head>
-							<title>NCRM Academy</title>
-							<html
-								lang="en"
-								className="scroll-smooth"
-							/>
-							<link
-								rel="shortcut icon"
-								href="/favicon.ico"
-							/>
-						</Head>
 						<Script
 							src="https://secure.nmi.com/token/Collect.js"
 							data-tokenization-key={process.env.NEXT_PUBLIC_NMI_COLLECT_KEY}
 							strategy="beforeInteractive"
 							data-theme="material"
+						/>
+						<Script
+							src="https://secure.nmi.com/token/CollectCheckout.js"
+							data-checkout-key={process.env.NEXT_PUBLIC_NMI_PUB_KEY}
+							strategy="beforeInteractive"
 						/>
 						<Layout>
 							<Component {...pageProps} />

@@ -6,7 +6,6 @@ import { notify } from '@/util/notification'
 import getter from '@/util/getter'
 import { FaTrash } from 'react-icons/fa'
 import { Loader } from '@/components/util'
-import Script from 'next/script'
 import checkout from '@/util/checkout'
 
 const Cart = () => {
@@ -51,10 +50,6 @@ const Cart = () => {
 	}
 	return (
 		<section className="w-2/3 mx-auto my-10">
-			<Script
-				src="https://secure.nmi.com/token/CollectCheckout.js"
-				data-checkout-key={process.env.NEXT_PUBLIC_NMI_PUB_KEY}
-			/>
 			{courses.length > 0 ? (
 				courses.map((item, index) => (
 					<div
