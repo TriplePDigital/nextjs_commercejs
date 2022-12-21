@@ -1,9 +1,9 @@
-import { useSession, signIn, signOut } from 'next-auth/client'
+import { signIn, signOut, useSession } from 'next-auth/client'
 import ActiveLink from './ActiveLink'
 import { RiShutDownLine } from 'react-icons/ri'
 import { useContext, useEffect, useState } from 'react'
 import { cartContextObject, UserContext } from '../../pages/_app'
-import { BsCaretDownFill, BsCaretUpFill, BsFillPersonFill, BsGearFill, BsAwardFill } from 'react-icons/bs'
+import { BsAwardFill, BsCaretDownFill, BsCaretUpFill, BsFillPersonFill, BsGearFill } from 'react-icons/bs'
 import Link from 'next/link'
 import getUserFromSession from '@/util/getUserFromSession'
 import { BiCart } from 'react-icons/bi'
@@ -59,12 +59,12 @@ export default function Navbar() {
 					>
 						<a>Courses</a>
 					</ActiveLink>
-					<ActiveLink
-						href={`/memberships`}
-						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
-					>
-						<a>Memberships</a>
-					</ActiveLink>
+					{/*<ActiveLink*/}
+					{/*	href={`/memberships`}*/}
+					{/*	activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"*/}
+					{/*>*/}
+					{/*	<a>Memberships</a>*/}
+					{/*</ActiveLink>*/}
 					{user?.role === 'admin' ||
 						(user?.role === 'riskManager' && (
 							<ActiveLink
