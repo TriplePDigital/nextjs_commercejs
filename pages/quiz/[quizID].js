@@ -18,6 +18,7 @@ function Quiz({ quizID, session, content }) {
 	const [loading, setLoading] = useState(true)
 
 	const LENGTH = quiz.questions.length - 1
+	const ATTEMPTS = content.attempts.length || 0
 
 	const router = useRouter()
 
@@ -133,7 +134,7 @@ function Quiz({ quizID, session, content }) {
 	) : (
 		<>
 			<div className="bg-gray-100 shadow-md border rounded p-5 my-4 w-2/3 mx-auto">
-				<p>Number of previous attempts by you: {quiz.attempts.length}</p>
+				<p>Number of previous attempts by you: {ATTEMPTS}</p>
 				<p>Minimum percentage to pass: {quiz.minimumScore}%</p>
 				<p>Number of question: {quiz.questions.length}</p>
 			</div>

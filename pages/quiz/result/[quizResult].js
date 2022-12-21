@@ -25,7 +25,8 @@ const QuizResult = () => {
 
 	const getNextStage = (stageObj) => {
 		const nextStage = stageObj.find((stage) => stage.order === result.checkpoint.stage.order + 1)
-		return nextStage?._id || ''
+		if (!nextStage) return 'completed'
+		return nextStage?._id
 	}
 
 	const getNextCheckpoint = (checkpointObj) => {

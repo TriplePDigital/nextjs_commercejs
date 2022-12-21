@@ -2,7 +2,7 @@
 import { getSession } from 'next-auth/client'
 import getMissionBySlug from '@/util/getMissionBySlug'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Loader } from '@/components/util'
 import Stages from '@/components/Course/Stages'
 import getUserFromSession from '@/util/getUserFromSession'
@@ -11,6 +11,7 @@ import Content from '@/components/Course/Content'
 import moment from 'moment'
 import { TakeQuiz } from '@/components/Course/TakeQuiz'
 import Landing from '@/components/Course/Landing'
+import { UserContext } from '../../_app'
 
 // const getLatestProgress = (stages) => {
 // 	let progress = []
@@ -22,11 +23,11 @@ import Landing from '@/components/Course/Landing'
 // 	return progress
 // }
 
-function MissionSlug({ session, mission, user, enrollment }) {
+function MissionSlug({ mission, enrollment }) {
 	// const stageProgress = getLatestProgress(mission.stages)
 	// const max = Math.max(...stageProgress)
 	// const indexOfMax = stageProgress.indexOf(max)
-
+	const { user } = useContext(UserContext)
 	const [loading, setLoading] = useState(true)
 	const [stageContext, setStageContext] = useState(0)
 	const [checkpointContext, setCheckpointContext] = useState(0)
@@ -50,11 +51,14 @@ function MissionSlug({ session, mission, user, enrollment }) {
 
 	const skipToStage = (stageID) => {
 		if (stageID) {
-			const stageIndex = enrollment.course.stages.findIndex((stage) => {
-				return stage._id === stageID
-			})
-			setStageContext(stageIndex)
-			setCheckpointContext(0)
+			if (stageID === 'completed') router.push(`/user/student/${user._id}/achievements/${mission.slug}`)
+			else {
+				const stageIndex = enrollment.course.stages.findIndex((stage) => {
+					return stage._id === stageID
+				})
+				setStageContext(stageIndex)
+				setCheckpointContext(0)
+			}
 		}
 		setLoading(false)
 	}
