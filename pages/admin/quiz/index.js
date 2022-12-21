@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { getSession } from 'next-auth/client'
 import getQuizAttempts from '@/util/getQuizAttempts'
 import getUserFromSession from '@/util/getUserFromSession'
-import imgConstructor from '@/util/img'
-import Image from 'next/image'
 import moment from 'moment'
 import { Loader } from '@/components/util'
 import { client } from '@/util/config'
@@ -13,6 +11,7 @@ import { nanoid } from 'nanoid'
 import { BsCaretUpFill, BsCheck } from 'react-icons/bs'
 import Link from 'next/link'
 import { notify } from '@/util/notification'
+import Picture from '@/components/util/Picture'
 
 function Quiz({ quizAttempts, tabIndex }) {
 	return (
@@ -666,13 +665,10 @@ function AllQuizAttempts({ quizAttempts }) {
 							<td className="w-1/4">
 								<div className="flex items-center justify-center">
 									<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-										<Image
-											{...imgConstructor(attempt.user.avatar.asset, {
-												fit: 'fill'
-											})}
-											alt="Instructor Avatar"
-											layout="fill"
+										<Picture
+											avatar={attempt.user.avatar.asset}
 											quality={50}
+											alt={'Instructor avatar'}
 										/>
 										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 									</div>

@@ -1,10 +1,20 @@
-import { getSession } from 'next-auth/client'
-import getUserFromSession from '@/util/getUserFromSession'
-import { getMostPopularCourses } from '@/util/getEnrollments'
-import imgConstructor from '@/util/img'
-import Image from 'next/image'
+import { getMostPopularCoursesQuery } from '@/util/getEnrollments'
+import useSWR from 'swr'
+import getter from '@/util/getter'
+import { Loader } from '@/components/util'
+import { useContext } from 'react'
+import { UserContext } from '../_app'
+import Picture from '@/components/util/Picture'
 
-function MemberManagementPage({ courses }) {
+function MemberManagementPage() {
+	const { user } = useContext(UserContext)
+	const { data, error } = useSWR(getMostPopularCoursesQuery, getter)
+
+	if (!data || !user) return <Loader />
+	if (error) console.error(error)
+
+	const courses = data?.result || []
+
 	return (
 		<section className="flex flex-col md:flex-row gap-5 w-full">
 			<section className="w-full">
@@ -38,13 +48,10 @@ function MemberManagementPage({ courses }) {
 											className="flex items-center justify-start gap-2"
 										>
 											<div className="h-10 w-10 rounded-full overflow-hidden relative">
-												<Image
-													{...imgConstructor(instructor?.avatar, {
-														fit: 'fill'
-													})}
-													alt="Instructor Avatar"
-													layout="fill"
-													quality={50}
+												<Picture
+													avatar={instructor?.avatar}
+													quality={20}
+													alt={'Instructor avatar'}
 												/>
 												<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 											</div>
@@ -68,32 +75,3 @@ function MemberManagementPage({ courses }) {
 }
 
 export default MemberManagementPage
-
-export async function getServerSideProps(context) {
-	const session = await getSession(context)
-	if (!session) {
-		return {
-			redirect: {
-				destination: '/auth/login',
-				permanent: false
-			}
-		}
-	} else {
-		const user = await getUserFromSession(session.user.email)
-		if (user.role === 'riskManager' || user.role === 'admin') {
-			const courses = await getMostPopularCourses()
-			return {
-				props: {
-					courses
-				}
-			}
-		} else {
-			return {
-				redirect: {
-					destination: '/',
-					permanent: false
-				}
-			}
-		}
-	}
-}

@@ -4,11 +4,14 @@ import { AiFillStar, AiOutlineClockCircle } from 'react-icons/ai'
 import { RiBook2Line } from 'react-icons/ri'
 import { MdOutlineAssignment } from 'react-icons/md'
 import Image from 'next/image'
-import imgConstructor from '@/util/img'
 import ReactMarkdown from 'react-markdown'
 import mdConfig from '@/util/md'
 import { cartContextObject } from '../../pages/_app'
 import checkout from '@/util/checkout'
+import Link from 'next/link'
+import { useNextSanityImage } from 'next-sanity-image'
+import { client } from '@/util/config'
+import Picture from '@/components/util/Picture'
 
 const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 	const ctx = useContext(cartContextObject)
@@ -17,12 +20,12 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 		ctx.addProductToCart({ item, quantity: 1 })
 	}
 
+	const imageProps = useNextSanityImage(client, mission?.coverImage)
+
+	const CreateImage = (image) => useNextSanityImage(client, image)
+
 	return (
 		<div className="flex mx-auto w-full my-3">
-			<Script
-				src="https://secure.nmi.com/token/CollectCheckout.js"
-				data-checkout-key = {process.env.NEXT_PUBLIC_NMI_PUB_KEY}
-			/>
 			<div className="w-8/12 mr-8">
 				<h1 className="text-4xl tracking-wide font-bold">{mission.title}</h1>
 				<h2 className="text-lg font-medium text-gray-600">{mission.blurb}</h2>
@@ -50,9 +53,11 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 				<div className="relative h-full w-full mt-6">
 					{/* TODO: Either show cover image or preview video if available */}
 					<Image
-						{...imgConstructor(mission.coverImage, {
-							fit: 'fill'
-						})}
+						src={imageProps.src}
+						loader={imageProps.loader}
+						blurDataURL={imageProps.blurDataURL}
+						placeholder="blur"
+						layout="fill"
 						alt={mission.title}
 						objectFit="cover"
 						objectPosition="center"
@@ -69,17 +74,22 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 							>
 								<div className="flex items-center gap-4 flex-1">
 									<div className="relative w-14 h-14 rounded-full overflow-hidden">
-										<Image
-											{...imgConstructor(instructor.avatar, {
-												fit: 'fill'
-											})}
-											placeholder="blur"
-											alt="the instructors avatar image in the shape of a circle"
+										<Picture
+											avatar={instructor.avatar}
+											alt={'the instructors avatar image in' + ' the shape of a circle'}
+											quality={50}
 										/>
 										<div className="rounded-full absolute top-0 left-0 h-full w-full bg-ncrma-500 opacity-40"></div>
 									</div>
 									<div className="flex flex-col gap-1 text-sm text-gray-700">
-										<span className="block font-medium">{instructor.name}</span>
+										<Link
+											passHref={true}
+											href={`/user/instructor/${instructor._id}`}
+										>
+											<a>
+												<span className="block font-medium hover:underline">{instructor.name}</span>
+											</a>
+										</Link>
 										<span className="block underline lowercase">{instructor.email}</span>
 									</div>
 								</div>
@@ -114,25 +124,41 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 						})}
 					</div>
 				</div> */}
-				<button
-					className="bg-ncrma-400 hover:bg-ncrma-600 text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3"
-					onClick={() => addToCart(mission._id)}
-				>
-					Add to Cart
-				</button>
-				<button
-					className="bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3"
-					onClick={() => {
-						checkout([
-							{
-								sku: mission.sku,
-								quantity: 1
-							}
-						])
-					}}
-				>
-					One Click Checkout
-				</button>
+				{!mission.sku ? (
+					<>
+						<div className="flex flex-col gap-2">
+							{mission.activePromo ? (
+								<Link href={`/promo/${mission.activePromo.slug}`}>
+									<a className="text-center bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3">View Promotional Offer</a>
+								</Link>
+							) : (
+								<p>We apologize, but at this time you aren&apos;t allowed to purchase this product. Please contact an administrator if you believe this is a mistake.</p>
+							)}
+						</div>
+					</>
+				) : (
+					<>
+						<button
+							className="bg-ncrma-400 hover:bg-ncrma-600 text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3"
+							onClick={() => addToCart(mission._id)}
+						>
+							Add to Cart
+						</button>
+						<button
+							className="bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white uppercase font-medium rounded w-1/2 mx-auto px-4 py-3"
+							onClick={() => {
+								checkout([
+									{
+										sku: mission.sku,
+										quantity: 1
+									}
+								])
+							}}
+						>
+							One Click Checkout
+						</button>
+					</>
+				)}
 			</div>
 		</div>
 	)

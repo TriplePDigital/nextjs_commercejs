@@ -7,6 +7,7 @@ import { RiskManagementProfile } from '../../user/student/[id]'
 import { flexRender, getCoreRowModel, getExpandedRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import { GrClose } from 'react-icons/gr'
+import { RiskManagerMatrixReport } from '@/components/RM/RiskManagerMatrix'
 
 const ReportingPage = ({ data, companyData }) => {
 	const [riskMangers, setRiskMangers] = useState(data)
@@ -454,101 +455,6 @@ function IndeterminateCheckbox({ indeterminate, className = '', ...rest }) {
 			className={className + ' cursor-pointer'}
 			{...rest}
 		/>
-	)
-}
-
-export const RiskManagerMatrixReport = ({ profile }) => {
-	return (
-		<div className="flex flex-col">
-			<h2>Assessment Proficiency</h2>
-			<div className="flex gap-2">
-				{profile?.assessmentProficiency ? (
-					Object.entries(profile.assessmentProficiency).map(([key, value], index) => {
-						return (
-							<div
-								className="flex flex-col"
-								key={index}
-							>
-								<p>{key}</p>
-								<ProficiencyMatrix
-									status={value.status}
-									timestamp={value.updatedAt}
-								/>
-							</div>
-						)
-					})
-				) : (
-					<ProficiencyMatrix
-						status={undefined}
-						timestamp={new Date()}
-					/>
-				)}
-			</div>
-			<h2>CRP Video Training</h2>
-			<div className="flex gap-2">
-				{profile?.crpVideoTraining ? (
-					Object.entries(profile.crpVideoTraining).map(([key, value], index) => {
-						return (
-							<div
-								className="flex flex-col"
-								key={index}
-							>
-								<p>{key}</p>
-								<ProficiencyMatrix
-									status={value.status}
-									timestamp={value.updatedAt}
-								/>
-							</div>
-						)
-					})
-				) : (
-					<ProficiencyMatrix
-						status={undefined}
-						timestamp={new Date()}
-					/>
-				)}
-			</div>
-			<h2>Shadow Assessment</h2>
-			<div className="flex gap-2">
-				{profile?.shadowAssessment ? (
-					<div className="flex flex-col">
-						<ProficiencyMatrix
-							status={profile.shadowAssessment.status}
-							timestamp={profile.shadowAssessment.updatedAt}
-						/>
-					</div>
-				) : (
-					<ProficiencyMatrix
-						status={undefined}
-						timestamp={new Date()}
-					/>
-				)}
-			</div>
-			<h2>Training Assessment</h2>
-			<div className="flex gap-2">
-				{profile?.trainingAssessments ? (
-					Object.entries(profile.trainingAssessments).map(([key, value], index) => {
-						return (
-							<div
-								className="flex flex-col"
-								key={index}
-							>
-								<p>{key}</p>
-								<ProficiencyMatrix
-									status={value.status}
-									timestamp={value.updatedAt}
-								/>
-							</div>
-						)
-					})
-				) : (
-					<ProficiencyMatrix
-						status={undefined}
-						timestamp={new Date()}
-					/>
-				)}
-			</div>
-		</div>
 	)
 }
 

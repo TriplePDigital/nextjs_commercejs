@@ -6,7 +6,8 @@ import React, { createContext, useState } from 'react'
 import { ToastContainer } from 'react-toastify'
 import { CartContextProvider } from '../context/cartProvider'
 import Script from 'next/script'
-import Head from 'next/head'
+import { SWRConfig } from 'swr'
+import * as Sentry from '@sentry/browser'
 
 export const UserContext = createContext({
 	user: {},
@@ -27,40 +28,40 @@ export const cartContextObject = CreateCartContext()
 
 function MyApp({ Component, pageProps }) {
 	const [user, setUser] = useState(null)
-
+	Sentry.setUser({ email: user?.email || '' })
 	return (
-		<Provider session={pageProps.session}>
-			<UserContext.Provider value={{ user, setUser }}>
-				<CartContextProvider context={cartContextObject}>
-					<Head>
-						<title>NCRM Academy</title>
-						<html
-							lang="en"
-							className="scroll-smooth"
+		<SWRConfig refetchInterval={10000}>
+			<Provider session={pageProps.session}>
+				<UserContext.Provider value={{ user, setUser }}>
+					<CartContextProvider context={cartContextObject}>
+						<Script
+							src="https://secure.nmi.com/token/Collect.js"
+							data-tokenization-key={process.env.NEXT_PUBLIC_NMI_COLLECT_KEY}
+							strategy="beforeInteractive"
+							data-theme="material"
 						/>
-					</Head>
-					<Script
-						src="https://secure.nmi.com/token/Collect.js"
-						data-tokenization-key={process.env.NEXT_PUBLIC_NMI_COLLECT_KEY}
-						strategy="beforeInteractive"
-						data-theme="material"
-					/>
-					<Layout>
-						<Component {...pageProps} />
-						<ToastContainer
-							position="top-right"
-							autoClose={8000}
-							hideProgressBar={false}
-							newestOnTop={false}
-							draggable={false}
-							pauseOnVisibilityChange
-							closeOnClick
-							pauseOnHover
+						<Script
+							src="https://secure.nmi.com/token/CollectCheckout.js"
+							data-checkout-key={process.env.NEXT_PUBLIC_NMI_PUB_KEY}
+							strategy="beforeInteractive"
 						/>
-					</Layout>
-				</CartContextProvider>
-			</UserContext.Provider>
-		</Provider>
+						<Layout>
+							<Component {...pageProps} />
+							<ToastContainer
+								position="top-right"
+								autoClose={8000}
+								hideProgressBar={false}
+								newestOnTop={false}
+								draggable={false}
+								pauseOnVisibilityChange
+								closeOnClick
+								pauseOnHover
+							/>
+						</Layout>
+					</CartContextProvider>
+				</UserContext.Provider>
+			</Provider>
+		</SWRConfig>
 	)
 }
 

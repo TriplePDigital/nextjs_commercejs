@@ -11,6 +11,11 @@ export default async function getMissionBySlug(slug) {
           categories,
           colorCode,
           sku,
+          promoURL,
+          activePromo->{
+            ...,
+            "slug": slug.current,
+          },
           "instructors": *[_type == 'instructor' && references(^._id)]{
             ...,
             "avatar": avatar.asset->

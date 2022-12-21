@@ -1,6 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-import imgConstructor from '@/util/img'
+import { useEffect, useRef, useState } from 'react'
 import { getSession } from 'next-auth/client'
 import getUserFromSession from '@/util/getUserFromSession'
 import { getEnrollmentsPerUser, getLatestEnrollments } from '@/util/getEnrollments'
@@ -9,6 +7,8 @@ import { BsSearch } from 'react-icons/bs'
 import Papa from 'papaparse'
 import { client } from '@/util/config'
 import { Accordion, Modal } from 'flowbite-react'
+import { calculateCourseProgress, filterEnrollment } from '@/util/progress'
+import Picture from '@/components/util/Picture'
 
 function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 	const [filteredEnrollment, setFilteredEnrollment] = useState(enrollments)
@@ -56,7 +56,7 @@ function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 			}
 		}
 	}
-	useEffect(() => {}, [filteredEnrollment, filteredLatestEnrollments])
+	// useEffect(() => {}, [filteredEnrollment, filteredLatestEnrollments])
 	return (
 		<section className="w-full mt-5">
 			<div className="flex justify-between mb-5">
@@ -87,6 +87,7 @@ function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 					{tabIndex === 0 && (
 						<AllEnrollments
 							enrollments={filteredEnrollment}
+							setEnrollments={setFilteredEnrollment}
 							loading={loading}
 						/>
 					)}
@@ -98,7 +99,7 @@ function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 	)
 }
 
-function AllEnrollments({ enrollments, loading }) {
+function AllEnrollments({ enrollments, loading, setEnrollments }) {
 	const [open, setOpen] = useState(false)
 	const [expandID, setExpandID] = useState(null)
 
@@ -111,38 +112,38 @@ function AllEnrollments({ enrollments, loading }) {
 		setOpen(!open)
 	}
 
-	const filterDuplicateProgressReports = (arr) => {
-		// arr.map((obj) => {
-		// 	if (obj.firstName === 'Diana') {
-		// 		obj.enrollment.map((enrDoc) => {
-		// 			if (enrDoc.progress?.length > 1) {
-		// 				const contentIDs = enrDoc.progress.map((progress) => {
-		// 					return progress.content._id
-		// 				})
-		// 				console.log(contentIDs)
-		// 				const uniqueContentIDs = []
-		// 				const filteredProgress = enrDoc.progress.filter(
-		// 					(v, index, self) => {
-		// 						const isDuplicate = contentIDs.includes(
-		// 							v.content._id
-		// 						)
-		// 						if (!isDuplicate) {
-		// 							uniqueContentIDs.push(v.content._id)
-		// 							return true
-		// 						}
-		// 						return false
-		// 					}
-		// 				)
-		// 				console.log(uniqueContentIDs)
-		// 				console.log(filteredProgress)
-		// 			}
-		// 		})
-		// 	}
-		// })
-	}
+	// const filterDuplicateProgressReports = (arr) => {
+	// 	// arr.map((obj) => {
+	// 	// 	if (obj.firstName === 'Diana') {
+	// 	// 		obj.enrollment.map((enrDoc) => {
+	// 	// 			if (enrDoc.progress?.length > 1) {
+	// 	// 				const contentIDs = enrDoc.progress.map((progress) => {
+	// 	// 					return progress.content._id
+	// 	// 				})
+	// 	// 				console.log(contentIDs)
+	// 	// 				const uniqueContentIDs = []
+	// 	// 				const filteredProgress = enrDoc.progress.filter(
+	// 	// 					(v, index, self) => {
+	// 	// 						const isDuplicate = contentIDs.includes(
+	// 	// 							v.content._id
+	// 	// 						)
+	// 	// 						if (!isDuplicate) {
+	// 	// 							uniqueContentIDs.push(v.content._id)
+	// 	// 							return true
+	// 	// 						}
+	// 	// 						return false
+	// 	// 					}
+	// 	// 				)
+	// 	// 				console.log(uniqueContentIDs)
+	// 	// 				console.log(filteredProgress)
+	// 	// 			}
+	// 	// 		})
+	// 	// 	}
+	// 	// })
+	// }
 
 	useEffect(() => {
-		filterDuplicateProgressReports(enrollments)
+		// filterDuplicateProgressReports(enrollments)
 	}, [enrollments])
 
 	return loading ? (
@@ -160,98 +161,108 @@ function AllEnrollments({ enrollments, loading }) {
 				</thead>
 				<tbody className="flex flex-col">
 					{enrollments &&
-						enrollments.map((user, userIndex) => (
-							<tr
-								key={userIndex}
-								className="flex items-center py-2 px-5 border border-gray-200 text-center"
-							>
-								<td className="basis-1/4 items-center flex">
-									<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-										<Image
-											{...imgConstructor(user.avatar.asset, {
-												fit: 'fill'
-											})}
-											alt="Instructor Avatar"
-											layout="fill"
-											quality={50}
-										/>
-
-										<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
-									</div>
-									<div className="flex flex-col items-start">
-										<span className="">
-											{user.firstName} {user.lastName}
-										</span>
-
-										<span className="text-sm text-gray-500">{user.email}</span>
-									</div>
-								</td>
-								<td className="basis-1/4">{user.count}</td>
-								<td className="basis-1/4">
-									<>
-										<button
-											className="bg-ncrma-300 rounded px-5 py-1 min-w-fit"
-											onClick={() => handleExpand(userIndex)}
-										>
-											{userIndex === expandID && open ? 'Hide course progress' : 'Show course progress'}
-										</button>
-										<Modal
-											show={userIndex === expandID && open ? true : false}
-											onClose={() => setOpen(!open)}
-											size={'2xl'}
-											placement="center"
-										>
-											<Modal.Header>
+						enrollments.map((user, userIndex) => {
+							const { enrollment } = filterEnrollment(user)
+							return (
+								<tr
+									key={userIndex}
+									className="flex items-center py-2 px-5 border border-gray-200 text-center"
+								>
+									<td className="basis-1/4 items-center flex">
+										<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
+											<Picture
+												avatar={user.avatar.asset}
+												quality={20}
+												alt={'Instructor Avatar'}
+											/>
+											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
+										</div>
+										<div className="flex flex-col items-start">
+											<span className="">
 												{user.firstName} {user.lastName}
-											</Modal.Header>
-											<Modal.Body className="max-h-screen overflow-y-scroll">
-												{user.enrollment.map((enrollment, index) => {
-													return enrollment.progress.length !== 0 ? (
-														<Accordion key={index}>
-															<Accordion.Panel>
-																<Accordion.Title>{enrollment.course.title}</Accordion.Title>
-																<Accordion.Content>
-																	<ul className="w-full list-disc font-light text-sm">
-																		{enrollment.course.stages.map((stage, i) => {
-																			return enrollment.progress.length !== 0 ? (
-																				<li
-																					key={i}
-																					className="ml-8"
-																				>
-																					<div>
-																						{stage.title}
-																						<ul className="w-full list-disc font-light text-sm">
-																							{enrollment.progress.map((progress, ind) => {
-																								return progress.content.parentStage === stage._id && progress.status !== 0 ? (
-																									<li
-																										key={ind}
-																										className="ml-8"
-																									>
-																										<div className="flex justify-between items-center">
-																											<span>{progress.content.title}</span>
-																											<span>{`${progress.status}%`}</span>
-																										</div>
-																									</li>
-																								) : null
-																							})}
-																						</ul>
-																					</div>
-																				</li>
-																			) : null
-																		})}
-																	</ul>
-																</Accordion.Content>
-															</Accordion.Panel>
-														</Accordion>
-													) : null
-												})}
-											</Modal.Body>
-										</Modal>
-									</>
-								</td>
-								<td className="basis-1/4">{user?.achievements?.length || 0}</td>
-							</tr>
-						))}
+											</span>
+
+											<span className="text-sm text-gray-500">{user.email}</span>
+										</div>
+									</td>
+									<td className="basis-1/4">{user.count}</td>
+									<td className="basis-1/4">
+										<>
+											<button
+												className="bg-ncrma-300 rounded px-5 py-1 min-w-fit"
+												onClick={() => handleExpand(userIndex)}
+											>
+												{userIndex === expandID && open ? 'Hide course progress' : 'Show course progress'}
+											</button>
+											<Modal
+												show={userIndex === expandID && open}
+												onClose={() => setOpen(!open)}
+												size={'2xl'}
+												placement="center"
+											>
+												<Modal.Header>
+													{user.firstName} {user.lastName}
+												</Modal.Header>
+												<Modal.Body className="max-h-screen overflow-y-scroll">
+													{enrollment.map((enrollment, index) => {
+														const progressPercentage = calculateCourseProgress(enrollment)
+														return enrollment?.progress && enrollment?.course ? (
+															<Accordion key={index}>
+																<Accordion.Panel>
+																	<Accordion.Title>{enrollment.course?.title}</Accordion.Title>
+																	<Accordion.Content>
+																		<div className="w-full flex items-center justify-between mb-6">
+																			{`${progressPercentage}%`} Completed
+																			<input
+																				className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm dark:bg-gray-700"
+																				type="range"
+																				value={progressPercentage}
+																				max={100}
+																				min={0}
+																			/>
+																		</div>
+																		<ul className="w-full list-disc font-light text-sm">
+																			{enrollment?.course?.stages.map((stage, i) => {
+																				return (
+																					<li
+																						key={i}
+																						className="ml-8"
+																					>
+																						<div>
+																							{stage.title}
+																							<ul className="w-full list-disc font-light text-sm">
+																								{enrollment.progress.map((progress, ind) => {
+																									return progress.content.parentStage === stage._id && progress.status !== 0 ? (
+																										<li
+																											key={ind}
+																											className="ml-8"
+																										>
+																											<div className="flex justify-between items-center">
+																												<span>{progress.content.title}</span>
+																												<span>{`${progress.status > 100 ? '100' : Math.round(progress.status)}%`}</span>
+																											</div>
+																										</li>
+																									) : null
+																								})}
+																							</ul>
+																						</div>
+																					</li>
+																				)
+																			})}
+																		</ul>
+																	</Accordion.Content>
+																</Accordion.Panel>
+															</Accordion>
+														) : null
+													})}
+												</Modal.Body>
+											</Modal>
+										</>
+									</td>
+									<td className="basis-1/4">{user?.achievements?.length || 0}</td>
+								</tr>
+							)
+						})}
 				</tbody>
 			</table>
 		</>
@@ -295,13 +306,10 @@ function LatestEnrollments({ latestEnrollments }) {
 								<td className="w-1/3 px-4 py-2">
 									<div className="flex gap-2 items-center justify-center">
 										<div className="h-10 w-10 rounded-full overflow-hidden mr-2 relative">
-											<Image
-												{...imgConstructor(enrollment?.student?.avatar, {
-													fit: 'fill'
-												})}
-												alt="Instructor Avatar"
-												layout="fill"
+											<Picture
+												avatar={enrollment?.student?.avatar}
 												quality={50}
+												alt={'Instructor avatar'}
 											/>
 											<span className="absolute top-0 left-0 rounded-full h-full w-full bg-ncrma-300 opacity-50"></span>
 										</div>
