@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import Script from 'next/script'
 import { AiFillStar, AiOutlineClockCircle } from 'react-icons/ai'
 import { RiBook2Line } from 'react-icons/ri'
 import { MdOutlineAssignment } from 'react-icons/md'
@@ -21,8 +20,6 @@ const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
 	}
 
 	const imageProps = useNextSanityImage(client, mission?.coverImage)
-
-	const CreateImage = (image) => useNextSanityImage(client, image)
 
 	return (
 		<div className="flex mx-auto w-full my-3">
