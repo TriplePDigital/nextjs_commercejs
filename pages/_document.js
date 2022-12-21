@@ -3,15 +3,18 @@ import React from 'react'
 
 export default function Document() {
 	return (
-		<Html>
+		<Html
+			lang="en"
+			className="scroll-smooth"
+		>
 			<Head>
-				<html
-					lang="en"
-					className="scroll-smooth"
-				/>
 				<link
 					rel="shortcut icon"
 					href="/favicon.ico"
+				/>
+				<meta
+					name="viewport"
+					content="width=device-width, initial-scale=1"
 				/>
 			</Head>
 			<body>
