@@ -27,7 +27,6 @@ const QuizResult = () => {
 
 	const getNextStage = (stageObj) => {
 		const nextStage = stageObj.find((stage) => stage.order === result.checkpoint.stage.order + 1)
-		// if (!nextStage) return router.push()
 		return nextStage?._id || ''
 	}
 
@@ -45,8 +44,8 @@ const QuizResult = () => {
 				<h2 className="text-lg font-light opacity-50">{result.checkpoint.stage.mission.title}</h2>
 			</div>
 			<div>
-				Your score: <span className={`font-bold ${result.score > result.checkpoint.type.minimumScore ? 'text-green-500' : 'text-red-500'}`}>{result.score}</span> / 100{' '}
-				<span className="text-sm text-gray-400">({(Number(result.score) / 100).toFixed(2) * 100}%)</span>
+				Your score: <span className={`font-bold ${result.score > result.checkpoint.type.minimumScore ? 'text-green-500' : 'text-red-500'}`}>{Number(result.score).toFixed(2)}</span> / 100{' '}
+				<span className="text-sm text-gray-400">({Number(result.score).toFixed(2)}%)</span>
 			</div>
 			<div className="text-sm mb-3">
 				Minimum Score to Pass: {result.checkpoint.type.minimumScore}{' '}
