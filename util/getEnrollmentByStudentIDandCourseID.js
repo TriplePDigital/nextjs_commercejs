@@ -2,8 +2,11 @@ import { fetcher } from './fetcher'
 import groq from 'groq'
 
 export default async function getEnrollmentByStudentIDandCourseID(userID, courseID) {
-	const query = groq`
-    *[_type == 'enrollment' && references('${userID}') && references('${courseID}')]{
+	return await fetcher(getEnrollmentByStudentIDandCourseIDQuery(userID, courseID))
+}
+
+export const getEnrollmentByStudentIDandCourseIDQuery = (userID, courseID) => groq`
+*[_type == 'enrollment' && references('${userID}') && references('${courseID}')]{
     _id,
     "progress": *[_type == 'progress' && references(^._id)] | order(status desc){
         content ->{
@@ -52,6 +55,4 @@ export default async function getEnrollmentByStudentIDandCourseID(userID, course
         }
     }
     }[0]
-    `
-	return await fetcher(query)
-}
+`

@@ -2,7 +2,10 @@ import { fetcher } from './fetcher'
 import groq from 'groq'
 
 export default async function getMissionBySlug(slug) {
-	const query = groq`
+	return await fetcher(getMissionBySlugQuery(slug))
+}
+
+export const getMissionBySlugQuery = (slug) => groq`
         *[_type == 'mission' && slug.current == '${slug}']{
           _id,
           title,
@@ -58,6 +61,3 @@ export default async function getMissionBySlug(slug) {
           }
         }[0]
     `
-	const result = await fetcher(query)
-	return result
-}

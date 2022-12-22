@@ -11,9 +11,34 @@ import Link from 'next/link'
 import { useNextSanityImage } from 'next-sanity-image'
 import { client } from '@/util/config'
 import Picture from '@/components/util/Picture'
+import moment from 'moment/moment'
 
-const Landing = ({ mission, numberOfCheckpoints, courseDuration }) => {
+const countNumberOfCheckpoints = (stages) => {
+	let count = 0
+	stages.map((stage) => {
+		stage.checkpoints.map(() => {
+			count++
+		})
+	})
+	return count
+}
+
+const countCourseDuration = (stages) => {
+	let count = 0
+	stages.map((stage) => {
+		stage.checkpoints.map((checkpoint) => {
+			count += checkpoint.type.duration
+		})
+	})
+	return moment.utc(count * 1000).format('HH:mm:ss')
+}
+
+const Landing = ({ mission }) => {
 	const ctx = useContext(cartContextObject)
+
+	const numberOfCheckpoints = countNumberOfCheckpoints(mission.stages)
+
+	const courseDuration = countCourseDuration(mission.stages)
 
 	const addToCart = (item) => {
 		ctx.addProductToCart({ item, quantity: 1 })
