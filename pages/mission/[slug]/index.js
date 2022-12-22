@@ -1,16 +1,15 @@
-/* eslint-disable no-unused-vars */
-import { getSession } from 'next-auth/client'
-import getMissionBySlug from '@/util/getMissionBySlug'
+import { getMissionBySlugQuery } from '@/util/getMissionBySlug'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Loader } from '@/components/util'
 import Stages from '@/components/Course/Stages'
-import getUserFromSession from '@/util/getUserFromSession'
-import getEnrollmentByStudentIDandCourseID from '@/util/getEnrollmentByStudentIDandCourseID'
+import { getEnrollmentByStudentIDandCourseIDQuery } from '@/util/getEnrollmentByStudentIDandCourseID'
 import Content from '@/components/Course/Content'
-import moment from 'moment'
 import { TakeQuiz } from '@/components/Course/TakeQuiz'
 import Landing from '@/components/Course/Landing'
+import { UserContext } from '../../_app'
+import getter from '@/util/getter'
+import useSWR from 'swr'
 
 // const getLatestProgress = (stages) => {
 // 	let progress = []
@@ -22,46 +21,38 @@ import Landing from '@/components/Course/Landing'
 // 	return progress
 // }
 
-function MissionSlug({ session, mission, user, enrollment }) {
+function MissionSlug({}) {
 	// const stageProgress = getLatestProgress(mission.stages)
 	// const max = Math.max(...stageProgress)
 	// const indexOfMax = stageProgress.indexOf(max)
-
-	const [loading, setLoading] = useState(true)
-	const [stageContext, setStageContext] = useState(0)
-	const [checkpointContext, setCheckpointContext] = useState(0)
-	const [currentCheckpoint, setCurrentCheckpoint] = useState(enrollment ? enrollment.course.stages[stageContext].checkpoints[checkpointContext] : null)
-
-	const [numberOfCheckpoints, setNumberOfCheckpoints] = useState(0)
-	const [courseDuration, setCourseDuration] = useState(0)
+	const { user } = useContext(UserContext)
 
 	const router = useRouter()
+	const slug = router.query.slug
 	const checkpointIDQuery = router.query?.checkpointID
 	const stageIDQuery = router.query?.stageID
 
-	useEffect(() => {
-		setLoading(true)
-		setCurrentCheckpoint(enrollment ? enrollment.course.stages[stageContext].checkpoints[checkpointContext] : null)
-		skipToCheckpoint(checkpointIDQuery)
-		skipToStage(stageIDQuery)
-		countNumberOfCheckpoints(mission.stages)
-		countCourseDuration(mission.stages)
-	}, [stageContext, checkpointContext, enrollment])
+	const { data: mission, error: missionError } = useSWR(getMissionBySlugQuery(slug), getter)
+
+	const { data: enrollment, error: enrollmentError } = useSWR(getEnrollmentByStudentIDandCourseIDQuery(user?._id, mission?.result._id), getter)
+
+	const [stageContext, setStageContext] = useState(0)
+	const [checkpointContext, setCheckpointContext] = useState(0)
+	const [currentCheckpoint, setCurrentCheckpoint] = useState(null)
 
 	const skipToStage = (stageID) => {
 		if (stageID) {
-			const stageIndex = enrollment.course.stages.findIndex((stage) => {
+			const stageIndex = enrollment.result.course.stages.findIndex((stage) => {
 				return stage._id === stageID
 			})
 			setStageContext(stageIndex)
 			setCheckpointContext(0)
 		}
-		setLoading(false)
 	}
 
 	const skipToCheckpoint = (checkpointID) => {
 		if (checkpointID) {
-			const stageIndex = enrollment.course.stages.map((stage, stageIndex) => {
+			const stageIndex = enrollment.result.course.stages.map((stage, stageIndex) => {
 				const checkpointIndex = stage.checkpoints.find((checkpoint) => {
 					return checkpoint._id === checkpointID
 				})
@@ -74,82 +65,41 @@ function MissionSlug({ session, mission, user, enrollment }) {
 			setStageContext(chosenStage.stageIndex)
 			setCheckpointContext(chosenStage.checkpointQueryIndex)
 		}
-		setLoading(false)
 	}
 
-	const countNumberOfCheckpoints = (stages) => {
-		let count = 0
-		stages.map((stage) => {
-			stage.checkpoints.map(() => {
-				count++
-			})
-		})
-		setNumberOfCheckpoints(count)
-	}
+	useEffect(() => {
+		setCurrentCheckpoint(enrollment?.result ? enrollment.result.course.stages[stageContext].checkpoints[checkpointContext] : null)
+		skipToCheckpoint(checkpointIDQuery)
+		skipToStage(stageIDQuery)
+	}, [stageContext, checkpointContext, enrollment])
 
-	const countCourseDuration = (stages) => {
-		let count = 0
-		stages.map((stage) => {
-			stage.checkpoints.map((checkpoint) => {
-				count += checkpoint.type.duration
-			})
-		})
-		setCourseDuration(moment.utc(count * 1000).format('HH:mm:ss'))
-	}
+	if (!mission || !enrollment) return <Loader />
 
-	return loading ? (
+	if (missionError || enrollmentError) console.log(missionError || enrollmentError)
+
+	return !enrollment.result ? (
+		<Landing mission={mission.result} />
+	) : !currentCheckpoint ? (
 		<Loader />
-	) : enrollment ? (
+	) : (
 		<div className="flex flex-row">
 			{currentCheckpoint.instance === 'video' && (
 				<Content
 					currentCheckpoint={currentCheckpoint}
-					enrollment={enrollment}
+					enrollment={enrollment.result}
 					setCheckpointContext={setCheckpointContext}
 					setStageContext={setStageContext}
 				/>
 			)}
 			{currentCheckpoint.instance === 'quiz' && <TakeQuiz />}
 			<Stages
-				enrollment={enrollment}
+				enrollment={enrollment.result}
 				setCheckpointContext={setCheckpointContext}
 				setStageContext={setStageContext}
 				setCurrentCheckpoint={setCurrentCheckpoint}
 			/>
 		</div>
-	) : (
-		<Landing
-			mission={mission}
-			courseDuration={courseDuration}
-			numberOfCheckpoints={numberOfCheckpoints}
-		/>
 	)
 }
 
 export default MissionSlug
-
-export async function getServerSideProps(ctx) {
-	const session = await getSession(ctx)
-	const user = await getUserFromSession(session?.user?.email)
-	const mission = await getMissionBySlug(ctx.params.slug)
-	try {
-		const enrollment = await getEnrollmentByStudentIDandCourseID(user._id, mission._id)
-		return {
-			props: {
-				session,
-				mission,
-				user,
-				enrollment
-			}
-		}
-	} catch (error) {
-		return {
-			props: {
-				session,
-				mission,
-				user,
-				enrollment: null
-			}
-		}
-	}
-}

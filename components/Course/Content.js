@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import ReactPlayer from 'react-player/vimeo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ import mdConfig from '@/util/md'
 import { useRouter } from 'next/router'
 import { Loader } from '../util'
 import { useNextSanityImage } from 'next-sanity-image'
+import { UserContext } from '../../pages/_app'
 
 // TODO: https://cdn.dribbble.com/users/1008889/screenshots/17247195/media/e8e6ae59a1569f0b3370c1c2d4a29ba0.png
 
@@ -28,10 +29,12 @@ const getCheckpointProgress = async (checkpointID, enrollmentID) => {
 }
 
 export default function Content({ currentCheckpoint, enrollment, setCheckpointContext, setStageContext }) {
+	const { user } = useContext(UserContext)
 	const videoRef = useRef(null)
 	const [videoEnded, setVideoEnded] = useState(false)
 	const [loading, setLoading] = useState(true)
 	const router = useRouter()
+	const slug = router.query.slug
 	const imageProps = useNextSanityImage(client, currentCheckpoint.type?.instructor.avatar)
 
 	const getCurrentProgress = async () => {
@@ -79,23 +82,17 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 	}
 
 	const findNextVideo = () => {
+		const MAX_STAGE = enrollment.course.stages.length - 1
 		const stageIndex = enrollment.course.stages.findIndex((stage) => stage._id === currentCheckpoint.currentStage)
+		const MAX_CHECKPOINT = enrollment.course.stages[stageIndex].checkpoints.length - 1
 		const checkpointIndex = enrollment.course.stages[stageIndex]?.checkpoints.findIndex((checkpoint) => checkpoint._id === currentCheckpoint._id)
 		let obj
-		if (stageIndex === enrollment.course.stages.length - 1 && checkpointIndex === enrollment.course.stages[stageIndex].checkpoints.length - 1) {
-			obj = {
-				stageIndex: null,
-				checkpointIndex: null
-			}
-		}
-		if (checkpointIndex === enrollment.course.stages[stageIndex].checkpoints.length - 1) {
+		if (checkpointIndex === enrollment.course.stages[stageIndex].checkpoints.length - 1 && stageIndex < MAX_STAGE) {
 			obj = {
 				stageIndex: stageIndex + 1,
 				checkpointIndex: 0
 			}
-		}
-		//TODO: This might break if the quiz is not the last checkpoint in the stage
-		if (
+		} else if (
 			(enrollment.course.stages[stageIndex]?.checkpoints.length > 1 && enrollment.course.stages[stageIndex]?.checkpoints[checkpointIndex + 1].instance === 'quiz') ||
 			(enrollment.course.stages[stageIndex + 1]?.checkpoints.length === 1 && enrollment.course.stages[stageIndex + 1]?.checkpoints[0].instance === 'quiz')
 		) {
@@ -103,6 +100,11 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 				stageIndex: 'quiz',
 				checkpointIndex: 'quiz',
 				checkpointID: enrollment.course.stages[stageIndex]?.checkpoints[checkpointIndex + 1]._id
+			}
+		} else if (stageIndex === MAX_STAGE && checkpointIndex === MAX_CHECKPOINT) {
+			obj = {
+				stageIndex: null,
+				checkpointIndex: null
 			}
 		}
 		return obj
@@ -141,7 +143,7 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 									Replay Video
 								</button>
 
-								{findNextVideo().stageIndex !== null && findNextVideo().checkpointIndex !== null && (
+								{findNextVideo().stageIndex !== null && findNextVideo().checkpointIndex !== null ? (
 									<button
 										className="z-10 rounded-lg uppercase bg-orange-400 px-6 py-2 font-semibold text-white text-2xl flex items-center justify-center gap-2"
 										onClick={() => {
@@ -164,6 +166,16 @@ export default function Content({ currentCheckpoint, enrollment, setCheckpointCo
 											size={28}
 										/>
 									</button>
+								) : (
+									<Link href={`/user/student/${user?._id}/achievements/${slug}`}>
+										<a className="z-10 rounded-lg uppercase bg-orange-400 px-6 py-2 font-semibold text-white text-2xl flex items-center justify-center gap-2">
+											Finish Course
+											<AiFillCaretRight
+												className="opacity-50"
+												size={28}
+											/>
+										</a>
+									</Link>
 								)}
 							</div>
 							<div className="-z-[1]">

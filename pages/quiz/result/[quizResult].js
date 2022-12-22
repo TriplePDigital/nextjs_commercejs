@@ -2,14 +2,16 @@ import { useSession } from 'next-auth/client'
 import { getQuizResultByIDQuery } from '@/util/getQuizResultByID'
 import Link from 'next/link'
 import { MdCheck, MdClose } from 'react-icons/md'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { useRouter } from 'next/router'
 import getter from '@/util/getter'
 import useSWR from 'swr'
 import { Loader } from '@/components/util'
+import { UserContext } from '../../_app'
 
 const QuizResult = () => {
 	const [showAlert, setShowAlert] = useState(true)
+	const { user } = useContext(UserContext)
 
 	const router = useRouter()
 
@@ -42,8 +44,8 @@ const QuizResult = () => {
 				<h2 className="text-lg font-light opacity-50">{result.checkpoint.stage.mission.title}</h2>
 			</div>
 			<div>
-				Your score: <span className={`font-bold ${result.score > result.checkpoint.type.minimumScore ? 'text-green-500' : 'text-red-500'}`}>{result.score}</span> / 100{' '}
-				<span className="text-sm text-gray-400">({(Number(result.score) / 100).toFixed(2) * 100}%)</span>
+				Your score: <span className={`font-bold ${result.score > result.checkpoint.type.minimumScore ? 'text-green-500' : 'text-red-500'}`}>{Number(result.score).toFixed(2)}</span> / 100{' '}
+				<span className="text-sm text-gray-400">({Number(result.score).toFixed(2)}%)</span>
 			</div>
 			<div className="text-sm mb-3">
 				Minimum Score to Pass: {result.checkpoint.type.minimumScore}{' '}
@@ -109,7 +111,11 @@ const QuizResult = () => {
 				<Link href={`/missions`}>
 					<a className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg px-6 py-4 w-fit">Back to Courses</a>
 				</Link>
-				{result.checkpoint.stage.checkpoints?.length !== result.checkpoint.order ? (
+				{getNextStage(result.checkpoint.stage.mission?.nextStage) === '' && getNextCheckpoint(result.checkpoint.stage?.checkpoints) === '' ? (
+					<Link href={`/user/student/${user?._id}/achievements/${result.checkpoint.stage.mission.slug}`}>
+						<a className="bg-ncrma-400 hover:bg-ncrma-600 text-white px-6 py-4 rounded-lg">Finish course</a>
+					</Link>
+				) : result.checkpoint.stage.checkpoints?.length !== result.checkpoint.order ? (
 					<Link href={`/mission/${result.checkpoint.stage.mission.slug}?checkpointID=${getNextCheckpoint(result.checkpoint.stage?.checkpoints)}`}>
 						<a className="bg-ncrma-400 hover:bg-ncrma-600 text-white px-6 py-4 rounded-lg">Proceed to next Checkpoint</a>
 					</Link>
@@ -124,23 +130,3 @@ const QuizResult = () => {
 }
 
 export default QuizResult
-
-// export async function getServerSideProps(ctx) {
-// 	const session = await getSession(ctx)
-// 	if (!session) {
-// 		return {
-// 			redirect: {
-// 				destination: `/auth/login?callbackUrl=${process.env.NEXT_PUBLIC_CALLBACK_BASE_URL}welcome`,
-// 				permanent: false
-// 			}
-// 		}
-// 	} else {
-// 		const quizResultID = ctx.query.quizResult
-// 		const result = await getQuizResultByID(quizResultID)
-// 		return {
-// 			props: {
-// 				result
-// 			}
-// 		}
-// 	}
-// }

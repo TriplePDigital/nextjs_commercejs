@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import axios from 'axios'
-import collect from '@/util/collect'
 import { client } from '@/util/config'
 import { FaCheck, FaEnvelope } from 'react-icons/fa'
 import { nanoid } from 'nanoid'
@@ -262,7 +261,10 @@ function Intro_offer({ products }) {
 					</li>
 				</ul>
 			</section>
-			<div className="md:w-1/2 w-full my-10 flex gap-0 mx-auto items-center justify-center">
+			<div className="md:w-1/2 w-full my-10 flex flex-col gap-0 mx-auto items-center justify-center">
+				<p className="mt-2 text-lg text-center text-gray-800 dark:text-gray-400 md:px-0 px-5">
+					Until 1/1/2023 save over 50% and pay the introductory offer of <span className="font-bold">$995</span>!
+				</p>
 				<form
 					className="flex flex-col w-full"
 					id="form"
@@ -355,9 +357,7 @@ function Intro_offer({ products }) {
 							</label>
 							<div id="cvv"></div>
 						</div>
-						<p className="mt-2 text-lg text-center text-gray-800 dark:text-gray-400 md:px-0 px-5">
-							Until 1/1/2023 save over 50% and pay the introductory offer of <span className="font-bold">$995</span>!
-						</p>
+						<span className="text-sm text-center">Purchases of online or downloadable products/services are final and non-refundable. You recognize and agree all sales are final with no warranties once a course is accessed.</span>
 						<button
 							className="w-1/4 block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white font-medium rounded px-2 py-3 text-base"
 							id="payButton"
