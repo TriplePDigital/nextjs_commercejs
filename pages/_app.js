@@ -8,6 +8,7 @@ import { CartContextProvider } from '../context/cartProvider'
 import Script from 'next/script'
 import { SWRConfig } from 'swr'
 import * as Sentry from '@sentry/browser'
+import { Analytics } from '@vercel/analytics/react'
 
 export const UserContext = createContext({
 	user: {},
@@ -46,6 +47,7 @@ function MyApp({ Component, pageProps }) {
 							strategy="beforeInteractive"
 						/>
 						<Layout>
+							<Analytics />
 							<Component {...pageProps} />
 							<ToastContainer
 								position="top-right"
