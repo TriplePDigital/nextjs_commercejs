@@ -1,27 +1,14 @@
-import { useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import { signIn } from 'next-auth/client'
 import { FaMagic } from 'react-icons/fa'
 import { Loader } from '@/components/util'
 import { useRouter } from 'next/router'
 import { notify } from '@/util/notification'
 
-// eslint-disable-next-line no-unused-vars
-function getCallbackUrl(email) {
-	try {
-		const urlParams = new URLSearchParams(window.location.search)
-		if (!urlParams) {
-			throw Error('Invalid callback URLs')
-		}
-		return urlParams.get('callbackUrl')
-	} catch (error) {
-		throw new Error(error)
-	}
-}
-
 function EmailForm({ onSubmit }) {
 	const [email, setEmail] = useState('')
 	const [loading, setLoading] = useState(false)
-	const router = useRouter()
+	const { query } = useRouter()
 
 	const handleSignIn = async (e) => {
 		e.preventDefault()
@@ -34,14 +21,10 @@ function EmailForm({ onSubmit }) {
 	}
 
 	useEffect(() => {
-		if(router.query.error) {
+		if (query.error) {
 			setLoading(false)
-			setEmail(router.query.email)
-			notify(
-				'error',
-				decodeURI(router.query.error),
-				'welcome-page-error'
-			)
+			setEmail(query.email[0])
+			notify('error', decodeURI(query.error[0]), 'welcome-page-error')
 		}
 	}, [])
 
@@ -79,12 +62,7 @@ function EmailForm({ onSubmit }) {
 					Sign in using magic passcode
 				</button>
 				<p className="text-sm text-gray-500 my-2">
-					You will receive a 6 digit code to your email inbox. This
-					code will act as your password and will regenerate upon
-					every login attempt.{' '}
-					<strong className="text-gray-800">
-						DO NOT SHARE THIS CODE WITH ANYONE!
-					</strong>
+					You will receive a 6 digit code to your email inbox. This code will act as your password and will regenerate upon every login attempt. <strong className="text-gray-800">DO NOT SHARE THIS CODE WITH ANYONE!</strong>
 				</p>
 			</form>
 			{/* <div className="border-t border-gray-200 flex flex-col mt-6 pt-4">
@@ -148,13 +126,5 @@ function CodeForm({ email }) {
 export default function SignIn() {
 	const [email, setEmail] = useState(null)
 
-	return (
-		<section className="w-full flex flex-col text-center h-full justify-center items-center">
-			{email ? (
-				<CodeForm email={email} />
-			) : (
-				<EmailForm onSubmit={setEmail} />
-			)}
-		</section>
-	)
+	return <section className="w-full flex flex-col text-center h-full justify-center items-center">{email ? <CodeForm email={email} /> : <EmailForm onSubmit={setEmail} />}</section>
 }
