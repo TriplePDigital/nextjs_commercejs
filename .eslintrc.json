@@ -1,5 +1,5 @@
 {
-	"extends": ["plugin:cypress/recommended"],
+	"extends": ["plugin:cypress/recommended", "next", "next/core-web-vitals"],
 	"rules": {
 		"semi": ["off"],
 		"require-await": ["error"],
