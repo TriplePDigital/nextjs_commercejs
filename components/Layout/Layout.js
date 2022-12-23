@@ -7,16 +7,22 @@ import { isActive } from '@/util/isActive'
 import React, { useEffect } from 'react'
 import AdminSidebar from '../Nav/AdminSidebar'
 import Head from 'next/head'
+import useSWR from 'swr'
+import { userSessionQuery } from '@/util/getUserFromSession'
+import getter from '@/util/getter'
 
 export default function Layout({ children }) {
 	const [session, loading] = useSession()
 	const router = useRouter()
+	const CURRENT_PATH = router.pathname
+
+	const { data: account, error: accountError } = useSWR(userSessionQuery(session?.user?.email), getter)
 
 	useEffect(() => {
 		let mounted = true
 
 		if (mounted) {
-			if (session && !loading && !router?.pathname.includes('login')) {
+			if (session && !loading && !CURRENT_PATH.includes('login')) {
 				isActive(session.user.email)
 					.then((res) => {
 						if (!res) {
@@ -28,17 +34,21 @@ export default function Layout({ children }) {
 					})
 			}
 		}
-
 		return () => {
 			mounted = false
 		}
 	}, [session, loading, router])
 
-	return loading ? (
-		<div className="w-full h-screen flex justify-center items-center text-center">
-			<Loader size={96} />
-		</div>
-	) : (
+	if (!account || loading)
+		return (
+			<div className="w-full h-screen flex justify-center items-center text-center">
+				<Loader size={96} />
+			</div>
+		)
+
+	if (accountError) console.error(accountError)
+
+	return (
 		<>
 			<Head>
 				<title>NCRM Academy</title>
