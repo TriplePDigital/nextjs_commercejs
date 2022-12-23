@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { FaTrophy } from 'react-icons/fa'
 import { client } from '@/util/config'
 import { useState } from 'react'
-import { post } from 'axios'
+import axios from 'axios'
 import { signOut } from 'next-auth/client'
 import moment from 'moment'
 import { getQuizAttemptsByStudentQuery } from '@/util/getQuizAttemptsByStudent'
@@ -15,13 +15,38 @@ import { RiskManagerMatrixReport } from '@/components/RM/RiskManagerMatrix'
 import getter from '@/util/getter'
 import { useRouter } from 'next/router'
 import edgeFetcher from '@/util/edgeFetcher'
+import { SWRResponse } from '@/types/index'
+
+type AccountInfo = {
+	_id: string
+	firstName: string
+	lastName: string
+	email: string
+	avatar: {
+		asset: {}
+	}
+	role: string
+	createdAt: string
+	updatedAt: string
+	__v: number
+	achievements: [
+		{
+			_id: string
+			title: string
+		}
+	]
+	riskManagerProfile: {
+		_id: string
+	}
+	missions: []
+}
 
 function Profile() {
 	const [tabIndex, setTabIndex] = useState(0)
 	const router = useRouter()
 	const id = router.query.id
 
-	const { data: accountData, error: accountError } = useSWR(
+	const { data: accountData, error: accountError } = useSWR<SWRResponse<AccountInfo>, Error>(
 		`
 		*[_type == 'user'  && _id == '${id}']{
 			...,
@@ -54,7 +79,7 @@ function Profile() {
 
 	const syncEdgeInstance = async () => {
 		try {
-			const res = await post(
+			const res = await axios.post(
 				`${process.env.NEXT_PUBLIC_EDGE_URL}/updateUser`,
 				{},
 				{
