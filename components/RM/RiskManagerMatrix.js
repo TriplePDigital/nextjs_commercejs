@@ -8,7 +8,6 @@ export const RiskManagerMatrixReport = ({ profile, fallbackDate = new Date() }) 
 			<div className="flex gap-2">
 				{profile?.assessmentProficiency ? (
 					Object.entries(profile.assessmentProficiency).map(([key, value], index) => {
-						console.log(value)
 						return (
 							<div
 								className="flex flex-col items-center justify-center"

@@ -2,7 +2,10 @@ import { fetcher } from './fetcher'
 import groq from 'groq'
 
 export default async function getQuizAttemptsByStudent(studentID) {
-	const query = groq`
+	return await fetcher(getQuizAttemptsByStudentQuery(studentID))
+}
+
+export const getQuizAttemptsByStudentQuery = (studentID) => groq`
   *[_type == "quizAttempt" && references("${studentID}")]{
   _id,
   score,
@@ -28,5 +31,3 @@ export default async function getQuizAttemptsByStudent(studentID) {
     }
   },
   } | order(_createdAt desc)`
-	return await fetcher(query)
-}
