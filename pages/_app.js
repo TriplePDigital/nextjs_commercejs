@@ -9,6 +9,7 @@ import Script from 'next/script'
 import { SWRConfig } from 'swr'
 import * as Sentry from '@sentry/browser'
 import { Analytics } from '@vercel/analytics/react'
+import Head from 'next/head'
 
 export const UserContext = createContext({
 	user: {},
@@ -35,6 +36,12 @@ function MyApp({ Component, pageProps }) {
 			<Provider session={pageProps.session}>
 				<UserContext.Provider value={{ user, setUser }}>
 					<CartContextProvider context={cartContextObject}>
+						<Head>
+							<meta
+								name="viewport"
+								content="width=device-width, initial-scale=1"
+							/>
+						</Head>
 						<Script
 							src="https://secure.nmi.com/token/Collect.js"
 							data-tokenization-key={process.env.NEXT_PUBLIC_NMI_COLLECT_KEY}
