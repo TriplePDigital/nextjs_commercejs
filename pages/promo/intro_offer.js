@@ -7,7 +7,6 @@ import { FaCheck, FaEnvelope } from 'react-icons/fa'
 import { nanoid } from 'nanoid'
 import { notify } from '@/util/notification'
 import { Loader } from '@/components/util'
-import { useRouter } from 'next/router'
 
 function Intro_offer({ products }) {
 	const [user, setUser] = useState({
@@ -17,7 +16,6 @@ function Intro_offer({ products }) {
 		payment_token: ''
 	})
 	const [loading, setLoading] = useState(false)
-	const router = useRouter()
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {

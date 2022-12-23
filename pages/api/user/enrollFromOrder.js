@@ -6,6 +6,10 @@ import { client } from '@/util/config'
 // takes in an email and returns either the found user or a newly created user
 const userCheck = async () => {}
 
+export const config = {
+	runtime: 'edge'
+}
+
 export default async function (req, res) {
 	if (req.method !== 'POST') {
 		res.status(405).json({ message: 'Method Not Allowed' })
