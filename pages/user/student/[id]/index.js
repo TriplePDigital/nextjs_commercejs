@@ -195,7 +195,7 @@ const QuizAttempts = ({ quizAttempts }) => {
 							</div>
 							<div className="flex flex-row">
 								<div className="font-bold">Score:</div>
-								<div className="ml-2">{attempt.score}</div>
+								<div className="ml-2">{Number(attempt.score).toFixed(2)}</div>
 							</div>
 						</div>
 						<div className="flex flex-col w-1/2">
