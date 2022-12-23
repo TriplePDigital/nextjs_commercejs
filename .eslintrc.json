@@ -26,5 +26,6 @@
 		"es6": true,
 		"cypress/globals": true
 	},
-	"plugins": ["cypress"]
+	"plugins": ["cypress", "@typescript-eslint"],
+	"parser": "@typescript-eslint/parser"
 }
