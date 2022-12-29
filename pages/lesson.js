@@ -51,19 +51,13 @@ export default function Lesson({ data, content, chapters }) {
 						// }
 					}}
 				/>
-				{currentContent.stage.data.attributes.instructors.data.map(
-					(instructor, instructorIndex) => (
-						<li key={instructorIndex}>
-							{instructor.attributes.firstName}
-						</li>
-					)
-				)}
+				{currentContent.stage.data.attributes.instructors.data.map((instructor, instructorIndex) => (
+					<li key={instructorIndex}>{instructor.attributes.firstName}</li>
+				))}
 				{/* <pre className="">
 					{JSON.stringify(currentContent, null, '\t')}
 				</pre> */}
-				<p className="leading-loose tracking-wide">
-					{currentContent.description}
-				</p>
+				<p className="leading-loose tracking-wide">{currentContent.description}</p>
 			</div>
 			<ul className="w-3/12 bg-gray-100 shadow-md border px-4 py-6 mt-6 mx-2 mr-0 rounded">
 				{mission.title}
@@ -75,9 +69,7 @@ export default function Lesson({ data, content, chapters }) {
 							className="border border-gray-400 rounded-xl p-5 bg-white shadow-inner"
 							key={chIndex}
 						>
-							<h2 className="text-lg font-semibold leading-loose">
-								{title}
-							</h2>
+							<h2 className="text-lg font-semibold leading-loose">{title}</h2>
 							<>
 								{videos.data.map((video, cntIndex) => {
 									const { duration, title } = video.attributes
@@ -87,20 +79,14 @@ export default function Lesson({ data, content, chapters }) {
 											key={cntIndex}
 										>
 											<button
-												className={`py-2 px-4 my-2 text-black rounded-lg ${
-													contentIndex ===
-														video.order_in_course &&
-													'font-bold'
-												}`}
+												className={`py-2 px-4 my-2 text-black rounded-lg ${contentIndex === video.order_in_course && 'font-bold'}`}
 												onClick={() => {
 													setstageIndex(cntIndex)
 												}}
 											>
 												{title}
 											</button>
-											<span className="text-sm text-gray-500">
-												{`${duration || '0'}:00`}
-											</span>
+											<span className="text-sm text-gray-500">{`${duration || '0'}:00`}</span>
 										</div>
 									)
 								})}
@@ -182,13 +168,9 @@ export async function getServerSideProps(pageContext) {
 
 		const res = await get(`http://localhost:1337/api/missions?${q}`)
 
-		const contentResults = await get(
-			`http://localhost:1337/api/videos?${query}`
-		)
+		const contentResults = await get(`http://localhost:1337/api/videos?${query}`)
 
-		const chapterResults = await get(
-			`http://localhost:1337/api/stages?${qr}`
-		)
+		const chapterResults = await get(`http://localhost:1337/api/stages?${qr}`)
 
 		const course = res.data.data[0]
 
