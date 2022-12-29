@@ -10,7 +10,8 @@
 		"format": "prettier -w '**/*.{js,jsx,ts,tsx}'",
 		"format:watch": "npx onchange \"**/*.{js,jsx,ts,tsx}\" -- prettier --write --ignore-unknown {{changed}}",
 		"test": "cypress run",
-		"test:ui": "cypress open"
+		"test:ui": "cypress open",
+		"test:cov": "npx nyc report --reporter=lcov"
 	},
 	"dependencies": {
 		"@sanity/client": "^2.21.10",
@@ -59,12 +60,12 @@
 		"@types/axios": "^0.14.0",
 		"@types/papaparse": "^5.3.2",
 		"@types/react": "17.0.2",
-		"@typescript-eslint/eslint-plugin": "^5.47.0",
-		"@typescript-eslint/parser": "^5.47.0",
+		"@typescript-eslint/eslint-plugin": "^5.47.1",
+		"@typescript-eslint/parser": "^5.47.1",
 		"autoprefixer": "^10.4.0",
 		"babel-plugin-istanbul": "^6.1.1",
 		"cypress": "^10.6.0",
-		"eslint": "7",
+		"eslint": "^8.30.0",
 		"eslint-config-next": "12.0.3",
 		"eslint-plugin-cypress": "^2.12.1",
 		"postcss": "^8.3.11",
