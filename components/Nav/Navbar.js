@@ -45,10 +45,10 @@ export default function Navbar() {
 						href={`/`}
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
-						<a>Home</a>
+						<a>Browse</a>
 					</ActiveLink>
 					<ActiveLink
-						href={`/my-learning`}
+						href={`/enrollments`}
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
 						<a>My Learning</a>
@@ -58,6 +58,12 @@ export default function Navbar() {
 						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
 					>
 						<a>Courses</a>
+					</ActiveLink>
+					<ActiveLink
+						href={`/certificates`}
+						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
+					>
+						<a>Certificates</a>
 					</ActiveLink>
 					{/*<ActiveLink*/}
 					{/*	href={`/memberships`}*/}
