@@ -2,7 +2,7 @@ import { FaCheck, FaEnvelope } from 'react-icons/fa'
 import React, { useState } from 'react'
 import { GrClose } from 'react-icons/gr'
 import { Loader } from '@/components/util'
-import { injectCollectJS } from '../../pages/memberships'
+import { injectCollectJS } from '@/util/createCollect'
 
 const PriceCard = ({ title, description, price, benefits, sku, selected, handleSelect, setShowOverlay }) => {
 	const [showPurchaseModal, setShowPurchaseModal] = useState(false)
@@ -192,7 +192,7 @@ const PriceCard = ({ title, description, price, benefits, sku, selected, handleS
 						</div>
 						<div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
 							<button
-								className="w-1/2 mx-auto block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white font-medium rounded px-2 py-3 text-base"
+								className="cursor-pointer w-1/2 mx-auto block bg-transparent border-2 border-ncrma-400 hover:bg-ncrma-400 text-back hover:text-white font-medium rounded px-2 py-3 text-base"
 								id="payButton"
 								onClick={() => setLoading(true)}
 							>
