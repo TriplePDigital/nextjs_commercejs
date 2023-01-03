@@ -49,7 +49,7 @@ const PriceCard = ({ title, description, price, benefits, sku, selected, handleS
 						sku,
 						price
 					})
-					injectCollectJS(price)
+					injectCollectJS(price, '/api/purchase/membership')
 					setShowOverlay(true)
 				}}
 			>

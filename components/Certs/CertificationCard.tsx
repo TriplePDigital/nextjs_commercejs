@@ -2,6 +2,7 @@ import React from 'react'
 import { FaCheck } from 'react-icons/fa'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
+import Anchor from '@/components/util/Anchor'
 
 function CertificationCard({ certificate }) {
 	return (
@@ -21,8 +22,8 @@ function CertificationCard({ certificate }) {
 					</p>
 				</div>
 			</div>
-			<div className="w-full lg:w-1/2 h-full flex items-center">
-				<ul className="">
+			<div className="w-full lg:w-1/2 h-full flex items-center justify-between">
+				<ul className="lg:w-2/3 w-full">
 					{certificate.missions
 						? certificate.missions.map((mission, missionIndex) => (
 								<li
@@ -33,8 +34,11 @@ function CertificationCard({ certificate }) {
 									<p className="text-sm">{mission.title}</p>
 								</li>
 						  ))
-						: []}
+						: null}
 				</ul>
+				<div className="lg:w-1/3 w-full">
+					<Anchor href={`/certificates/${certificate.slug.current}`}>Learn More</Anchor>
+				</div>
 			</div>
 		</div>
 	)

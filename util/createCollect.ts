@@ -12,10 +12,10 @@ interface Product {
 	sku: string
 }
 
-const finishSubmit = (token: string, user: User, product: Product) => {
+const finishSubmit = (token: string, user: User, product: Product, endpoint: string) => {
 	const { firstName, lastName, email } = user
 	return axios
-		.post('/api/purchase/membership', {
+		.post(`${endpoint}`, {
 			firstName,
 			lastName,
 			email,
@@ -34,7 +34,7 @@ const finishSubmit = (token: string, user: User, product: Product) => {
 		})
 }
 
-export const injectCollectJS = (price) => {
+export const injectCollectJS = (price: string, endpoint: string) => {
 	// @ts-ignore
 	window.CollectJS.configure({
 		variant: 'inline',
@@ -98,7 +98,8 @@ export const injectCollectJS = (price) => {
 					lastName: form['last_name'].value,
 					email: form['email'].value
 				},
-				{ price: form['price'].value, sku: form['sku'].value }
+				{ price: form['price'].value, sku: form['sku'].value },
+				endpoint
 			)
 			Promise.resolve(res).then((res) => {
 				if (res) {
