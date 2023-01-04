@@ -11,5 +11,5 @@ export type Certificate = {
 	description: string
 	price: number
 	missions: Mission[]
-	slugs: Slug
+	slug: Slug
 }

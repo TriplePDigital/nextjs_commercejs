@@ -5,6 +5,8 @@ import getter from '@/util/getter'
 import groq from 'groq'
 import { Loader } from '@/components/util'
 import PriceCard from '@/components/Membership/PriceCard'
+import { SWRResponse } from '@/types/index'
+import { Membership } from '@/types/schema/membership'
 
 const MembershipPage = () => {
 	const [product, setProduct] = useState({
@@ -17,7 +19,7 @@ const MembershipPage = () => {
 	const membershipQuery = groq`
 		*[_type == "membership"]
 	`
-	const { data, error } = useSWR(membershipQuery, getter)
+	const { data, error } = useSWR<SWRResponse<Membership[]>>(membershipQuery, getter)
 
 	if (!data) return <Loader />
 	if (error) console.error(error)

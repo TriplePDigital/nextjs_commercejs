@@ -37,7 +37,12 @@ function CertificationCard({ certificate }) {
 						: null}
 				</ul>
 				<div className="lg:w-1/3 w-full">
-					<Anchor href={`/certificates/${certificate.slug.current}`}>Learn More</Anchor>
+					<Anchor
+						href={`/certificates/${certificate.slug.current}`}
+						variant="button"
+					>
+						Learn More
+					</Anchor>
 				</div>
 			</div>
 		</div>

@@ -1,40 +1,22 @@
 import { signIn, signOut, useSession } from 'next-auth/client'
 import ActiveLink from './ActiveLink'
 import { RiShutDownLine } from 'react-icons/ri'
-import { useContext, useEffect, useState } from 'react'
-import { cartContextObject, UserContext } from '../../pages/_app'
+import { useContext, useState } from 'react'
+import { cartContextObject, userContextObject } from '../../pages/_app'
 import { BsAwardFill, BsCaretDownFill, BsCaretUpFill, BsFillPersonFill, BsGearFill } from 'react-icons/bs'
 import Link from 'next/link'
-import getUserFromSession from '@/util/getUserFromSession'
 import { BiCart } from 'react-icons/bi'
 
 export default function Navbar() {
 	const [session, loading] = useSession()
 	const [toggleDropdown, setToggleDropdown] = useState(false)
-	const { setUser, user } = useContext(UserContext)
-
 	const ctx = useContext(cartContextObject)
-
-	const getUser = () => {
-		getUserFromSession(session.user.email)
-			.then((usr) => {
-				setUser(usr)
-			})
-			.catch((err) => {
-				throw Error(err)
-			})
-	}
-
-	useEffect(() => {
-		if (session) getUser()
-	}, [session])
-
-	let rex = /([A-Z])([A-Z])([a-z])|([a-z])([A-Z])/g
+	const { user } = useContext(userContextObject)
 
 	return loading ? null : (
 		<nav className={`w-full h-16 border-b border-gray-200 px-10`}>
 			<ul className={`flex flex-row justify-between items-center h-full`}>
-				<div className="flex flex-row justify-around lg:justify-start gap-5 items-center h-full lg:w-1/3 w-1/2 text-gray-500 font-semibold">
+				<div className="flex flex-row justify-around lg:justify-start gap-5 items-center h-full lg:w-2/3 w-1/2 text-gray-500 font-semibold">
 					<span
 						className="font-bold text-white bg-slate-500 px-2 py-2 rounded"
 						title="The current release of this application is still under active development. If you experience any issues with the application, please let one of our associates know."
@@ -65,12 +47,12 @@ export default function Navbar() {
 					>
 						<a>Certificates</a>
 					</ActiveLink>
-					{/*<ActiveLink*/}
-					{/*	href={`/memberships`}*/}
-					{/*	activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"*/}
-					{/*>*/}
-					{/*	<a>Memberships</a>*/}
-					{/*</ActiveLink>*/}
+					<ActiveLink
+						href={`/memberships`}
+						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
+					>
+						<a>Memberships</a>
+					</ActiveLink>
 					{user?.role === 'admin' ||
 						(user?.role === 'riskManager' && (
 							<ActiveLink
@@ -80,14 +62,8 @@ export default function Navbar() {
 								<a>Member Management</a>
 							</ActiveLink>
 						))}
-					{/* <ActiveLink
-						href={`/certs`}
-						activeClassName="font-bold underline underline-offset-8 decoration-4 text-black"
-					>
-						<a>Certificates</a>
-					</ActiveLink> */}
 				</div>
-				<div className="lg:w-2/3 w-1/2 flex justify-end">
+				<div className="lg:w-1/3 w-1/2 flex justify-end">
 					{!session ? (
 						<>
 							<Link
@@ -130,7 +106,7 @@ export default function Navbar() {
 									<BsFillPersonFill size={30} />
 								</div>
 
-								<span className={`inline-block capitalize mr-2 font-semibold leading-loose tracking-wide`}>{user?.firstName.toLowerCase()}</span>
+								<span className={`inline-block capitalize mr-2 font-semibold leading-loose tracking-wide`}>{user?.firstName?.toLowerCase()}</span>
 								{toggleDropdown ? (
 									<ol className="absolute w-full h-fit top-full left-0 bg-gray-100 rounded shadow-md border text-left flex flex-col gap-1 z-50">
 										<button onClick={() => alert('Purchase membership to access exclusive features')}>
@@ -138,7 +114,7 @@ export default function Navbar() {
 												<span className="opacity-50">
 													<BsAwardFill />
 												</span>
-												{user?.membership ? user?.membership.replace(rex, '$1$4 $2$3$5') : 'Become a Member'}
+												{user?.membershipType ? user?.membershipType.name : 'Become a Member'}
 											</li>
 										</button>
 										<Link
