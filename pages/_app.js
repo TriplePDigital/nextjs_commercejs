@@ -2,7 +2,7 @@ import 'tailwindcss/tailwind.css'
 import 'react-toastify/dist/ReactToastify.css'
 import { Provider } from 'next-auth/client'
 import { Layout } from '../components/Layout'
-import React, { createContext, useState } from 'react'
+import React, { createContext, useContext } from 'react'
 import { ToastContainer } from 'react-toastify'
 import { CartContextProvider } from '../context/cartProvider'
 import Script from 'next/script'
@@ -10,11 +10,7 @@ import { SWRConfig } from 'swr'
 import * as Sentry from '@sentry/browser'
 import { Analytics } from '@vercel/analytics/react'
 import Head from 'next/head'
-
-export const UserContext = createContext({
-	user: {},
-	setUser: () => {}
-})
+import { UserContextProvider } from '../context/user'
 
 const defaultContext = {
 	cart: [],
@@ -22,19 +18,29 @@ const defaultContext = {
 	removeProductFromCart: () => {}
 }
 
+const defaultUserContext = {
+	user: null,
+	setUser: () => {}
+}
+
 export function CreateCartContext() {
 	return createContext(defaultContext)
 }
 
+export function CreateUserContext() {
+	return createContext(defaultUserContext)
+}
+
 export const cartContextObject = CreateCartContext()
+export const userContextObject = CreateUserContext()
 
 function MyApp({ Component, pageProps }) {
-	const [user, setUser] = useState(null)
+	const { user } = useContext(userContextObject)
 	Sentry.setUser({ email: user?.email || '' })
 	return (
 		<SWRConfig refetchInterval={10000}>
 			<Provider session={pageProps.session}>
-				<UserContext.Provider value={{ user, setUser }}>
+				<UserContextProvider context={userContextObject}>
 					<CartContextProvider context={cartContextObject}>
 						<Head>
 							<meta
@@ -68,7 +74,7 @@ function MyApp({ Component, pageProps }) {
 							/>
 						</Layout>
 					</CartContextProvider>
-				</UserContext.Provider>
+				</UserContextProvider>
 			</Provider>
 		</SWRConfig>
 	)
