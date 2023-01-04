@@ -10,7 +10,7 @@ import mdConfig from '@/util/md'
 import { useRouter } from 'next/router'
 import { Loader } from '../util'
 import { useNextSanityImage } from 'next-sanity-image'
-import { UserContext } from '../../pages/_app'
+import { userContextObject } from '../../pages/_app'
 
 // TODO: https://cdn.dribbble.com/users/1008889/screenshots/17247195/media/e8e6ae59a1569f0b3370c1c2d4a29ba0.png
 
@@ -29,7 +29,7 @@ const getCheckpointProgress = async (checkpointID, enrollmentID) => {
 }
 
 export default function Content({ currentCheckpoint, enrollment, setCheckpointContext, setStageContext }) {
-	const { user } = useContext(UserContext)
+	const { user } = useContext(userContextObject)
 	const videoRef = useRef(null)
 	const [videoEnded, setVideoEnded] = useState(false)
 	const [loading, setLoading] = useState(true)

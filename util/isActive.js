@@ -6,7 +6,7 @@ export const isActive = async (sessionEmail) => {
 		if (!userCheck) {
 			return false
 		} else {
-			return userCheck.active ? true : false
+			return !!userCheck.active
 		}
 	} catch (error) {
 		throw new Error(error)

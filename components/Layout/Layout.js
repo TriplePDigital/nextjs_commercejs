@@ -4,18 +4,19 @@ import { useSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import Loader from 'react-spinners/ClipLoader'
 import { isActive } from '@/util/isActive'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import AdminSidebar from '../Nav/AdminSidebar'
 import Head from 'next/head'
 import useSWR from 'swr'
 import { userSessionQuery } from '@/util/getUserFromSession'
 import getter from '@/util/getter'
+import { userContextObject } from '../../pages/_app'
 
 export default function Layout({ children }) {
 	const [session, loading] = useSession()
 	const router = useRouter()
 	const CURRENT_PATH = router.pathname
-
+	const { user, setUser } = useContext(userContextObject)
 	const { data: account, error: accountError } = useSWR(userSessionQuery(session?.user?.email), getter)
 
 	useEffect(() => {
@@ -28,6 +29,7 @@ export default function Layout({ children }) {
 						if (!res) {
 							router.push(`/auth/welcome?email=${session?.user?.email}`)
 						}
+						setUser((prev) => ({ ...prev, ...account?.result }))
 					})
 					.catch((err) => {
 						throw new Error(err)

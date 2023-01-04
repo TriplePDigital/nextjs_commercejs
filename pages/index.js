@@ -1,9 +1,9 @@
 // import Head from 'next/head'
-import { useSession, signIn } from 'next-auth/client'
+import { signIn, useSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import { Loader } from '@/components/util'
 
-export default function Home({}) {
+export default function Home() {
 	const [session, loading] = useSession()
 
 	const router = useRouter()

@@ -130,5 +130,4 @@ const options = {
 	debug: process.env.NODE_ENV !== 'production'
 }
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default (req, res) => NextAuth(req, res, options)

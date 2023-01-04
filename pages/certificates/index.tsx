@@ -2,7 +2,7 @@ import React from 'react'
 import useSWR from 'swr'
 import getter from '@/util/getter'
 import CertificationCard from '@/components/Certs/CertificationCard'
-import { Loader } from '@/components/util'
+import Loader from '@/components/util/Loader'
 
 function CertificatesPage() {
 	const { data: certificates, error: certificatesError } = useSWR(`*[_type=="certification"]{...,missions[]->{...}}`, getter)

@@ -188,11 +188,11 @@ export default async function (req, res) {
 
 				console.log(`includes membership sku?: ${membs.includes(sku)}`)
 
+				const membership = await client.fetch(`*[_type == 'membership' && sku == '${sku}'][0]`)
+				const user = await client.fetch(`*[_type == 'user' && email == '${email.toLowerCase().trim()}'][0]`)
+				const course = await client.fetch(`*[_type == 'mission' && sku == '${sku}'][0]`)
 				switch (membs.includes(sku)) {
 					case true:
-						const membership = await client.fetch(`*[_type == 'membership' && sku == '${sku}'][0]`)
-						const user = await client.fetch(`*[_type == 'user' && email == '${email.toLowerCase().trim()}'][0]`)
-
 						if (user) {
 							await client
 								.patch(user._id)
@@ -231,12 +231,8 @@ export default async function (req, res) {
 						}
 						break
 					case false:
-						const course = await client.fetch(`*[_type == 'mission' && sku == '${sku}'][0]`)
-
-						const userCheck = await client.fetch(`*[_type == 'user' && email == '${email.toLowerCase().trim()}']`)
-
-						if (userCheck.length > 0) {
-							const existingUser = userCheck[0]
+						if (user) {
+							const existingUser = user
 							const existingEnrollments = await client.fetch(`*[_type == 'enrollment' && student._ref == '${existingUser._id}']{..., course->{...}}`)
 
 							for (const enrollment of existingEnrollments) {

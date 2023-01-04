@@ -7,11 +7,11 @@ import { useRouter } from 'next/router'
 import getter from '@/util/getter'
 import useSWR from 'swr'
 import { Loader } from '@/components/util'
-import { UserContext } from '../../_app'
+import { userContextObject } from '../../_app'
 
 const QuizResult = () => {
 	const [showAlert, setShowAlert] = useState(true)
-	const { user } = useContext(UserContext)
+	const { user } = useContext(userContextObject)
 
 	const router = useRouter()
 
