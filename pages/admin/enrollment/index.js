@@ -51,6 +51,7 @@ function EnrollmentReportPage({ enrollments, latestEnrollments, tabIndex }) {
 						.catch((err) => {
 							throw new Error(err)
 						})
+					break
 				default:
 					break
 			}

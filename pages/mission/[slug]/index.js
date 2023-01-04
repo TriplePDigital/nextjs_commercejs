@@ -7,9 +7,9 @@ import { getEnrollmentByStudentIDandCourseIDQuery } from '@/util/getEnrollmentBy
 import Content from '@/components/Course/Content'
 import { TakeQuiz } from '@/components/Course/TakeQuiz'
 import Landing from '@/components/Course/Landing'
-import { UserContext } from '../../_app'
 import getter from '@/util/getter'
 import useSWR from 'swr'
+import { userContextObject } from '../../_app'
 
 // const getLatestProgress = (stages) => {
 // 	let progress = []
@@ -21,11 +21,11 @@ import useSWR from 'swr'
 // 	return progress
 // }
 
-function MissionSlug({}) {
+function MissionSlug() {
 	// const stageProgress = getLatestProgress(mission.stages)
 	// const max = Math.max(...stageProgress)
 	// const indexOfMax = stageProgress.indexOf(max)
-	const { user } = useContext(UserContext)
+	const { user } = useContext(userContextObject)
 
 	const router = useRouter()
 	const slug = router.query.slug

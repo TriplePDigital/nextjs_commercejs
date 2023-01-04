@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Loader } from '../util'
 
 export default function Questions({ data }) {
@@ -23,7 +23,7 @@ export default function Questions({ data }) {
 	}, [data, currentQuestionIndex])
 
 	const checkIfQuestionsInState = (id) => {
-		const flag = null
+		let flag = null
 		questions.forEach((q) => {
 			if (q.questionID === id) {
 				flag = true
@@ -51,7 +51,7 @@ export default function Questions({ data }) {
 							answer
 						}
 						if (questions.length !== 0) {
-							const flag = null
+							let flag = null
 							questions.forEach((q) => {
 								if (q.questionID === questionID) {
 									flag = true
@@ -118,8 +118,6 @@ export default function Questions({ data }) {
 								questions.forEach((question) => {
 									if (question.questionID === response.questionID) {
 										question.answer = response.answer
-									} else {
-										return
 									}
 								})
 							} else {

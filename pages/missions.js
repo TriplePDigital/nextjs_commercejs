@@ -1,17 +1,17 @@
 import { Loader } from '../components/util'
 import { ListOfCourses } from '../components/Courses'
 import { useContext } from 'react'
-import { UserContext } from './_app'
 import { useSession } from 'next-auth/client'
 import { enrollmentQuery } from '@/util/getEnrollmentByStudentID'
 import { trackQuery } from '@/util/getTracks'
 import useSWR from 'swr'
 import getter from '@/util/getter'
 import { webinarQuery } from '@/util/getWebinar'
+import { userContextObject } from './_app'
 
-export default function Course({}) {
+export default function Course() {
 	/* pulling user's context from _app */
-	const { user } = useContext(UserContext)
+	const { user } = useContext(userContextObject)
 	const [session, loading] = useSession()
 
 	const { data: webinar, error: webinarError } = useSWR(webinarQuery, getter)
