@@ -14,6 +14,7 @@
 		"test:cov": "npx nyc report --reporter=lcov"
 	},
 	"dependencies": {
+		"@novu/node": "^0.10.1",
 		"@sanity/client": "^2.21.10",
 		"@sanity/image-url": "^1.0.1",
 		"@sentry/browser": "7.3.0",
