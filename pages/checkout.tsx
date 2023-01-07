@@ -5,12 +5,10 @@ import Button from '@/components/util/Button'
 import { injectCollectJS } from '@/util/createCollect'
 import getter from '@/util/getter'
 import useSWR from 'swr'
-import { Certificate } from '@/types/schema/certificate'
+import { Certification, Membership, Mission, SanityKeyedReference } from '@/types/schema'
 import { SWRResponse } from '@/types/index'
 import Anchor from '@/components/util/Anchor'
 import { userContextObject } from './_app'
-import { Membership } from '@/types/schema/membership'
-import { Mission } from '@/types/schema/mission'
 
 const CheckoutPage: React.FC = () => {
 	const router = useRouter()
@@ -23,7 +21,7 @@ const CheckoutPage: React.FC = () => {
 
 	const { type, price, sku, discount }: { type?: string; price?: string; sku?: string; discount?: number } = router.query
 
-	const { data: certificate, error: certificateError } = useSWR<SWRResponse<Certificate>>(`*[_type=="certification" && sku=="${sku}"]{...,missions[]->{...}}[0]`, getter)
+	const { data: certificate, error: certificateError } = useSWR<SWRResponse<Certification>>(`*[_type=="certification" && sku=="${sku}"]{...,missions[]->{...}}[0]`, getter)
 
 	const { data: membership, error: membershipError } = useSWR<SWRResponse<Membership>>(`*[_type=="membership" && sku=="${sku}"]{...}[0]`, getter)
 
@@ -181,12 +179,12 @@ type CheckoutDetailsProps = {
 	productType: string
 	name: string
 	description: string
-	extras: string[] | Mission[]
+	extras: Array<Mission> | Array<string> | Array<SanityKeyedReference<Mission>>
 }
 
 const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ name, link, description, extras, productType, price }) => {
 	return (
-		<div className="w-full flex flex-col">
+		<div className="w-full flex flex-col h-full">
 			<h2 className="text-xl mb-3">Order details:</h2>
 			<Anchor
 				href={`/certificates/${link}`}
@@ -199,13 +197,14 @@ const CheckoutDetails: React.FC<CheckoutDetailsProps> = ({ name, link, descripti
 			<p className="text-sm mb-3">{description}</p>
 			<h3 className="font-medium">Included {productType === 'certification' ? 'courses' : 'benefits'}:</h3>
 			<ul className="list-disc ml-6">
-				{extras.map((mission, missionIndex) => {
+				{extras.map((mission: string | Mission | SanityKeyedReference<Mission>, missionIndex) => {
 					return (
 						<li
 							className="text-sm"
 							key={missionIndex}
 						>
-							{typeof mission === 'string' ? mission : mission.title}
+							{typeof mission === 'string' && mission}
+							{typeof mission === 'object' && 'title' in mission && mission.title}
 						</li>
 					)
 				})}

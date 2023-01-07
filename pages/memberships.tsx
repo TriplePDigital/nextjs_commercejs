@@ -6,7 +6,7 @@ import groq from 'groq'
 import { Loader } from '@/components/util'
 import PriceCard from '@/components/Membership/PriceCard'
 import { SWRResponse } from '@/types/index'
-import { Membership } from '@/types/schema/membership'
+import { Membership } from '@/types/schema'
 
 const MembershipPage = () => {
 	const [product, setProduct] = useState({

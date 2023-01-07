@@ -1,5 +1,6 @@
 import axios from 'axios'
 import xml2js from 'xml2js'
+import createReceiptResponse from '../util/createReceiptResponse'
 
 export default async function (req, res) {
 	if (req.method !== 'GET') {
@@ -21,15 +22,9 @@ export default async function (req, res) {
 		} else {
 			const data = transaction[0]
 
-			const response = {
-				transaction_id: data.transaction_id[0],
-				amount: data.action[0].amount[0],
-				product: data.product,
-				email: data.email[0],
-				name: `${data.first_name[0]} ${data.last_name[0]}`,
-				description: data.order_description[0]
-			}
-			res.status(200).json({ message: 'Transaction found', transaction: response })
+			const receipt = createReceiptResponse(data)
+
+			res.status(200).json({ message: receipt.message, transaction: receipt })
 		}
 	}
 }

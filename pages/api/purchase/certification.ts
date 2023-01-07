@@ -1,8 +1,9 @@
 import axios from 'axios'
 import getUserOrCreate from '../util/user'
 import { client } from '@/util/config'
-import { Certificate } from '@/types/schema/certificate'
-import { Mission } from '@/types/schema/mission'
+import { Certification, Enrollment, Mission } from '@/types/schema'
+import createResponse from '../util/createResponse'
+import { SanityKeyedReference } from 'sanity-codegen'
 
 export const config = {
 	runtime: 'edge'
@@ -19,9 +20,17 @@ export default async function purchaseMembership(req, res) {
 			const user = await getUserOrCreate(email, firstName, lastName)
 
 			// get the membership product
-			const certificate: Certificate = await client.fetch(`*[_type == 'certification' && sku == '${sku}']{...,missions[]->}[0]`)
+			const certificate: Certification = await client.fetch(`*[_type == 'certification' && sku == '${sku}']{...,missions[]->}[0]`)
 
-			const missions: Mission[] = certificate.missions.map((mission) => mission)
+			const missions: Array<SanityKeyedReference<Mission>> = certificate.missions.map((mission) => mission)
+
+			const missionIDs: string[] = []
+
+			missions.forEach((mission) => {
+				if ('_id' in mission) {
+					missionIDs.push(mission._id as string)
+				}
+			})
 
 			// complete the purchase of the membership
 			const url = `https://secure.networkmerchants.com/api/transact.php`
@@ -35,38 +44,41 @@ export default async function purchaseMembership(req, res) {
 					first_name: firstName,
 					last_name: lastName,
 					email,
-					order_description: `${certificate.title} certificate bundle, including courses (${missions.map((mission) => mission.title)}).`,
+					order_description: `${certificate.title} certificate bundle, including courses (${missions.map((mission) => ('title' in mission ? mission.title : ''))}).`,
 					security_key: process.env.NMI_SECRET_KEY,
 					customer_receipt: true
 				}
 			})
 
-			// update the user with the new membership
+			const isAlreadyEnrolled: Enrollment[] = await client.fetch(`*[_type == 'enrollment' && user._ref == '${user._id}']`)
 
-			// await client
-			// 	.patch(user._id)
-			// 	.set({
-			// 		membershipType: {
-			// 			_type: 'reference',
-			// 			_ref: membership._id
-			// 		}
-			// 	})
-			// 	.commit()
+			// enroll the user in the courses
+			for (const missionID of missionIDs) {
+				if (!isAlreadyEnrolled.some((enrollment) => enrollment?.course?._ref === missionID)) {
+					await client.create({
+						_type: 'enrollment',
+						course: {
+							_type: 'reference',
+							_ref: missionID
+						},
+						student: {
+							_type: 'reference',
+							_ref: user._id
+						}
+					})
+				} else {
+					console.log(`already enrolled in ${missionID}`)
+				}
+			}
 
 			// return the response
-			const response = data.split('&')
-			const responseCode = response[8].split('=')[1]
-			const responseMsg = response[1].split('=')[1]
-			const responseID = response[3].split('=')[1]
-			if (Number(responseCode) === 300) {
-				return res.status(400).json({ message: `Payment failed due to ${responseMsg}` })
+			const response = createResponse(data)
+
+			if (response.error) {
+				return res.status(400).json({ message: response.error })
+			} else {
+				return res.status(200).json({ message: 'Order created', payload: response })
 			}
-			const payload = {
-				transactionID: responseID,
-				code: responseCode,
-				message: responseMsg
-			}
-			return res.status(200).json({ message: 'Order created', payload })
 		} catch (e) {
 			console.error(e)
 			return res.status(500).json({ message: e.message })
