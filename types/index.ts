@@ -3,8 +3,3 @@ export type SWRResponse<T> = {
 	ms: number
 	query: string
 }
-
-export type Slug = {
-	current: string
-	_type: 'slug'
-}
