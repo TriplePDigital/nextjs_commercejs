@@ -75,7 +75,7 @@ export default async function purchaseMembership(req, res) {
 			const response = createResponse(data)
 
 			if (response.error) {
-				return res.status(400).json({ message: response.error })
+				return res.status(400).json({ error: response.error, message: response.message })
 			} else {
 				return res.status(200).json({ message: 'Order created', payload: response })
 			}

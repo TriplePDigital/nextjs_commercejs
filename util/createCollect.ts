@@ -12,7 +12,8 @@ interface Product {
 	sku: string
 }
 
-const finishSubmit = (token: string, user: User, product: Product, endpoint: string) => {
+export const finishSubmit = (token: string, user: User, product: Product, endpoint: string) => {
+	console.log({ token, user, product, endpoint })
 	const { firstName, lastName, email } = user
 	return axios
 		.post(`${endpoint}`, {
@@ -25,7 +26,7 @@ const finishSubmit = (token: string, user: User, product: Product, endpoint: str
 		})
 		.then((res) => {
 			console.log(res)
-			notify('success', 'Order successfully placed!')
+			notify('success', 'Order successfully placed!', '1')
 			return res.data.payload.transactionID
 		})
 		.catch((err) => {
@@ -40,47 +41,6 @@ export const injectCollectJS = (price: string, endpoint: string) => {
 		variant: 'inline',
 		paymentType: 'cc',
 		price: price,
-		currency: 'USD',
-		country: 'US',
-		styleSniffer: 'true',
-		fields: {
-			ccnumber: {
-				selector: '#ccnumber',
-				title: 'Card Number',
-				placeholder: '0000 0000 0000 0000'
-			},
-			ccexp: {
-				selector: '#ccexp',
-				title: 'Card Expiration',
-				placeholder: '00 / 00'
-			},
-			cvv: {
-				display: 'show',
-				selector: '#cvv',
-				title: 'CVV Code',
-				placeholder: '***'
-			}
-		},
-		customCss: {
-			border: '0px',
-			'background-color': 'rgb(250 250 250)'
-		},
-		invalidCss: {
-			color: 'red',
-			'background-color': '#f78e83'
-		},
-		validCss: {
-			color: 'green',
-			'background-color': '#d0ffd0'
-		},
-		focusCss: {
-			color: 'black',
-			'background-color': 'rgb(220 220 220)'
-		},
-		placeholderCss: {
-			color: 'black',
-			'background-color': 'rgb(220 220 220)'
-		},
 		validationCallback: function (field, status, message) {
 			if (status) {
 				notify('success', message, field)
@@ -108,4 +68,69 @@ export const injectCollectJS = (price: string, endpoint: string) => {
 			})
 		}
 	})
+}
+
+export default function injectCollect(collectJsUrl, tokenizationKey) {
+	try {
+		const script = document.createElement('script')
+
+		script.setAttribute('src', collectJsUrl)
+		script.setAttribute('data-tokenization-key', tokenizationKey)
+		script.setAttribute('data-variant', 'inline')
+
+		document.querySelector('body').appendChild(script)
+
+		return new Promise((resolve, reject) => {
+			script.onload = function () {
+				// @ts-ignore
+				resolve(window.CollectJS)
+			}
+		})
+	} catch (e) {
+		console.error(e)
+	}
+}
+
+export const collectConfig = {
+	currency: 'USD',
+	country: 'US',
+	styleSniffer: 'true',
+	fields: {
+		ccnumber: {
+			selector: '#ccnumber',
+			title: 'Card Number',
+			placeholder: '0000 0000 0000 0000'
+		},
+		ccexp: {
+			selector: '#ccexp',
+			title: 'Card Expiration',
+			placeholder: '00 / 00'
+		},
+		cvv: {
+			display: 'show',
+			selector: '#cvv',
+			title: 'CVV Code',
+			placeholder: '***'
+		}
+	},
+	customCss: {
+		border: '0px',
+		'background-color': 'rgb(250 250 250)'
+	},
+	invalidCss: {
+		color: 'red',
+		'background-color': '#f78e83'
+	},
+	validCss: {
+		color: 'green',
+		'background-color': '#d0ffd0'
+	},
+	focusCss: {
+		color: 'black',
+		'background-color': 'rgb(220 220 220)'
+	},
+	placeholderCss: {
+		color: 'black',
+		'background-color': 'rgb(220 220 220)'
+	}
 }

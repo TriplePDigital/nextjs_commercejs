@@ -92,7 +92,7 @@ function Profile() {
 				}
 			)
 			if (res.status === 200) {
-				notify('success', 'User profile updated successfully')
+				notify('success', 'User profile updated successfully', '1')
 			}
 			return res
 		} catch (error) {

@@ -1,20 +1,20 @@
 import type {
+	SanityReference,
+	SanityKeyedReference,
 	SanityAsset,
-	SanityBlock,
-	SanityDocument,
+	SanityImage,
 	SanityFile,
 	SanityGeoPoint,
-	SanityImage,
-	SanityImageAsset,
+	SanityBlock,
+	SanityDocument,
 	SanityImageCrop,
-	SanityImageDimensions,
 	SanityImageHotspot,
-	SanityImageMetadata,
-	SanityImagePalette,
-	SanityImagePaletteSwatch,
 	SanityKeyed,
-	SanityKeyedReference,
-	SanityReference
+	SanityImageAsset,
+	SanityImageMetadata,
+	SanityImageDimensions,
+	SanityImagePalette,
+	SanityImagePaletteSwatch
 } from 'sanity-codegen'
 
 export type {
@@ -100,28 +100,28 @@ export interface Mission extends SanityDocument {
 	 *
 	 *
 	 */
-	title?: string
+	title: string
 
 	/**
 	 * Slug — `slug`
 	 *
 	 *
 	 */
-	slug?: { _type: 'slug'; current: string }
+	slug: { _type: 'slug'; current: string }
 
 	/**
 	 * Course Blurb — `text`
 	 *
 	 * One liner about the course
 	 */
-	blurb?: string
+	blurb: string
 
 	/**
 	 * Description — `markdown`
 	 *
 	 *
 	 */
-	description?: Markdown
+	description: Markdown
 
 	/**
 	 * Cover Image — `image`
@@ -140,14 +140,14 @@ export interface Mission extends SanityDocument {
 	 *
 	 *
 	 */
-	instructors?: Array<SanityKeyedReference<Instructor>>
+	instructors: Array<SanityKeyedReference<Instructor>>
 
 	/**
 	 * Color Code of the Course — `string`
 	 *
 	 * The hexadecimal value of the color assigned to the course (including the # mark at the beginning).
 	 */
-	colorCode?: string
+	colorCode: string
 
 	/**
 	 * Fallback URL — `url`
@@ -423,7 +423,7 @@ export interface User extends SanityDocument {
 	 *
 	 *
 	 */
-	email?: string
+	email: string
 
 	/**
 	 * Image — `url`
@@ -437,7 +437,7 @@ export interface User extends SanityDocument {
 	 *
 	 *
 	 */
-	avatar?: {
+	avatar: {
 		_type: 'image'
 		asset: SanityReference<SanityImageAsset>
 		crop?: SanityImageCrop
@@ -478,6 +478,13 @@ export interface User extends SanityDocument {
 	 *
 	 */
 	membershipType?: SanityReference<Membership>
+
+	/**
+	 * Membership ID — `string`
+	 *
+	 *
+	 */
+	membershipID?: string
 
 	/**
 	 * Completed Certificates — `array`
@@ -1570,6 +1577,13 @@ export interface Membership extends SanityDocument {
 	 *
 	 */
 	discount?: number
+
+	/**
+	 * Discount Count — `number`
+	 *
+	 * How many times can the discount on course bundle purchases be used?
+	 */
+	discountCount: number
 }
 
 export type Answer = {
