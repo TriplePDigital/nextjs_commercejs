@@ -45,13 +45,15 @@ export const finishSubmit = (token: string, user: Account, product: Product, end
 
 export default function injectCollect(collectJsUrl, tokenizationKey) {
 	try {
-		const script = window.document.createElement('script')
+		// @ts-ignore
+		const script = document.createElement('script')
 
 		script.setAttribute('src', collectJsUrl)
 		script.setAttribute('data-tokenization-key', tokenizationKey)
 		script.setAttribute('data-variant', 'inline')
 
-		window.document.querySelector('body').appendChild(script)
+		// @ts-ignore
+		document.querySelector('body').appendChild(script)
 
 		return new Promise((resolve, reject) => {
 			script.onload = function () {
