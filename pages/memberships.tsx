@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import useSWR from 'swr'
 import getter from '@/util/getter'
@@ -9,13 +9,6 @@ import { SWRResponse } from '@/types/index'
 import { Membership } from '@/types/schema'
 
 const MembershipPage = () => {
-	const [product, setProduct] = useState({
-		price: '0',
-		sku: '',
-		title: ''
-	})
-	const [showOverlay, setShowOverlay] = useState(false)
-
 	const membershipQuery = groq`
 		*[_type == "membership"]
 	`
@@ -26,7 +19,6 @@ const MembershipPage = () => {
 
 	return (
 		<section className="bg-white dark:bg-gray-900">
-			{showOverlay && <div className="z-20 absolute opacity-75 bg-black w-[calc(100%_-_5rem)] h-screen"></div>}
 			<div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
 				<div className="mx-auto max-w-screen-md text-center mb-8 lg:mb-12 relative">
 					<h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">NCRM Academy Memberships</h2>
@@ -50,9 +42,6 @@ const MembershipPage = () => {
 									benefits={doc.benefits}
 									sku={doc.sku}
 									title={doc.name}
-									handleSelect={setProduct}
-									selected={product}
-									setShowOverlay={setShowOverlay}
 								/>
 							)
 						})}
