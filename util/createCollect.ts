@@ -16,7 +16,6 @@ export interface Product {
 }
 
 export const finishSubmit = (token: string, user: Account, product: Product, endpoint: string) => {
-	console.log({ token, user, product, endpoint })
 	const { firstName, lastName, email } = user
 	return axios
 		.post(`${endpoint}`, {
@@ -28,7 +27,6 @@ export const finishSubmit = (token: string, user: Account, product: Product, end
 			sku: product.sku
 		})
 		.then((res) => {
-			console.log(res)
 			notify('success', 'Order successfully placed!', '1')
 			if (product.discountUsed) {
 				client
@@ -45,50 +43,15 @@ export const finishSubmit = (token: string, user: Account, product: Product, end
 		})
 }
 
-export const injectCollectJS = (price: string, endpoint: string) => {
-	// @ts-ignore
-	window.CollectJS.configure({
-		variant: 'inline',
-		paymentType: 'cc',
-		price: price,
-		validationCallback: function (field, status, message) {
-			if (status) {
-				notify('success', message, field)
-			} else {
-				notify('warning', message, field)
-			}
-		},
-		callback: function (response) {
-			console.log(response)
-			const form = document.getElementsByTagName('form')[0].elements
-			const res = finishSubmit(
-				response.token,
-				{
-					firstName: form['first_name'].value,
-					lastName: form['last_name'].value,
-					email: form['email'].value
-				},
-				{ price: form['price'].value, sku: form['sku'].value },
-				endpoint
-			)
-			Promise.resolve(res).then((res) => {
-				if (res) {
-					window.location.href = `/success?transid=${res}`
-				}
-			})
-		}
-	})
-}
-
 export default function injectCollect(collectJsUrl, tokenizationKey) {
 	try {
-		const script = document.createElement('script')
+		const script = window.document.createElement('script')
 
 		script.setAttribute('src', collectJsUrl)
 		script.setAttribute('data-tokenization-key', tokenizationKey)
 		script.setAttribute('data-variant', 'inline')
 
-		document.querySelector('body').appendChild(script)
+		window.document.querySelector('body').appendChild(script)
 
 		return new Promise((resolve, reject) => {
 			script.onload = function () {
