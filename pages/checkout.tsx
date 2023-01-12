@@ -17,6 +17,7 @@ import { useNextSanityImage } from 'next-sanity-image'
 import { client } from '@/util/config'
 import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
+import { Loader } from '@/components/util'
 
 type DiscountFieldProps = {
 	user?: { firstName: string; lastName: string; email: string }
@@ -111,12 +112,12 @@ const DiscountField: React.FC<DiscountFieldProps> = ({ handle, setDiscount, setF
 										return {
 											firstName: data.result.firstName,
 											lastName: data.result.lastName,
-											email: data.result.email
+											email: data.result.email,
+											id: data.result._id
 										}
 									})
 									//set discount if user has more than 0 left on account
 									if (data.result.discountUsage > 0) {
-										console.log(data.result.membershipType.discount, typeof data.result.membershipType.discount)
 										setDiscount(data.result.membershipType.discount)
 										setFinalPrice(price - price * (data.result.membershipType.discount / 100))
 									} else {
@@ -137,7 +138,8 @@ const CheckoutPage: React.FC = () => {
 	const [user, setUser] = React.useState({
 		firstName: '',
 		lastName: '',
-		email: ''
+		email: '',
+		id: ''
 	})
 	const [proceed, setProceed] = React.useState(false)
 	const [discount, setDiscount] = React.useState(0)
@@ -149,19 +151,16 @@ const CheckoutPage: React.FC = () => {
 
 	const { data: membership, error: membershipError } = useSWR<SWRResponse<Membership>>(`*[_type=="membership" && sku=="${sku}"]{...}[0]`, getter)
 
-	const [collect, response, reset] = useCollect({
+	const [collect, response, reset, loading] = useCollect({
 		config: collectConfig,
 		customer: user,
 		product: {
 			sku: sku,
-			price: finalPrice
+			price: finalPrice === 0 ? (type === 'certification' ? certificate?.result.price : membership?.result.price) : finalPrice,
+			discountUsed: discount !== 0
 		},
 		endpoint: `/api/purchase/${type}`
 	})
-
-	// useEffect(() => {
-	// 	injectCollectJS(price, `/api/purchase/${type}`)
-	// }, [type, price, sku])
 
 	if (!certificate && type === 'certification') return <div>Loading...</div>
 
@@ -311,9 +310,9 @@ const CheckoutPage: React.FC = () => {
 						disabled={!proceed}
 						id="payButton"
 						type="button"
-						className={`${!proceed ? 'invisible' : 'visible'}`}
+						classes={`${!proceed ? 'invisible' : 'visible'}`}
 					>
-						Purchase
+						{loading ? <Loader /> : 'Purchase'}
 					</Button>
 				</div>
 			</form>
@@ -330,8 +329,7 @@ const CheckoutPage: React.FC = () => {
 			)}
 			{type === 'membership' && (
 				<CheckoutDetails
-					//TODO: fix this link being passed as a prop
-					link={''}
+					link={'/memberships'}
 					price={membership.result.price}
 					productType={type}
 					name={membership.result.name}

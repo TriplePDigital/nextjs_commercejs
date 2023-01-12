@@ -1,27 +1,20 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
 import CollectJSContext from '../context/collect/CollectContext'
 import { notify } from '@/util/notification'
-import { finishSubmit } from '@/util/createCollect'
+import { Account, finishSubmit, Product } from '@/util/createCollect'
 
 type UseCollect = {
-	config: any
-	customer: {
-		firstName: string
-		lastName: string
-		email: string
-	}
-	product: {
-		price: number
-		sku: string
-	}
+	config: Object
+	customer: Account
+	product: Product
 	endpoint: string
 }
 
 export default function useCollect({ config, customer, product, endpoint }: UseCollect) {
 	const [paymentToken, setPaymentToken] = useState(null)
 	const [collect, setCollect] = useState(null)
+	const [loading, setLoading] = useState(false)
 	const { unsetErrors, addError, collectJSPromise } = useContext(CollectJSContext)
-	console.log({ config, customer, product, endpoint })
 
 	const reset = useCallback(() => {
 		collect.retokenize()
@@ -34,22 +27,32 @@ export default function useCollect({ config, customer, product, endpoint }: UseC
 			collectJS.configure({
 				...config,
 				callback: function (e) {
-					console.log(e)
+					setLoading(true)
 					setPaymentToken(e)
-					finishSubmit(e.token, customer, product, endpoint).then((res) => {
-						if (res) {
-							console.log(res)
-						}
-					})
+					finishSubmit(e.token, customer, product, endpoint)
+						.then((res) => {
+							if (res) {
+								setLoading(false)
+								window.location.href = `/success?transid=${res}`
+							} else {
+								throw 'There was an error processing your order'
+							}
+						})
+						.catch((err) => {
+							console.log(err)
+							setLoading(false)
+						})
 				},
 				validationCallback: function (fieldName, valid, message) {
 					if (valid) {
 						unsetErrors(fieldName)
 						notify('success', message, fieldName)
+						setLoading(false)
 					} else {
 						unsetErrors(fieldName)
 						addError(fieldName, message)
 						notify('warning', message, fieldName)
+						setLoading(false)
 					}
 				}
 			})
@@ -57,5 +60,5 @@ export default function useCollect({ config, customer, product, endpoint }: UseC
 		// No dependencies - we don't ever want this to run more than once. Calling this more times will cause fields to blink.
 	}, [])
 
-	return [collect, paymentToken, reset]
+	return [collect, paymentToken, reset, loading]
 }

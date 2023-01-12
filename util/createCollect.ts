@@ -1,18 +1,21 @@
 import { notify } from '@/util/notification'
 import axios from 'axios'
+import { client } from '@/util/config'
 
-interface User {
+export interface Account {
 	firstName: string
 	lastName: string
 	email: string
+	id?: string
 }
 
-interface Product {
+export interface Product {
 	price: number
 	sku: string
+	discountUsed?: boolean
 }
 
-export const finishSubmit = (token: string, user: User, product: Product, endpoint: string) => {
+export const finishSubmit = (token: string, user: Account, product: Product, endpoint: string) => {
 	console.log({ token, user, product, endpoint })
 	const { firstName, lastName, email } = user
 	return axios
@@ -27,6 +30,13 @@ export const finishSubmit = (token: string, user: User, product: Product, endpoi
 		.then((res) => {
 			console.log(res)
 			notify('success', 'Order successfully placed!', '1')
+			if (product.discountUsed) {
+				client
+					.patch(user.id)
+					.dec({ discountUsage: 1 })
+					.commit()
+					.then((res) => console.log(res))
+			}
 			return res.data.payload.transactionID
 		})
 		.catch((err) => {

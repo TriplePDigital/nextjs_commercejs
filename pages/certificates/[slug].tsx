@@ -19,7 +19,7 @@ function CertificateSlugPage() {
 			</div>
 			<div className="flex flex-col lg:w-1/3 w-full">
 				<Anchor
-					href={`/checkout?price=${certificate.result.price}&type=certification&sku=${certificate.result.sku}`}
+					href={`/checkout?type=certification&sku=${certificate.result.sku}`}
 					className="text-center"
 					variant="button"
 				>
