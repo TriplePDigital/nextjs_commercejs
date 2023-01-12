@@ -1,16 +1,8 @@
 import { FaCheck } from 'react-icons/fa'
-import React, { useState } from 'react'
+import React from 'react'
 import Anchor from '@/components/util/Anchor'
 
-const PriceCard = ({ title, description, price, benefits, sku, selected, handleSelect, setShowOverlay }) => {
-	const [showPurchaseModal, setShowPurchaseModal] = useState(false)
-	const [loading, setLoading] = useState(false)
-	const [user, setUser] = useState({
-		email: '',
-		firstName: '',
-		lastName: ''
-	})
-
+const PriceCard: React.FC<PriceCardProps> = ({ title, description, price, benefits, sku }) => {
 	return (
 		<div className="flex flex-col h-fit p-6 mx-auto max-w-lg text-center text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white">
 			<h3 className="mb-4 text-2xl font-semibold">{title}</h3>
@@ -47,6 +39,14 @@ const PriceCard = ({ title, description, price, benefits, sku, selected, handleS
 			</Anchor>
 		</div>
 	)
+}
+
+type PriceCardProps = {
+	title: string
+	description: string
+	price: string | number
+	benefits: string[]
+	sku: string
 }
 
 export default PriceCard
