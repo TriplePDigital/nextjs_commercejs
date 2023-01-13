@@ -8,6 +8,7 @@ import useSWR from 'swr'
 import getter from '@/util/getter'
 import { webinarQuery } from '@/util/getWebinar'
 import { userContextObject } from './_app'
+import Anchor from '@/components/util/Anchor'
 
 export default function Course() {
 	/* pulling user's context from _app */
@@ -83,7 +84,12 @@ export default function Course() {
 				{filterTracksFromEnrollment(tracks?.result, enrollment?.result).map((track, i) => {
 					return track?.missions && track?.missions.length > 0 ? (
 						<div key={i}>
-							<h1 className="text-4xl font-semibold mt-5">{track.name}</h1>
+							<Anchor
+								href={`/track/${track.slug}`}
+								variant="link"
+							>
+								<h1 className="text-4xl font-semibold mt-5">{track.name}</h1>
+							</Anchor>
 							<div className="flex overflow-x-scroll pb-10">
 								<div className="flex flex-nowrap mt-2">
 									{track.missions
@@ -102,7 +108,6 @@ export default function Course() {
 					) : null
 				})}
 			</section>
-			{/*<Webinar webinar={webinar.result} />*/}
 		</div>
 	)
 }
