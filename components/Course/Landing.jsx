@@ -60,12 +60,12 @@ const Landing = ({ mission }) => {
 					<div className="text-gray-500 flex items-center gap-1">
 						<RiBook2Line className="" />
 						<span className="font-medium">Lessons</span>
-						{mission.stages?.length}
+						{numberOfCheckpoints}
 					</div>
 					<div className="text-gray-500 flex items-center gap-1">
 						<MdOutlineAssignment />
 						<span className="font-medium">Chapters</span>
-						{numberOfCheckpoints}
+						{mission.stages?.length}
 					</div>
 					<div className="text-gray-500 flex items-center gap-1">
 						<AiOutlineClockCircle />
