@@ -11,8 +11,8 @@ import * as Sentry from '@sentry/browser'
 import { Analytics } from '@vercel/analytics/react'
 import Head from 'next/head'
 import { UserContextProvider } from '../context/user'
-import injectCollect from '@/util/createCollect'
 import CollectProvider from '../context/collect/CollectProvider'
+import injectCollect from '@/util/createCollect'
 
 const defaultContext = {
 	cart: [],
@@ -36,7 +36,7 @@ export function CreateUserContext() {
 export const cartContextObject = CreateCartContext()
 export const userContextObject = CreateUserContext()
 
-const collectJS = injectCollect('https://secure.networkmerchants.com/token/Collect.js', process.env.NEXT_PUBLIC_NMI_COLLECT_KEY)
+const collectJS = typeof window !== 'undefined' && injectCollect('https://secure.networkmerchants.com/token/Collect.js', process.env.NEXT_PUBLIC_NMI_COLLECT_KEY)
 
 function MyApp({ Component, pageProps }) {
 	const { user } = useContext(userContextObject)

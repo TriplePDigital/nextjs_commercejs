@@ -44,26 +44,21 @@ export const finishSubmit = (token: string, user: Account, product: Product, end
 }
 
 export default function injectCollect(collectJsUrl, tokenizationKey) {
-	try {
-		// @ts-ignore
-		const script = document.createElement('script')
+	const script = document.createElement('script')
 
-		script.setAttribute('src', collectJsUrl)
-		script.setAttribute('data-tokenization-key', tokenizationKey)
-		script.setAttribute('data-variant', 'inline')
+	script.setAttribute('src', collectJsUrl)
+	script.setAttribute('data-tokenization-key', tokenizationKey)
+	script.setAttribute('data-variant', 'inline')
 
-		// @ts-ignore
-		document.querySelector('body').appendChild(script)
+	// @ts-ignore
+	document.querySelector('body').appendChild(script)
 
-		return new Promise((resolve, reject) => {
-			script.onload = function () {
-				// @ts-ignore
-				resolve(window.CollectJS)
-			}
-		})
-	} catch (e) {
-		console.error(e)
-	}
+	return new Promise((resolve, reject) => {
+		script.onload = function () {
+			// @ts-ignore
+			resolve(window.CollectJS)
+		}
+	})
 }
 
 export const collectConfig = {
