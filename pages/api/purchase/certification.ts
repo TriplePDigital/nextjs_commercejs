@@ -9,7 +9,7 @@ export const config = {
 	runtime: 'edge'
 }
 
-export default async function purchaseMembership(req, res) {
+export default async function purchaseCertificate(req, res) {
 	if (req.method !== 'POST') {
 		res.status(405).json({ message: 'Method Not Allowed' })
 	} else {
