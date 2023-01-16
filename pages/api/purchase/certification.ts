@@ -25,8 +25,6 @@ export default async function purchaseCertificate(req: NextApiRequest, res: Next
 
 			const missions = certificate.missions.map((mission) => mission)
 
-			const missionTitles = certificate.missions.map((mission) => mission.title)
-
 			const missionIDs: string[] = []
 
 			missions.forEach((mission) => {
@@ -53,6 +51,15 @@ export default async function purchaseCertificate(req: NextApiRequest, res: Next
 				}
 			})
 
+			const notification = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/notification`, {
+				cause: 'purchase',
+				customerFirst: firstName,
+				customerLast: lastName,
+				customerEmail: email,
+				description: `${certificate.title} certificate bundle`,
+				courses: missions.map((mission) => ('title' in mission ? mission.title : ''))
+			} as notificationBody)
+
 			const isAlreadyEnrolled: Enrollment[] = await client.fetch(`*[_type == 'enrollment' && user._ref == '${user._id}']`)
 
 			// enroll the user in the courses
@@ -76,15 +83,6 @@ export default async function purchaseCertificate(req: NextApiRequest, res: Next
 
 			// return the response
 			const response = createResponse(data)
-
-			const notification = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/notification`, {
-				cause: 'purchase',
-				customerFirst: firstName,
-				customerLast: lastName,
-				customerEmail: email,
-				transactionID: 'transactionID' in response ? response.transactionID : '',
-				courses: missionTitles
-			} as notificationBody)
 
 			if (response.error) {
 				return res.status(400).json({ error: response.error, message: response.message })
