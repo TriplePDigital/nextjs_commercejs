@@ -42,6 +42,11 @@ export default async function (req, res) {
 
 					const user = await getUserOrCreate(email, first_name, last_name)
 
+					if (user instanceof Error) {
+						res.status(400)
+						res.json({ message: user.message, error: true })
+					}
+
 					const filteredCourses = data.courses.filter((item) => item.sku !== undefined && item.sku !== null)
 					const payload = {
 						count: filteredCourses.length

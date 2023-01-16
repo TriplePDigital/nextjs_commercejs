@@ -48,6 +48,10 @@ export default async function purchaseMembership(req, res) {
 			// get the user or create the user checking out
 			const user = await getUserOrCreate(email, firstName, lastName)
 
+			if (user instanceof Error) {
+				throw user
+			}
+
 			// get the membership product
 			const membership: Membership = await client.fetch(`*[_type == 'membership' && sku == '${sku}'][0]`)
 

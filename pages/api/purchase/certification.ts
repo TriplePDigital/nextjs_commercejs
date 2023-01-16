@@ -20,6 +20,10 @@ export default async function purchaseCertificate(req: NextApiRequest, res: Next
 			// get the user or create the user checking out
 			const user = await getUserOrCreate(email, firstName, lastName)
 
+			if (user instanceof Error) {
+				throw user
+			}
+
 			// get the membership product
 			const certificate: Omit<Certification, 'missions'> & { missions: [Mission] } = await client.fetch(`*[_type == 'certification' && sku == '${sku}']{...,missions[]->}[0]`)
 
