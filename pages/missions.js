@@ -26,8 +26,8 @@ export default function Course() {
 	if (webinarError || enrollmentError || trackError) return <div>Something went wrong</div>
 
 	const filterTracksFromEnrollment = (tracks, enrollment) => {
-		// for each track in the array of tracks get the missions array property
-		// for each mission in the array of missions get the missionID property
+		// for each track in the array of tracks gets the missions array property
+		// for each mission in the array of missions gets the missionID property
 		// for each missionID in the array of missionIDs check if it is in the array of enrollment
 		// if it is in the array of enrollment then add the track to the array of filtered tracks
 		// return the array of filtered tracks
