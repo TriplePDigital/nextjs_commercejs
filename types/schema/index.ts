@@ -1,20 +1,20 @@
 import type {
-	SanityReference,
-	SanityKeyedReference,
 	SanityAsset,
-	SanityImage,
-	SanityFile,
-	SanityGeoPoint,
 	SanityBlock,
 	SanityDocument,
-	SanityImageCrop,
-	SanityImageHotspot,
-	SanityKeyed,
+	SanityFile,
+	SanityGeoPoint,
+	SanityImage,
 	SanityImageAsset,
-	SanityImageMetadata,
+	SanityImageCrop,
 	SanityImageDimensions,
+	SanityImageHotspot,
+	SanityImageMetadata,
 	SanityImagePalette,
-	SanityImagePaletteSwatch
+	SanityImagePaletteSwatch,
+	SanityKeyed,
+	SanityKeyedReference,
+	SanityReference
 } from 'sanity-codegen'
 
 export type {
@@ -620,11 +620,11 @@ export interface Track extends SanityDocument {
 	name?: string
 
 	/**
-	 * Enrolled — `array`
+	 * Slug — `slug`
 	 *
 	 *
 	 */
-	enrolled?: Array<SanityKeyedReference<User>>
+	slug?: { _type: 'slug'; current: string }
 
 	/**
 	 * Achievement — `reference`
@@ -639,6 +639,13 @@ export interface Track extends SanityDocument {
 	 *
 	 */
 	missions?: Array<SanityKeyedReference<Mission>>
+
+	/**
+	 * SKU — `string`
+	 *
+	 *
+	 */
+	sku?: string
 }
 
 /**
@@ -1586,6 +1593,29 @@ export interface Membership extends SanityDocument {
 	discountCount: number
 }
 
+/**
+ * Notification
+ *
+ *
+ */
+export interface Notification extends SanityDocument {
+	_type: 'notification'
+
+	/**
+	 * Cause — `string`
+	 *
+	 *
+	 */
+	cause?: 'purchase'
+
+	/**
+	 * Recipient — `array`
+	 *
+	 *
+	 */
+	recipient?: Array<SanityKeyed<string>>
+}
+
 export type Answer = {
 	_type: 'answer'
 	/**
@@ -1603,7 +1633,7 @@ export type Answer = {
 	correct?: boolean
 }
 
-export type Documents = Certification | Mission | Stage | Video | Instructor | Checkpoint | Question | User | Webinar | Track | Quiz | QuizAttempt | Progress | Enrollment | RiskManagerProfile | Company | Marketing | Membership
+export type Documents = Certification | Mission | Stage | Video | Instructor | Checkpoint | Question | User | Webinar | Track | Quiz | QuizAttempt | Progress | Enrollment | RiskManagerProfile | Company | Marketing | Membership | Notification
 
 /**
  * This interface is a stub. It was referenced in your sanity schema but
