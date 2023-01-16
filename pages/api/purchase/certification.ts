@@ -3,13 +3,14 @@ import getUserOrCreate from '../util/user'
 import { client } from '@/util/config'
 import { Certification, Enrollment, Mission } from '@/types/schema'
 import createResponse from '../util/createResponse'
-import { SanityKeyedReference } from 'sanity-codegen'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { notificationBody } from '../admin/notification'
 
 export const config = {
 	runtime: 'edge'
 }
 
-export default async function purchaseCertificate(req, res) {
+export default async function purchaseCertificate(req: NextApiRequest, res: NextApiResponse) {
 	if (req.method !== 'POST') {
 		res.status(405).json({ message: 'Method Not Allowed' })
 	} else {
@@ -20,9 +21,11 @@ export default async function purchaseCertificate(req, res) {
 			const user = await getUserOrCreate(email, firstName, lastName)
 
 			// get the membership product
-			const certificate: Certification = await client.fetch(`*[_type == 'certification' && sku == '${sku}']{...,missions[]->}[0]`)
+			const certificate: Omit<Certification, 'missions'> & { missions: [Mission] } = await client.fetch(`*[_type == 'certification' && sku == '${sku}']{...,missions[]->}[0]`)
 
-			const missions: Array<SanityKeyedReference<Mission>> = certificate.missions.map((mission) => mission)
+			const missions = certificate.missions.map((mission) => mission)
+
+			const missionTitles = certificate.missions.map((mission) => mission.title)
 
 			const missionIDs: string[] = []
 
@@ -74,10 +77,19 @@ export default async function purchaseCertificate(req, res) {
 			// return the response
 			const response = createResponse(data)
 
+			const notification = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/notification`, {
+				cause: 'purchase',
+				customerFirst: firstName,
+				customerLast: lastName,
+				customerEmail: email,
+				transactionID: 'transactionID' in response ? response.transactionID : '',
+				courses: missionTitles
+			} as notificationBody)
+
 			if (response.error) {
 				return res.status(400).json({ error: response.error, message: response.message })
 			} else {
-				return res.status(200).json({ message: 'Order created', payload: response })
+				return res.status(200).json({ message: 'Order created', payload: response, notification: notification.data })
 			}
 		} catch (e) {
 			console.error(e)
