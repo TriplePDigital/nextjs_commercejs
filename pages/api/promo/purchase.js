@@ -18,7 +18,8 @@ export default async function handler(req, res) {
 						first_name,
 						last_name,
 						email,
-						merchant_defined_field_2: sku,
+						merchant_defined_field_1: sku,
+						merchant_defined_field_2: 'PCRM',
 						order_description: `PCRM Bundle Purchase - ${sku}`
 					}
 				}

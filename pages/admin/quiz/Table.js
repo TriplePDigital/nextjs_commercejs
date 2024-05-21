@@ -1,4 +1,4 @@
-function Table({}) {
+function Table() {
 	return <></>
 }
 

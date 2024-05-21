@@ -1,17 +1,15 @@
 import { useSession } from 'next-auth/client'
 import { getQuizResultByIDQuery } from '@/util/getQuizResultByID'
 import Link from 'next/link'
-import { MdCheck, MdClose } from 'react-icons/md'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { useRouter } from 'next/router'
 import getter from '@/util/getter'
 import useSWR from 'swr'
 import { Loader } from '@/components/util'
-import { UserContext } from '../../_app'
+import { userContextObject } from '../../_app'
 
 const QuizResult = () => {
-	const [showAlert, setShowAlert] = useState(true)
-	const { user } = useContext(UserContext)
+	const { user } = useContext(userContextObject)
 
 	const router = useRouter()
 
@@ -43,70 +41,18 @@ const QuizResult = () => {
 				<h1 className="text-3xl font-medium">{result.checkpoint.title}</h1>
 				<h2 className="text-lg font-light opacity-50">{result.checkpoint.stage.mission.title}</h2>
 			</div>
-			<div>
-				Your score: <span className={`font-bold ${result.score > result.checkpoint.type.minimumScore ? 'text-green-500' : 'text-red-500'}`}>{Number(result.score).toFixed(2)}</span> / 100{' '}
-				<span className="text-sm text-gray-400">({Number(result.score).toFixed(2)}%)</span>
-			</div>
-			<div className="text-sm mb-3">
-				Minimum Score to Pass: {result.checkpoint.type.minimumScore}{' '}
-				<span className="text-sm text-gray-400">
-					({(Number(result.checkpoint.type.minimumScore) / 100).toFixed(2) * 100}
-					%)
-				</span>
-			</div>
-			{showAlert ? (
-				<div
-					className="relative text-xs text-yellow-700 font-light italic px-4 py-3 w-4/5 mx-auto bg-yellow-100 rounded-lg"
-					role="alert"
-				>
-					We kindly apologize but your responses are not shown at this time. Our team is working on an issue regarding the retrieval of individual student&apos;s responses.{' '}
-					<span className="font-bold">Your final score will be stored regardless of this issue being present.</span>
-					<button
-						className="absolute right-2 top-2 text-gray-400"
-						onClick={() => setShowAlert(false)}
-					>
-						<MdClose size={21} />
-					</button>
+			<div className="text-center">
+				<div>
+					<span className="font-medium mr-1">Your score:</span>
+					<span className={`font-bold ${result.score > result.checkpoint.type.minimumScore ? 'text-green-500' : 'text-red-500'}`}>{Number(result.score).toFixed(2)}</span> / 100{' '}
+					<span className="text-xs text-gray-400">({Number(result.score).toFixed(2)}%)</span>
 				</div>
-			) : null}
-			<section className="mt-5 ">
-				{result.checkpoint.type.questions.map((question, questionIndex) => {
-					return (
-						<div
-							className="list-none"
-							key={questionIndex}
-						>
-							<li className="font-medium">{`${questionIndex + 1}.) ${question.title}`}</li>
-							<ul className="mx-5 my-2">
-								{question.answers.map((answer, answerIndex) => {
-									return (
-										<li
-											key={answerIndex}
-											className="flex gap-5 items-center justify-between w-full md:w-full"
-										>
-											<span className="md:w-1/3 ">{answer.answers}</span>
-											<span className="md:w-1/3 text-sm text-gray-600 flex items-center justify-center">Correct response: </span>
-											<span className="md:w-1/3">
-												{answer.correct ? (
-													<MdCheck
-														size={21}
-														className="text-green-500"
-													/>
-												) : (
-													<MdClose
-														size={21}
-														className="text-red-500"
-													/>
-												)}
-											</span>
-										</li>
-									)
-								})}
-							</ul>
-						</div>
-					)
-				})}
-			</section>
+				<div className="text-sm mb-3">
+					<span className="font-medium mr-1">Minimum Score to Pass:</span>
+					<span className="font-bold">{(Number(result.checkpoint.type.minimumScore) / 100).toFixed(2) * 100}%</span>
+				</div>
+			</div>
+			<section className="mt-5 "></section>
 			<div className="flex gap-5 items-center justify-between my-5">
 				<Link href={`/missions`}>
 					<a className="bg-ncrma-100 hover:bg-ncrma-300 rounded-lg px-6 py-4 w-fit">Back to Courses</a>

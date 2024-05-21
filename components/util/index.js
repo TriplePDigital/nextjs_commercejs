@@ -1,1 +1,6 @@
 export { default as Loader } from './Loader'
+export * from './Agenda'
+export * from './ProficiencyMatrix'
+export * from './Picture'
+export * from './Notification'
+export * from './Button'

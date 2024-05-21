@@ -3,11 +3,11 @@ import useSWR from 'swr'
 import getter from '@/util/getter'
 import { Loader } from '@/components/util'
 import { useContext } from 'react'
-import { UserContext } from '../_app'
 import Picture from '@/components/util/Picture'
+import { userContextObject } from '../_app'
 
 function MemberManagementPage() {
-	const { user } = useContext(UserContext)
+	const { user } = useContext(userContextObject)
 	const { data, error } = useSWR(getMostPopularCoursesQuery, getter)
 
 	if (!data || !user) return <Loader />

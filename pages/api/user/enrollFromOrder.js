@@ -1,10 +1,15 @@
 import axios from 'axios'
 import xml2js from 'xml2js'
 import { client } from '@/util/config'
+import getUserOrCreate from '../util/user'
 
 // offload the user checking to this function.
 // takes in an email and returns either the found user or a newly created user
 const userCheck = async () => {}
+
+export const config = {
+	runtime: 'edge'
+}
 
 export default async function (req, res) {
 	if (req.method !== 'POST') {
@@ -29,38 +34,17 @@ export default async function (req, res) {
 		} else {
 			const data = transaction[0]
 
-			if (!data.product && data.action[0].source[0] === 'api') {
+			if (!data.product && data.action[0].source[0] === 'api' && data.merchant_defined_field[1]._ === 'PCRM') {
 				// enroll from custom API order
 				// this will be converted to a switch statement that checks the merchant defined field against each track and bundles SKU
 				try {
 					const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/promo/getAllCourses`)
 
-					const userCheck = await client.fetch(`*[_type == 'user' && email == '${email.toLowerCase().trim()}'][0]`)
+					const user = await getUserOrCreate(email, first_name, last_name)
 
-					let user
-
-					if (!userCheck) {
-						//create user object
-						let userObj = {
-							_type: 'user',
-							email: email.toLowerCase().trim(),
-							firstName: first_name,
-							lastName: last_name,
-							active: false,
-							role: 'student',
-							avatar: {
-								_type: 'image',
-								asset: {
-									_ref: 'image-9dcb9bb1b32805305dedaf9f0a2161930f585190-500x500-png',
-									_type: 'reference'
-								}
-							}
-						}
-
-						user = await client.create(userObj)
-					} else {
-						//link enrollment to existing user
-						user = userCheck
+					if (user instanceof Error) {
+						res.status(400)
+						res.json({ message: user.message, error: true })
 					}
 
 					const filteredCourses = data.courses.filter((item) => item.sku !== undefined && item.sku !== null)
@@ -176,117 +160,114 @@ export default async function (req, res) {
 
 				res.status(200).json({ message: 'Multiple products purchased', products })
 			} else {
-				const product = data.product[0]
-				const sku = product.sku[0]
-
-				//Set of SKUs that represent membership rather than a course
-				const membs = ['000', '001', '002', '003', '004']
-
-				console.log(`includes membership sku?: ${membs.includes(sku)}`)
-
-				switch (membs.includes(sku)) {
-					case true:
-						const membership = await client.fetch(`*[_type == 'membership' && sku == '${sku}'][0]`)
-						const user = await client.fetch(`*[_type == 'user' && email == '${email.toLowerCase().trim()}'][0]`)
-
-						if (user) {
-							await client
-								.patch(user._id)
-								.set({
-									membershipType: {
-										_type: 'reference',
-										_ref: membership._id
-									}
-								})
-								.commit()
-							res.status(200).json({ message: 'User updated successfully' })
-						} else {
-							const doc = {
-								_type: 'user',
-								email,
-								firstName: first_name,
-								lastName: last_name,
-								avatar: {
-									_type: 'image',
-									asset: {
-										_ref: 'image-9dcb9bb1b32805305dedaf9f0a2161930f585190-500x500-png',
-										_type: 'reference'
-									}
-								},
-								membershipType: {
-									_type: 'reference',
-									_ref: membership._id
-								},
-								role: 'student',
-								active: false
-							}
-
-							const basicAccount = await client.create(doc)
-
-							res.status(200).json({ message: 'User created', user: basicAccount })
-						}
-						break
-					case false:
-						const course = await client.fetch(`*[_type == 'mission' && sku == '${sku}'][0]`)
-
-						const userCheck = await client.fetch(`*[_type == 'user' && email == '${email.toLowerCase().trim()}']`)
-
-						if (userCheck.length > 0) {
-							const existingUser = userCheck[0]
-							const existingEnrollments = await client.fetch(`*[_type == 'enrollment' && student._ref == '${existingUser._id}']{..., course->{...}}`)
-
-							for (const enrollment of existingEnrollments) {
-								if (enrollment.course.sku === sku) {
-									//TODO: handle the refund of the purchase if the user already has the course
-									res.status(400).json({ message: 'User already enrolled in the purchased course' })
-								}
-							}
-
-							const enrollment = await client.create({
-								_type: 'enrollment',
-								student: { _type: 'reference', _ref: existingUser._id },
-								course: { _type: 'reference', _ref: course._id }
-							})
-							res.status(200).json({ message: 'User enrolled in course', enrollment })
-						} else {
-							const doc = {
-								_type: 'user',
-								email,
-								firstName: first_name,
-								lastName: last_name,
-								avatar: {
-									_type: 'image',
-									asset: {
-										_ref: 'image-9dcb9bb1b32805305dedaf9f0a2161930f585190-500x500-png',
-										_type: 'reference'
-									}
-								},
-								role: 'student',
-								active: false
-							}
-
-							const basicAccount = await client.create(doc)
-
-							const enrollment = {
-								_type: 'enrollment',
-								course: {
-									_type: 'reference',
-									_ref: course._id
-								},
-								student: {
-									_ref: basicAccount._id,
-									_type: 'reference'
-								}
-							}
-
-							const enrollmentCreate = await client.create(enrollment)
-
-							res.status(200).json({ message: 'User created', user: basicAccount, enrollment: enrollmentCreate })
-						}
-						break
-					default:
-						res.status(400).json({ message: 'Could not enroll user' })
-				}
+				res.status(400).json({ message: 'Could not enroll user' })
+				// const product = data.product[0]
+				// const sku = product.sku[0]
+				//
+				// //Set of SKUs that represent membership rather than a course
+				// const membs = ['000', '001', '002', '003', '004']
+				//
+				// console.log(`includes membership sku?: ${membs.includes(sku)}`)
+				//
+				// const membership = await client.fetch(`*[_type == 'membership' && sku == '${sku}'][0]`)
+				// const user = await client.fetch(`*[_type == 'user' && email == '${email.toLowerCase().trim()}'][0]`)
+				// const course = await client.fetch(`*[_type == 'mission' && sku == '${sku}'][0]`)
+				// switch (membs.includes(sku)) {
+				// 	case true:
+				// 		if (user) {
+				// 			await client
+				// 				.patch(user._id)
+				// 				.set({
+				// 					membershipType: {
+				// 						_type: 'reference',
+				// 						_ref: membership._id
+				// 					}
+				// 				})
+				// 				.commit()
+				// 			res.status(200).json({ message: 'User updated successfully' })
+				// 		} else {
+				// 			const doc = {
+				// 				_type: 'user',
+				// 				email,
+				// 				firstName: first_name,
+				// 				lastName: last_name,
+				// 				avatar: {
+				// 					_type: 'image',
+				// 					asset: {
+				// 						_ref: 'image-9dcb9bb1b32805305dedaf9f0a2161930f585190-500x500-png',
+				// 						_type: 'reference'
+				// 					}
+				// 				},
+				// 				membershipType: {
+				// 					_type: 'reference',
+				// 					_ref: membership._id
+				// 				},
+				// 				role: 'student',
+				// 				active: false
+				// 			}
+				//
+				// 			const basicAccount = await client.create(doc)
+				//
+				// 			res.status(200).json({ message: 'User created', user: basicAccount })
+				// 		}
+				// 		break
+				// 	case false:
+				// 		if (user) {
+				// 			const existingUser = user
+				// 			const existingEnrollments = await client.fetch(`*[_type == 'enrollment' && student._ref == '${existingUser._id}']{..., course->{...}}`)
+				//
+				// 			for (const enrollment of existingEnrollments) {
+				// 				if (enrollment.course.sku === sku) {
+				// 					//TODO: handle the refund of the purchase if the user already has the course
+				// 					res.status(400).json({ message: 'User already enrolled in the purchased course' })
+				// 				}
+				// 			}
+				//
+				// 			const enrollment = await client.create({
+				// 				_type: 'enrollment',
+				// 				student: { _type: 'reference', _ref: existingUser._id },
+				// 				course: { _type: 'reference', _ref: course._id }
+				// 			})
+				// 			res.status(200).json({ message: 'User enrolled in course', enrollment })
+				// 		} else {
+				// 			const doc = {
+				// 				_type: 'user',
+				// 				email,
+				// 				firstName: first_name,
+				// 				lastName: last_name,
+				// 				avatar: {
+				// 					_type: 'image',
+				// 					asset: {
+				// 						_ref: 'image-9dcb9bb1b32805305dedaf9f0a2161930f585190-500x500-png',
+				// 						_type: 'reference'
+				// 					}
+				// 				},
+				// 				role: 'student',
+				// 				active: false
+				// 			}
+				//
+				// 			const basicAccount = await client.create(doc)
+				//
+				// 			const enrollment = {
+				// 				_type: 'enrollment',
+				// 				course: {
+				// 					_type: 'reference',
+				// 					_ref: course._id
+				// 				},
+				// 				student: {
+				// 					_ref: basicAccount._id,
+				// 					_type: 'reference'
+				// 				}
+				// 			}
+				//
+				// 			const enrollmentCreate = await client.create(enrollment)
+				//
+				// 			res.status(200).json({ message: 'User created', user: basicAccount, enrollment: enrollmentCreate })
+				// 		}
+				// 		break
+				// 	default:
+				// 		res.status(400).json({ message: 'Could not enroll user' })
+				// }
 			}
 		}
 	}

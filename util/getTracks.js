@@ -42,6 +42,7 @@ export const trackQuery = groq`
 				achievement ->{
 					title,
 					slug
-				}
+				},
+				"slug": slug.current
 			} | order(numCourses desc)
     `

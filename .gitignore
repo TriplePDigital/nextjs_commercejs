@@ -42,3 +42,4 @@ README.code-workspace
 cypress/videos
 cypress/screenshots
 next.lock/
+/.nyc_output/

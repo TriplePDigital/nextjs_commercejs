@@ -1,5 +1,5 @@
 import { useNextSanityImage } from 'next-sanity-image'
-import {client} from '@/util/config'
+import { client } from '@/util/config'
 
 export default function imgConstructor(
 	asset,

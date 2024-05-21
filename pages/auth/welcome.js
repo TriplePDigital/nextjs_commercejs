@@ -90,7 +90,7 @@ export default function Welcome({ error }) {
 				.then((res) => {
 					if (res) {
 						setLoading(false)
-						router.reload('/missions')
+						router.reload('/')
 					}
 				})
 				.catch((err) => {
@@ -109,7 +109,7 @@ export default function Welcome({ error }) {
 	}
 
 	if (accountData?.result?.active) {
-		router.push('/missions')
+		router.push('/')
 	}
 
 	return loading ? (

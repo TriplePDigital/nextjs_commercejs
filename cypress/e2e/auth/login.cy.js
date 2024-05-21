@@ -2,7 +2,7 @@
 
 describe('The login field renders', () => {
 	beforeEach(() => {
-		cy.visit('http://localhost:3000/auth/login')
+		cy.visit('/auth/login')
 	})
 	it('renders the login field', () => {
 		cy.get('[name=email]').should('be.visible')
@@ -22,13 +22,13 @@ describe('The login field renders', () => {
 
 describe('The login let users sign in', () => {
 	it('user gets prompted for verification code on valid login', () => {
-		cy.visit('http://localhost:3000/auth/login')
+		cy.visit('/auth/login')
 		cy.get('[name=email]').type('dpapp001@odu.edu')
 		cy.get('[type=submit]').click()
 		cy.get('[name=token]').should('be.visible')
 	})
 	it('user gets redirected to missions page on successful login', () => {
-		cy.login()
+		cy.login('daniel_papp@outlook.com')
 		cy.url().should('include', '/missions')
 	})
 	it('user gets redirected to error page on unsuccessful login', () => {

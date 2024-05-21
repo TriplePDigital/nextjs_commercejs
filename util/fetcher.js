@@ -12,22 +12,13 @@ const config = {
 
 export const fetcher = async (query, useCDN = false) => {
 	try {
-		const results = await axios.get(
-			`https://tfh7h5l0.api${
-				useCDN ? 'cdn' : ''
-			}.sanity.io/vX/data/query/production?query=${encodeURIComponent(
-				query
-			)}`,
-			config
-		)
+		const results = await axios.get(`https://tfh7h5l0.api${useCDN ? 'cdn' : ''}.sanity.io/vX/data/query/production?query=${encodeURIComponent(query)}`, config)
 		return results.data.result
 	} catch (error) {
 		if (error.response) {
 			// The request was made and the server responded with a status code
 			// that falls out of the range of 2xx
-			throw new Error(
-				`\nCode [${error.response.status}]: ${error.response.data.error.type} \n${error.response.data.error.description} \n${error.response.data.error.query}`
-			)
+			throw new Error(`\nCode [${error.response.status}]: ${error.response.data.error.type} \n${error.response.data.error.description} \n${error.response.data.error.query}`)
 		} else if (error.request) {
 			// The request was made but no response was received
 			// `error.request` is an instance of XMLHttpRequest in the browser and an instance of

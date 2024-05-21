@@ -1,5 +1,5 @@
 {
-	"extends": ["next/core-web-vitals", "plugin:cypress/recommended"],
+	"extends": ["plugin:cypress/recommended", "plugin:react/recommended", "plugin:react-hooks/recommended", "eslint:recommended"],
 	"rules": {
 		"semi": ["off"],
 		"require-await": ["error"],
@@ -9,12 +9,12 @@
 		"eqeqeq": ["error"],
 		"no-extra-semi": ["error"],
 		"no-undef": ["error"],
-		"import/no-anonymous-default-export": [
-			"error",
-			{
-				"allowAnonymousFunction": true
-			}
-		],
+		"react-hooks/exhaustive-deps": ["warn", {
+			"additionalHooks": "useRecoilCallback"
+		}],
+		"react/react-in-jsx-scope": "off",
+		"no-mixed-spaces-and-tabs": ["warn", "smart-tabs"],
+		"react/prop-types": ["warn"],
 		"cypress/no-assigning-return-values": "error",
 		"cypress/no-unnecessary-waiting": "error",
 		"cypress/assertion-before-screenshot": "warn",
@@ -24,7 +24,10 @@
 	},
 	"env": {
 		"es6": true,
-		"cypress/globals": true
+		"cypress/globals": true,
+		"browser": true,
+		"node": true
 	},
-	"plugins": ["cypress"]
+	"plugins": ["cypress", "@typescript-eslint"],
+	"parser": "@typescript-eslint/parser"
 }
